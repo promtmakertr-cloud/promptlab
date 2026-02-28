@@ -21,9 +21,10 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [copyStatus, setCopyStatus] = useState('Metni Kopyala');
-  const [prompts, setPrompts] = useState<string[]>([]);
+  
+  // HATA DÜZELTİLDİ: TypeScript takısı (<string[]>) kaldırıldı, saf JavaScript yapıldı.
+  const [prompts, setPrompts] = useState([]);
 
-  // Sayfa yüklendiğinde rastgele promptlar seçiyoruz
   useEffect(() => {
     const shuffled = [...allPrompts].sort(() => 0.5 - Math.random());
     setPrompts(shuffled);
@@ -77,7 +78,6 @@ export default function Home() {
     setTimeout(() => setCopyStatus('Metni Kopyala'), 2000);
   };
 
-  // SİNEMATİK ODAKLANMA (BLUR) EFEKTİ İÇİN CSS
   useEffect(() => {
     const styleSheet = document.createElement("style");
     styleSheet.innerText = `
@@ -95,7 +95,6 @@ export default function Home() {
         transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         line-height: 1.4;
       }
-      /* Fare ile üzerine gelince anında netleşsin ve parlasın */
       .cinematic-text:hover {
         color: #ffffff !important;
         opacity: 1 !important;
@@ -114,7 +113,6 @@ export default function Home() {
     return () => document.head.removeChild(styleSheet);
   }, []);
 
-  // Ekranın etrafındaki GÜVENLİ (Merkezi bozanmayan) kordinatlar
   const positions = [
     { top: '15%', left: '8%', maxWidth: '25%', animationDuration: '14s', delay: '0s', fontSize: '1.2rem' },
     { top: '22%', right: '8%', maxWidth: '28%', animationDuration: '18s', delay: '4s', fontSize: '1.4rem' },
@@ -126,7 +124,6 @@ export default function Home() {
 
   return (
     <main style={container}>
-      {/* Üst Bar Logo */}
       <div style={topBar}>
         <div style={{...logoWrapper, cursor: 'pointer'}} onClick={handleReset}>
           <span style={topLogoText}><span style={{fontWeight: 300, opacity: 0.8}}>prompt</span>Lab.</span>
@@ -139,7 +136,6 @@ export default function Home() {
       <div style={contentArea}>
         {!result ? (
           <>
-            {/* SİNEMATİK PROMPT BULUTLARI */}
             <div style={floatingContainer}>
               {prompts.length > 0 && positions.map((pos, index) => (
                 <div 
@@ -161,7 +157,6 @@ export default function Home() {
               ))}
             </div>
 
-            {/* MERKEZ ALAN (Logo ve Başlık) */}
             <div style={heroSection}>
               <div style={logoFrame}>
                  <h1 style={centerLogoText}><span style={{fontWeight: 300}}>prompt</span><span style={{fontWeight: 'bold'}}>Lab.</span></h1>
@@ -171,7 +166,6 @@ export default function Home() {
             </div>
           </>
         ) : (
-          /* SONUÇ EKRANI */
           <div style={resultContainer}>
              <div style={aiResponseWrapper}>
                 <div style={aiLabel}>ÜRETİLEN MASTER PROMPT</div>
@@ -182,7 +176,6 @@ export default function Home() {
         )}
       </div>
 
-      {/* ALT GİRİŞ ALANI */}
       <div style={bottomArea}>
         <div style={inputBox}>
           <textarea 
@@ -219,7 +212,6 @@ export default function Home() {
   );
 }
 
-// STİLLER
 const container = { backgroundColor: '#080808', minHeight: '100vh', color: '#ECECEC', fontFamily: 'Inter, sans-serif', display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden' };
 const topBar = { padding: '25px 30px', position: 'absolute', top: 0, left: 0, right: 0, zIndex: 30, display: 'flex', justifyContent: 'space-between', alignItems: 'center' };
 const logoWrapper = { display: 'flex', alignItems: 'center' };
@@ -228,7 +220,6 @@ const backButton = { backgroundColor: 'transparent', color: '#fff', border: '1px
 
 const contentArea = { flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', position: 'relative' };
 
-// Sinematik Bulutların Alanı
 const floatingContainer = { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, pointerEvents: 'auto', zIndex: 5, overflow: 'hidden' };
 
 const heroSection = { display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', zIndex: 10, marginTop: '10vh' };
