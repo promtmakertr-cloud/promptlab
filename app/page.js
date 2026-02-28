@@ -3,16 +3,16 @@ import { useState, useEffect } from 'react';
 
 // HERKESİN İLGİSİNİ ÇEKECEK "HAP" PROMPT HAVUZU
 const allPrompts = [
-  "Bana 10 soruluk bir test yap ve detaylı MBTI kişilik analizimi çıkar...",
-  "Fincan fotoğrafımı yüklesem bana detaylı ve vizyoner bir kahve falı bakar mısın?",
-  "Yöneticime maaş zammı talebimi ileteceğim, çok profesyonel bir e-posta yaz...",
-  "Doğum haritama göre önümüzdeki 3 ay için detaylı astroloji yorumum...",
-  "Dolaptaki yarım tavuk ve patatesle yapabileceğim 3 pratik ve lezzetli tarif...",
-  "5 yaşındaki oğlum için uzayda geçen eğitici ve uyku getiren bir masal...",
-  "Hiç spora gitmeden evde 20 dakikada yapabileceğim yağ yakıcı antrenman planı...",
-  "Sevgilimden özür dilemek için duygusal ama abartı olmayan bir mesaj metni...",
-  "İngilizce konuşma pratiği yapmak için benimle bir kafedeymişiz gibi sohbet et...",
-  "Kariyerimde tıkanmış hissediyorum, bana farklı bir bakış açısı sunacak sorular sor..."
+ "Bana sorular sorarak MBTI kişilik analizimi yap ve içsel potansiyelimi keşfetmemi sağla...",
+  "Fincan fotoğrafıma bakarak geleneksel sembollerle, geçmişi ve geleceği yorumlayan derin bir kahve falı bak...",
+  "Patronuma maaş zammı talebimi ileteceğim; net, ikna edici ve profesyonel bir e-posta taslağı hazırla...",
+  "Doğum haritama göre önümüzdeki 3 aylık süreçte aşk ve kariyer odaklı detaylı astroloji yorumu yap...",
+  "Evdeki yarım tavuk ve patatesle şef elinden çıkmış gibi duran 3 pratik akşam yemeği tarifi ver...",
+  "5 yaşındaki çocuğum için özgüven aşılayan, sürükleyici ve rahatlatıcı bir uyku öncesi masalı yaz...",
+  "Sıfır ekipmanla evde sadece 20 dakikada ter atabileceğim, tüm vücut yağ yakıcı antrenman planı...",
+  "Sevgilimin kalbini kırdım. Samimi, içten ve kendimi affettirecek uzunlukta duygusal bir mesaj yaz...",
+  "Benimle günlük konularda İngilizce sohbet et ve yaptığım gramer hatalarını Türkçe açıklayarak düzelt...",
+  "Kariyerimde yerimde saydığımı hissediyorum, bana vizyon katacak ve ufuk açacak stratejik tavsiyeler ver..."
 ];
 
 export default function Home() {
