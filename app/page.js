@@ -1,18 +1,18 @@
 'use client';
 import { useState, useEffect } from 'react';
 
-// Geniş Prompt Havuzumuz
+// HERKESİN İLGİSİNİ ÇEKECEK YENİ "HAP" PROMPT HAVUZU
 const allPrompts = [
-  "Sepetini terk eden müşterileri geri döndürecek 3 aşamalı e-posta serisi...",
-  "İlkokul seviyesindeki çocuklar için 'Mavi Kedi' temalı eğitici hikaye...",
-  "React ve Tailwind CSS kullanarak karanlık tema destekli portfolyo sitesi...",
-  "Yeni nesil kahve zinciri için sürdürülebilir paketleme odaklı Instagram takvimi...",
-  "Yapay zeka etiği konusunda Google aramalarında üst sıralara çıkacak SEO blog yazısı...",
-  "B2B SaaS ürünü için LinkedIn soğuk mesajlaşma (cold outreach) şablonları...",
-  "Kişisel finans uygulaması için kullanıcı elde tutma (retention) stratejileri...",
-  "Sıfırdan başlayanlar için 4 haftalık evde vücut geliştirme antrenman programı...",
-  "Bir podcast bölümü için dikkat çekici açılış metni ve konuk soruları...",
-  "Yerel bir restoran için TikTok ve Reels viral video fikirleri..."
+  "Bana 10 soruluk bir test yap ve detaylı MBTI kişilik analizimi çıkar...",
+  "Fincan fotoğrafımı yüklesem bana detaylı ve vizyoner bir kahve falı bakar mısın?",
+  "Yöneticime maaş zammı talebimi ileteceğim, çok profesyonel bir e-posta yaz...",
+  "Doğum haritama göre önümüzdeki 3 ay için detaylı astroloji yorumum...",
+  "Dolaptaki yarım tavuk ve patatesle yapabileceğim 3 pratik ve lezzetli tarif...",
+  "5 yaşındaki oğlum için uzayda geçen eğitici ve uyku getiren bir masal...",
+  "Hiç spora gitmeden evde 20 dakikada yapabileceğim yağ yakıcı antrenman planı...",
+  "Sevgilimden özür dilemek için duygusal ama abartı olmayan bir mesaj metni...",
+  "İngilizce konuşma pratiği yapmak için benimle bir kafedeymişiz gibi sohbet et...",
+  "Kariyerimde tıkanmış hissediyorum, bana farklı bir bakış açısı sunacak sorular sor..."
 ];
 
 export default function Home() {
@@ -21,8 +21,6 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [copyStatus, setCopyStatus] = useState('Metni Kopyala');
-  
-  // HATA DÜZELTİLDİ: TypeScript takısı (<string[]>) kaldırıldı, saf JavaScript yapıldı.
   const [prompts, setPrompts] = useState([]);
 
   useEffect(() => {
@@ -113,20 +111,23 @@ export default function Home() {
     return () => document.head.removeChild(styleSheet);
   }, []);
 
+  // YENİ KORDİNATLAR: Yazılar sadece logonun ÜSTÜNDE (Ekranın üst %45'lik kısmında) çıkacak.
   const positions = [
-    { top: '15%', left: '8%', maxWidth: '25%', animationDuration: '14s', delay: '0s', fontSize: '1.2rem' },
-    { top: '22%', right: '8%', maxWidth: '28%', animationDuration: '18s', delay: '4s', fontSize: '1.4rem' },
-    { top: '45%', left: '4%', maxWidth: '22%', animationDuration: '16s', delay: '8s', fontSize: '1rem' },
-    { top: '40%', right: '5%', maxWidth: '24%', animationDuration: '15s', delay: '2s', fontSize: '1.1rem' },
-    { top: '70%', left: '10%', maxWidth: '26%', animationDuration: '17s', delay: '6s', fontSize: '1.3rem' },
-    { top: '65%', right: '12%', maxWidth: '25%', animationDuration: '19s', delay: '10s', fontSize: '1.1rem' },
+    { top: '8%', left: '10%', maxWidth: '25%', animationDuration: '14s', delay: '0s', fontSize: '1.2rem' },
+    { top: '15%', right: '8%', maxWidth: '28%', animationDuration: '18s', delay: '4s', fontSize: '1.3rem' },
+    { top: '30%', left: '5%', maxWidth: '22%', animationDuration: '16s', delay: '8s', fontSize: '1.1rem' },
+    { top: '25%', right: '12%', maxWidth: '24%', animationDuration: '15s', delay: '2s', fontSize: '1.1rem' },
+    { top: '40%', left: '20%', maxWidth: '26%', animationDuration: '17s', delay: '6s', fontSize: '1rem' },
+    { top: '35%', right: '25%', maxWidth: '25%', animationDuration: '19s', delay: '10s', fontSize: '1rem' },
   ];
 
   return (
     <main style={container}>
+      {/* Üst Bar Orijinal Görsel Logo */}
       <div style={topBar}>
-        <div style={{...logoWrapper, cursor: 'pointer'}} onClick={handleReset}>
-          <span style={topLogoText}><span style={{fontWeight: 300, opacity: 0.8}}>prompt</span>Lab.</span>
+        <div style={logoWrapper} onClick={handleReset}>
+          <img src="/logo.png" alt="Logo" style={miniLogo} />
+          <span style={logoText}>PromptLab</span>
         </div>
         {result && (
           <button onClick={handleReset} style={backButton}>← Yeni Prompt</button>
@@ -157,9 +158,10 @@ export default function Home() {
               ))}
             </div>
 
+            {/* MERKEZ ALAN DAHA AŞAĞIYA ÇEKİLDİ VE ORİJİNAL LOGO EKLENDİ */}
             <div style={heroSection}>
               <div style={logoFrame}>
-                 <h1 style={centerLogoText}><span style={{fontWeight: 300}}>prompt</span><span style={{fontWeight: 'bold'}}>Lab.</span></h1>
+                 <img src="/logo.png" alt="Logo" style={centerLogo} />
               </div>
               <h2 style={heroTitle}>Size nasıl yardımcı olabilirim?</h2>
               <p style={heroSub}>Karmaşık fikirlerinizi profesyonel bir prompta dönüştürün.</p>
@@ -212,21 +214,24 @@ export default function Home() {
   );
 }
 
+// STİLLER
 const container = { backgroundColor: '#080808', minHeight: '100vh', color: '#ECECEC', fontFamily: 'Inter, sans-serif', display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden' };
-const topBar = { padding: '25px 30px', position: 'absolute', top: 0, left: 0, right: 0, zIndex: 30, display: 'flex', justifyContent: 'space-between', alignItems: 'center' };
-const logoWrapper = { display: 'flex', alignItems: 'center' };
-const topLogoText = { fontWeight: 'bold', fontSize: '1.2rem', letterSpacing: '0.5px' };
+const topBar = { padding: '20px 25px', position: 'absolute', top: 0, left: 0, right: 0, zIndex: 30, display: 'flex', justifyContent: 'space-between', alignItems: 'center' };
+const logoWrapper = { display: 'flex', alignItems: 'center', gap: '10px', opacity: 0.8, cursor: 'pointer' };
+const miniLogo = { height: '22px', width: 'auto', objectFit: 'contain' };
+const logoText = { fontWeight: '600', fontSize: '0.9rem', letterSpacing: '1px' };
 const backButton = { backgroundColor: 'transparent', color: '#fff', border: '1px solid #333', padding: '8px 16px', borderRadius: '20px', cursor: 'pointer', fontSize: '0.85rem' };
 
 const contentArea = { flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', position: 'relative' };
 
 const floatingContainer = { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, pointerEvents: 'auto', zIndex: 5, overflow: 'hidden' };
 
-const heroSection = { display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', zIndex: 10, marginTop: '10vh' };
-const logoFrame = { marginBottom: '15px' };
-const centerLogoText = { fontSize: '3rem', margin: 0, letterSpacing: '-1px' };
-const heroTitle = { fontSize: '2.4rem', fontWeight: '600', marginBottom: '10px', color: '#fff' };
-const heroSub = { color: '#666', fontSize: '1.05rem' };
+// HERO SECTION MARGIN ARTIRILDI (Ekranda daha aşağıya indi)
+const heroSection = { display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', zIndex: 10, marginTop: '25vh' };
+const logoFrame = { marginBottom: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center' };
+const centerLogo = { width: '100%', maxWidth: '160px', height: 'auto', display: 'block', objectFit: 'contain' };
+const heroTitle = { fontSize: '2.2rem', fontWeight: '600', marginBottom: '10px', color: '#fff' };
+const heroSub = { color: '#666', fontSize: '1rem', maxWidth: '450px' };
 
 const resultContainer = { maxWidth: '850px', width: '100%', marginTop: '120px', marginBottom: '160px', zIndex: 10 };
 const aiResponseWrapper = { width: '100%', backgroundColor: '#111', padding: '30px', borderRadius: '16px', border: '1px solid #222' };
