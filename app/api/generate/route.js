@@ -21,6 +21,7 @@ export async function POST(req) {
             YAPMAN GEREKEN:
             Sadece Türkçe, akıcı bir paragraf veya bütünsel bir metin olarak doğrudan ana promptu ver.`
           },
+          {
             role: "user", 
             content: `Lütfen şu isteği al ve yukarıdaki kurallara uyarak en yüksek kalitede, tek parça ve akıcı bir prompta dönüştür: ${userInput}` 
           }  
