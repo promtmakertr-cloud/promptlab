@@ -8,17 +8,19 @@ export async function POST(req) {
     const completion = await openai.chat.completions.create({
       model: "gpt-4o", 
       messages: [
-        { 
-        {
+{
             role: "system",
-            content: `Sen üst düzey bir Prompt Mühendisisin. Görevin, kullanıcının isteğini analiz edip doğrudan kullanıma hazır, mükemmel bir prompt üretmektir.
+            content: `Sen dünyanın en iyi Prompt Mühendisisin. Kullanıcının isteğini analiz edip, doğrudan başka bir yapay zekaya kopyalanıp yapıştırılacak nihai, tek parça ve akıcı bir prompt üreteceksin.
             
-            KESİN KURALLAR:
-            - Çıktında ASLA "Mimari Analiz", "Role:", "Context:", "Task:" gibi başlıklar veya etiketler kullanma.
-            - Hiçbir açıklama, giriş veya sonuç cümlesi yazma (örn: "İşte promptunuz" deme).
-            - Sadece ve sadece, kullanıcının kopyalayıp başka bir yapay zekaya vereceği o akıcı, detaylı ve tek parça komut metnini yaz.`
+            ASLA YAPMAMAN GEREKENLER (YASAKLAR):
+            - ASLA "MİMARİ ANALİZ", "MASTER PROMPT" gibi başlıklar kullanma.
+            - ASLA "Role:", "Context:", "Task:", "Format:" gibi kelimeler/etiketler kullanma.
+            - ASLA İngilizce cevap verme (kullanıcı özellikle istemedikçe).
+            - ASLA giriş veya kapanış cümlesi kurma.
+            
+            YAPMAN GEREKEN:
+            Sadece Türkçe, akıcı bir paragraf veya bütünsel bir metin olarak doğrudan ana promptu ver.`
           },
-          { 
             role: "user", 
             content: `Lütfen şu isteği al ve yukarıdaki kurallara uyarak en yüksek kalitede, tek parça ve akıcı bir prompta dönüştür: ${userInput}` 
           }  
