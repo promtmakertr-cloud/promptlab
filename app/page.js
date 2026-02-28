@@ -1,9 +1,9 @@
 'use client';
 import { useState, useEffect } from 'react';
 
-// HERKESİN İLGİSİNİ ÇEKECEK "HAP" PROMPT HAVUZU
+// HERKESİN İLGİSİNİ ÇEKECEK YENİ "HAP" PROMPT HAVUZU (Doğal, amaca yönelik kelimeler)
 const allPrompts = [
- "Bana sorular sorarak MBTI kişilik analizimi yap ve içsel potansiyelimi keşfetmemi sağla...",
+  "Bana sorular sorarak MBTI kişilik analizimi yap ve içsel potansiyelimi keşfetmemi sağla...",
   "Fincan fotoğrafıma bakarak geleneksel sembollerle, geçmişi ve geleceği yorumlayan derin bir kahve falı bak...",
   "Patronuma maaş zammı talebimi ileteceğim; net, ikna edici ve profesyonel bir e-posta taslağı hazırla...",
   "Doğum haritama göre önümüzdeki 3 aylık süreçte aşk ve kariyer odaklı detaylı astroloji yorumu yap...",
@@ -76,7 +76,7 @@ export default function Home() {
     setTimeout(() => setCopyStatus('Metni Kopyala'), 2000);
   };
 
-  // MOBİL UYUMLU YENİ CSS
+  // MOBİL UYUMLU VE SİNEMATİK CSS
   useEffect(() => {
     const styleSheet = document.createElement("style");
     styleSheet.innerText = `
@@ -108,29 +108,25 @@ export default function Home() {
         100% { transform: scale(1); }
       }
 
-      /* 🚀 İŞTE HAYAT KURTARAN MOBİL KODLAR 🚀 */
+      /* MOBİL EKRANLAR İÇİN HAYAT KURTARAN AYARLAR */
       @media (max-width: 768px) {
         .cinematic-text {
           font-size: 0.95rem !important;
-          max-width: 85vw !important; /* Mobilde daralmasını engeller */
-          left: 7.5vw !important; /* Tam ortalar */
+          max-width: 85vw !important;
+          left: 7.5vw !important;
           right: auto !important;
           text-align: center !important;
         }
-        /* Mobilde ekran küçük olduğu için 6 yazı çok fazla. Son 3 tanesini gizliyoruz. */
         .cinematic-text:nth-child(n+4) {
           display: none !important;
         }
-        /* Kalan 3 yazıyı logoya değmeyecek şekilde alt alta diziyoruz */
         .cinematic-text:nth-child(1) { top: 12% !important; animation-delay: 0s !important;}
         .cinematic-text:nth-child(2) { top: 22% !important; animation-delay: 5s !important;}
         .cinematic-text:nth-child(3) { top: 32% !important; animation-delay: 10s !important;}
         
-        /* Merkezdeki logoyu ve başlığı mobilde daha da aşağı itiyoruz */
         .mobile-hero {
           margin-top: 45vh !important; 
         }
-        /* Mobilde başlık boyutunu çok az küçültelim ki şık dursun */
         .mobile-title {
           font-size: 1.8rem !important;
         }
@@ -140,7 +136,6 @@ export default function Home() {
     return () => document.head.removeChild(styleSheet);
   }, []);
 
-  // MASAÜSTÜ KORDİNATLARI (Mobilde yukarıdaki CSS kuralları bunları ezecek)
   const positions = [
     { top: '8%', left: '10%', maxWidth: '25%', animationDuration: '14s', delay: '0s', fontSize: '1.2rem' },
     { top: '15%', right: '8%', maxWidth: '28%', animationDuration: '18s', delay: '4s', fontSize: '1.3rem' },
@@ -186,7 +181,6 @@ export default function Home() {
               ))}
             </div>
 
-            {/* className eklendi: Mobilde aşağı itmek için */}
             <div style={heroSection} className="mobile-hero">
               <div style={logoFrame}>
                  <img src="/logo.png" alt="Logo" style={centerLogo} />
