@@ -17,10 +17,8 @@ const allPrompts = [
   "Stresli bir günün ardından zihnimi boşaltmamı sağlayacak 10 dakikalık rehberli meditasyon metni yaz..."
 ];
 
-// FARKLI PUNTOLAR (Masaüstü için)
 const fontSizes = ['0.85rem', '0.95rem', '1.05rem', '1.15rem', '1.25rem'];
 
-// EKRANIN HER YERİNİ (Merkez Dahil) KAPSAYAN GÜVENLİ KORDİNAT HAVUZU
 const masterPositions = [
   { top: '5%', left: '5%', maxWidth: '280px' },
   { top: '35%', left: '10%', maxWidth: '290px' },
@@ -138,7 +136,7 @@ export default function Home() {
 
       .cinematic-text {
         position: absolute;
-        color: #999999;
+        color: #777777; /* Metinler biraz daha silik */
         cursor: pointer;
         animation: trueBreathing 16s infinite cubic-bezier(0.4, 0, 0.2, 1);
         text-align: center;
@@ -164,7 +162,7 @@ export default function Home() {
 
       @media (max-width: 768px) {
         .hero-section { margin-top: 35vh !important; }
-        .hero-title { font-size: 1.6rem !important; line-height: 1.2 !important; padding: 0 10px !important; }
+        .hero-title { font-size: 1.8rem !important; line-height: 1.2 !important; padding: 0 10px !important; }
         .hero-sub { font-size: 0.9rem !important; padding: 0 15px !important; margin-top: 15px !important; }
         
         .cinematic-text {
@@ -183,8 +181,7 @@ export default function Home() {
         .slot-2 { top: 60% !important; }
         .slot-3 { display: none !important; } 
         
-        /* Mobilde yansıma da biraz daha sönük olur */
-        .floor-glow { opacity: 0.1 !important; height: 60px !important; bottom: -15px !important;}
+        .floor-glow { opacity: 0.25 !important; height: 60px !important; bottom: -10px !important;}
       }
     `;
     document.head.appendChild(styleSheet);
@@ -249,7 +246,7 @@ export default function Home() {
 
       <div style={bottomArea}>
         
-        {/* 🚨 ZARİFLEŞTİRİLMİŞ ZEMİN YANSIMASI 🚨 */}
+        {/* 🔥 GÖRSELİNDEKİ KUSURSUZ ZEMİN YANSIMASI 🔥 */}
         <div className="floor-glow" style={floorGlow}></div>
 
         <div style={glowWrapper}>
@@ -301,11 +298,11 @@ const contentArea = { flex: 1, display: 'flex', flexDirection: 'column', alignIt
 
 const floatingContainer = { position: 'absolute', top: '70px', left: 0, right: 0, height: '40vh', pointerEvents: 'auto', zIndex: 5, overflow: 'hidden' };
 
-const heroSection = { display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', zIndex: 10, marginTop: '30vh', width: '100%' };
+const heroSection = { display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', zIndex: 10, marginTop: '28vh', width: '100%' };
 const logoFrame = { marginBottom: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center' };
 const centerLogo = { width: '100%', maxWidth: '180px', height: 'auto', display: 'block', objectFit: 'contain' };
-const heroTitle = { fontSize: '2rem', fontWeight: '600', marginBottom: '10px', color: '#fff', letterSpacing: '-0.5px' };
-const heroSub = { color: '#888', fontSize: '1rem', maxWidth: '550px', padding: '0 20px', lineHeight: '1.5' };
+const heroTitle = { fontSize: '2.2rem', fontWeight: '600', marginBottom: '10px', color: '#fff', letterSpacing: '-0.5px' };
+const heroSub = { color: '#999', fontSize: '0.95rem', maxWidth: '550px', padding: '0 20px', lineHeight: '1.5' };
 
 const resultContainer = { maxWidth: '850px', width: '100%', marginTop: '80px', marginBottom: '160px', zIndex: 10, padding: '0 20px' };
 const aiResponseWrapper = { width: '100%', backgroundColor: '#111', padding: '20px', borderRadius: '16px', border: '1px solid #222' };
@@ -315,44 +312,45 @@ const copyBtn = { marginTop: '25px', background: '#222', color: '#fff', border: 
 
 const bottomArea = { position: 'fixed', bottom: 0, left: 0, right: 0, padding: '30px 20px 40px 20px', background: 'transparent', display: 'flex', flexDirection: 'column', alignItems: 'center', zIndex: 20 };
 
-// 🚨 YANSIMA DAHA İNCE VE ZARİF HALE GETİRİLDİ 🚨
+// 🔥 GÖRSELDEN ALINAN TAM RENKLER (TURUNCU -> MOR -> CAMGÖBEĞİ) 🔥
+const neonGradient = 'linear-gradient(90deg, #ff4500, #a020f0, #00ffff, #ff4500, #a020f0, #00ffff)';
+
 const floorGlow = {
   position: 'absolute',
-  bottom: '-20px', 
+  bottom: '-25px', 
   left: '50%',
   transform: 'translateX(-50%)',
-  width: '60vw', 
+  width: '75vw', 
   maxWidth: '800px',
-  height: '80px', 
-  background: 'linear-gradient(90deg, #ff2a85, #8a2be2, #41d1ff, #ff2a85)', // Daha ruhani renkler
+  height: '100px', 
+  background: neonGradient, // Renkler kutu ile senkronize
   backgroundSize: '200% 100%',
-  filter: 'blur(60px)',
-  opacity: 0.25, // Şeffaflık azaltıldı, elit duruş eklendi
+  filter: 'blur(65px)',
+  opacity: 0.45, // Işık yansıması artırıldı
   zIndex: 1,
   pointerEvents: 'none',
-  animation: 'glowingBorder 6s linear infinite'
+  animation: 'glowingBorder 4s linear infinite' // Kutu ile aynı hızda döner
 };
 
-// 🚨 ÇERÇEVE 1PX'E DÜŞÜRÜLDÜ VE RENKLER YUMUŞATILDI 🚨
+// 🔥 HAP ŞEKLİ (PILL) VE 2PX İDEAL ÇERÇEVE 🔥
 const glowWrapper = {
   position: 'relative',
   width: '100%',
   maxWidth: '750px',
-  borderRadius: '32px',
-  background: 'linear-gradient(90deg, #ff2a85, #8a2be2, #41d1ff, #ff2a85, #8a2be2)', // Daha yumuşak Siri tonları
+  borderRadius: '50px', // Görseldeki gibi tam yuvarlak (hap şekli)
+  background: neonGradient,
   backgroundSize: '200% 100%',
-  animation: 'glowingBorder 4s linear infinite',
-  padding: '1px', // İŞTE O İNCECİK ESTETİK DOKUNUŞ!
+  animation: 'glowingBorder 4s linear infinite', // Görseldeki gibi döner ışık
+  padding: '2px', // Görseldeki çerçevenin ideal kalınlığı
   zIndex: 2,
-  boxShadow: '0 0 20px rgba(138, 43, 226, 0.15)' // Kutuya çok hafif dış ışıltı eklendi
 };
 
 const inputBoxInner = {
-  backgroundColor: '#0a0a0a', 
-  borderRadius: '31px', // 32px dış çevre - 1px çerçeve = 31px (Matematiksel kusursuzluk)
+  backgroundColor: '#050505', // Görseldeki gibi simsiyah bir iç zemin
+  borderRadius: '48px', // Dış kapsayıcıya tam uyması için
   display: 'flex',
   alignItems: 'center',
-  padding: '10px 12px 10px 20px',
+  padding: '12px 16px 12px 24px', // Görseldeki gibi daha geniş iç boşluk
   width: '100%',
   height: '100%',
 };
