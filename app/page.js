@@ -162,6 +162,7 @@ export default function Home() {
         100% { transform: scale(1); }
       }
 
+      /* 🚨 MOBİLİN KESİN ÇÖZÜMÜ: TAM GENİŞLİK VE PADDING 🚨 */
       @media (max-width: 768px) {
         .hero-section { margin-top: 35vh !important; }
         .hero-title { font-size: 1.6rem !important; line-height: 1.2 !important; padding: 0 10px !important; }
@@ -169,15 +170,19 @@ export default function Home() {
         
         .cinematic-text {
           font-size: 0.85rem !important;
-          max-width: 85vw !important;
-          width: 85vw !important;
-          left: 50% !important;
-          right: auto !important;
+          width: 100vw !important;         /* Ekranı tam kapla */
+          max-width: 100vw !important;
+          left: 0 !important;              /* En soldan başla */
+          right: 0 !important;             /* En sağa kadar git */
+          padding: 0 25px !important;      /* Ama yazıları kenarlara 25px'den fazla yaklaştırma */
+          box-sizing: border-box !important;
+          --translateX: 0px !important;    /* Kayma hatasını sıfırla */
         }
         
-        .slot-0 { top: 0% !important; --translateX: -50% !important; }
-        .slot-1 { top: 30% !important; --translateX: -50% !important; }
-        .slot-2 { top: 60% !important; --translateX: -50% !important; }
+        /* Artık yatayda kaydırmaya gerek kalmadı, padding ile merkezlendi */
+        .slot-0 { top: 0% !important; }
+        .slot-1 { top: 30% !important; }
+        .slot-2 { top: 60% !important; }
         .slot-3 { display: none !important; } 
         
         .floor-glow { opacity: 0.15 !important; }
@@ -216,6 +221,7 @@ export default function Home() {
                     maxWidth: slot.pos.maxWidth,
                     fontSize: slot.size,
                     animationDelay: slot.delay,
+                    // Masaüstü merkezlemesi için CSS Hack'i
                     '--translateX': slot.pos.isCenter ? '-50%' : '0px' 
                   }}
                 >
@@ -228,7 +234,6 @@ export default function Home() {
               <div style={logoFrame}>
                  <img src="/logo.png" alt="Logo" style={centerLogo} />
               </div>
-              {/* 🚨 SENİN HARİKA METİN GÜNCELLEMEN BURADA 🚨 */}
               <h2 style={heroTitle} className="hero-title">Doğru promptu oluştur.</h2>
               <p style={heroSub} className="hero-sub">Metni yaz. Optimize edilmiş promptu al. Kopyala ve diğer AI araçlarında kullan.</p>
             </div>
