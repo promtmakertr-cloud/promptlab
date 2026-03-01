@@ -1,7 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
 
-// İNSANİ VE İLGİ ÇEKİCİ PROMPT HAVUZU (密度 artırıldı)
 const allPrompts = [
   "Bana sorular sorarak MBTI kişilik analizimi yap ve içsel potansiyelimi keşfetmemi sağla...",
   "Fincan fotoğrafıma bakarak geleneksel sembollerle, geçmişi ve geleceği yorumlayan derin bir kahve falı bak...",
@@ -14,13 +13,15 @@ const allPrompts = [
   "Benimle günlük konularda İngilizce sohbet et ve gramer hatalarını Türkçe açıklayarak düzelt...",
   "Kariyerimde yerimde saydığımı hissediyorum, bana ufuk açacak stratejik tavsiyeler ver...",
   "Yeni kuracağım e-ticaret sitesi için akılda kalıcı, 2 heceli ve modern marka isimleri türet...",
-  "Stresli bir günün ardından zihnimi boşaltmamı sağlayacak 10 dakikalık rehberli meditasyon metni yaz...",
-  "Dostluk hakkında kısa ve öz bir şiir...",
-  "Yeni bir spor programı...",
-  "Bir sonraki tatile nereye...",
-  "Evdeki malzemelerle pratik bir akşam yemeği tarifi...",
-  "5 yaşındaki çocuğum için özgüven aşılayan...",
-  "Kariyerimde yerimde saydığımı..."
+  "Stresli bir günün ardından zihnimi boşaltmamı sağlayacak 10 dakikalık rehberli meditasyon metni yaz..."
+];
+
+// MERKEZDEN UZAK, SADECE KENARLARDAKİ GÜVENLİ ALANLAR (Asla logoya veya başlığa değmez)
+const safeZones = [
+  { top: '10%', left: '5%', maxWidth: '280px' },
+  { top: '15%', right: '5%', maxWidth: '280px' },
+  { top: '45%', left: '8%', maxWidth: '260px' },
+  { top: '50%', right: '8%', maxWidth: '260px' }
 ];
 
 export default function Home() {
@@ -30,13 +31,29 @@ export default function Home() {
   const [isListening, setIsListening] = useState(false);
   const [copyStatus, setCopyStatus] = useState('Metni Kopyala');
   
-  const [shuffledPrompts, setShuffledPrompts] = useState([]);
+  const [slots, setSlots] = useState([]);
 
   useEffect(() => {
-    // Sayfa açıldığında promptları karıştır
-    const shuffled = [...allPrompts].sort(() => 0.5 - Math.random());
-    setShuffledPrompts(shuffled);
+    const shuffledTexts = [...allPrompts].sort(() => 0.5 - Math.random());
+    setSlots([
+      { id: 0, text: shuffledTexts[0], pos: safeZones[0], delay: '0s' },
+      { id: 1, text: shuffledTexts[1], pos: safeZones[1], delay: '5s' },
+      { id: 2, text: shuffledTexts[2], pos: safeZones[2], delay: '10s' },
+      { id: 3, text: shuffledTexts[3], pos: safeZones[3], delay: '15s' },
+    ]);
   }, []);
+
+  const handleAnimationIteration = (slotId) => {
+    setSlots(prevSlots => {
+      const currentTexts = prevSlots.map(s => s.text);
+      const availablePrompts = allPrompts.filter(p => !currentTexts.includes(p));
+      const newText = availablePrompts[Math.floor(Math.random() * availablePrompts.length)] || allPrompts[0];
+
+      return prevSlots.map(slot =>
+        slot.id === slotId ? { ...slot, text: newText } : slot
+      );
+    });
+  };
 
   const handleReset = () => {
     setResult('');
@@ -86,7 +103,6 @@ export default function Home() {
     setTimeout(() => setCopyStatus('Metni Kopyala'), 2000);
   };
 
-  // 🔥 SOFT VE AŞIRI YAVAŞ NEON CSS VE HİZALAMALAR 🔥
   useEffect(() => {
     const styleSheet = document.createElement("style");
     styleSheet.innerText = `
@@ -95,28 +111,30 @@ export default function Home() {
         100% { background-position: 200% 50%; }
       }
 
-      /* YAVAŞ VE SOFT FLOAT-UP ANİMASYONU */
-      @keyframes floatUpFade {
-        0% { opacity: 0; transform: translateY(15px); filter: blur(10px); }
-        15% { opacity: 0.5; transform: translateY(0px); filter: blur(0px); }
-        85% { opacity: 0.5; transform: translateY(-5px); filter: blur(0px); }
-        100% { opacity: 0; transform: translateY(-15px); filter: blur(10px); }
+      /* ÇOK YAVAŞ VE SİLİK NEFES ALMA ANİMASYONU (Sadece arkaplanda bir his) */
+      @keyframes softBreathing {
+        0% { opacity: 0; transform: scale(0.95); filter: blur(10px); }
+        30% { opacity: 0.4; transform: scale(1); filter: blur(0px); }
+        70% { opacity: 0.4; transform: scale(1.02); filter: blur(0px); }
+        100% { opacity: 0; transform: scale(1.05); filter: blur(10px); }
       }
 
       .cinematic-text {
-        color: #888888;
+        position: absolute;
+        color: #777777; /* Çok silik renk */
         cursor: pointer;
-        animation: floatUpFade 20s infinite linear;
+        animation: softBreathing 20s infinite ease-in-out; /* 20 saniye, çok yavaş */
         text-align: center;
         line-height: 1.5;
         font-weight: 300;
+        font-size: 0.95rem;
         transition: color 0.3s ease, text-shadow 0.3s ease;
       }
 
       .cinematic-text:hover {
         color: #ffffff !important;
-        opacity: 1 !important;
-        text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
+        opacity: 0.8 !important;
+        text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
         animation-play-state: paused;
         z-index: 50;
       }
@@ -128,27 +146,26 @@ export default function Home() {
         100% { transform: scale(1); }
       }
 
-      /* MOBİL TAMİRİ */
       @media (max-width: 768px) {
-        .floating-container {
-          grid-template-columns: 1fr 1fr !important;
-          padding: 0 10px !important;
-        }
-        .hero-section {
-          margin-top: 35vh !important;
-        }
-        .hero-title {
-          font-size: 1.8rem !important;
-        }
-        .hero-sub {
-          font-size: 0.85rem !important;
-          padding: 0 15px !important;
-        }
+        .hero-section { margin-top: 35vh !important; }
+        .hero-title { font-size: 1.8rem !important; line-height: 1.2 !important; padding: 0 10px !important; }
+        .hero-sub { font-size: 0.9rem !important; padding: 0 15px !important; margin-top: 15px !important; }
+        
         .cinematic-text {
-          font-size: 0.85rem !important;
+          font-size: 0.8rem !important;
+          width: 90vw !important;         
+          max-width: 90vw !important;
+          left: 5vw !important;              
+          right: auto !important;             
         }
-        .cinematic-text:nth-child(n+10) { display: none !important; }
-        .floor-glow { opacity: 0.15 !important; }
+        
+        /* Mobilde sadece 2 yazı, en üstte ve en altta, asla ortaya değmez */
+        .slot-0 { top: 5% !important; }
+        .slot-1 { top: 65% !important; }
+        .slot-2 { display: none !important; }
+        .slot-3 { display: none !important; } 
+        
+        .floor-glow { opacity: 0.25 !important; height: 60px !important; bottom: -10px !important;}
       }
     `;
     document.head.appendChild(styleSheet);
@@ -157,44 +174,47 @@ export default function Home() {
 
   return (
     <main style={container}>
-      {/* Üst Logo ve Yeni Prompt Butonu */}
       <div style={topBar}>
         <div style={logoWrapper} onClick={handleReset}>
           <img src="/logo.png" alt="Logo" style={miniLogo} />
-          <span style={logoText}>promptLab.</span>
+          <span style={logoText}>PromptLab</span>
         </div>
         {result && (
-          <button onClick={handleReset} style={backButton}>Yeni Prompt</button>
+          <button onClick={handleReset} style={backButton}>← Yeni Prompt</button>
         )}
       </div>
       
       <div style={contentArea}>
         {!result ? (
           <>
-            {/* VİDEO VE REFERANS GÖRSELİ GİBİ DENSITY KAZANDIRILMIŞ VE ASİMETRİK YÜKSELEN PROMPTLAR */}
-            <div className="floating-container" style={floatingContainer}>
-              {shuffledPrompts.map((prompt, index) => (
+            {/* O KAOTİK YAPI SİLİNDİ. SADECE KENARLARDA 4 TANE SAKİN YAZI VAR */}
+            <div style={floatingContainer}>
+              {slots.map((slot) => (
                 <div 
-                  key={index} 
-                  className="cinematic-text"
-                  onClick={() => setInput(prompt)}
+                  key={slot.id} 
+                  className={`cinematic-text slot-${slot.id}`}
+                  onClick={() => setInput(slot.text)}
+                  onAnimationIteration={() => handleAnimationIteration(slot.id)}
                   style={{
-                    fontSize: '1rem',
-                    animationDelay: `${index * 1.5}s`, // Daha density kazandıran asimetrik gecikme
+                    top: slot.pos.top,
+                    left: slot.pos.left || 'auto',
+                    right: slot.pos.right || 'auto',
+                    maxWidth: slot.pos.maxWidth,
+                    animationDelay: slot.delay,
                   }}
                 >
-                  "{prompt}"
+                  "{slot.text}"
                 </div>
               ))}
             </div>
 
-            {/* 🔥 REFERANS GÖRSELİ GİBİ KUSURSUZ YAKINLIKTA LOGO-BAŞLIK-ALT METİN 🔥 */}
+            {/* MERKEZ: SENİN İSTEDİĞİN GİBİ TERTEMİZ VE DOĞRU METİNLERLE */}
             <div style={heroSection} className="hero-section">
               <div style={logoFrame}>
                  <img src="/logo.png" alt="Logo" style={centerLogo} />
               </div>
-              <h2 style={heroTitle} className="hero-title">Doğru promptu burada üret.</h2>
-              <p style={heroSub} className="hero-sub">Karmaşık yazabilirsin. Sistem optimize eder. Çıktıyı kopyalayıp diğer AI araçlarında çalıştır.</p>
+              <h2 style={heroTitle} className="hero-title">Doğru promptu oluştur.</h2>
+              <p style={heroSub} className="hero-sub">Metni yaz. Optimize edilmiş promptu al. Kopyala ve diğer AI araçlarında kullan.</p>
             </div>
           </>
         ) : (
@@ -210,10 +230,9 @@ export default function Home() {
 
       <div style={bottomArea}>
         
-        {/* ZEMİN IŞIĞI (Soft ve Yumuşak) */}
+        {/* REFERANS GÖRSELİNDEKİ KUSURSUZ ZEMİN YANSIMASI VE KUTU */}
         <div className="floor-glow" style={floorGlow}></div>
 
-        {/* 🔥 GÖRSELDEKİ GİBİ TAM HAP ŞEKLİNDE VE 2PX SOFT NEON 🔥 */}
         <div style={glowWrapper}>
           <div style={inputBoxInner}>
             <textarea 
@@ -261,15 +280,13 @@ const backButton = { backgroundColor: 'transparent', color: '#fff', border: '1px
 
 const contentArea = { flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', position: 'relative', paddingBottom: '100px' };
 
-// Density kazandırılmış ve asimetrik yükselme sağlayan konteyner (Logonun üzerine gelmez)
-const floatingContainer = { position: 'absolute', top: '70px', left: 0, right: 0, height: '40vh', display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '30px', padding: '0 40px', pointerEvents: 'auto', zIndex: 5, overflow: 'hidden' };
+const floatingContainer = { position: 'absolute', top: '70px', left: 0, right: 0, bottom: '150px', pointerEvents: 'auto', zIndex: 5, overflow: 'hidden' };
 
-// 🔥 REFERANS GÖRSELİNDEKİ KUSURSUZ YAKINLIKTA HİZALANMIŞ MERKEZ BÖLGE 🔥
-const heroSection = { display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', zIndex: 10, marginTop: '5vh', width: '100%' };
+const heroSection = { display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', zIndex: 10, marginTop: '25vh', width: '100%' };
 const logoFrame = { marginBottom: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center' };
 const centerLogo = { width: '100%', maxWidth: '180px', height: 'auto', display: 'block', objectFit: 'contain' };
-const heroTitle = { fontSize: '2.5rem', fontWeight: '600', marginBottom: '10px', color: '#fff', letterSpacing: '-0.5px' };
-const heroSub = { color: '#888', fontSize: '1rem', maxWidth: '500px', padding: '0 20px', lineHeight: '1.5' };
+const heroTitle = { fontSize: '2.2rem', fontWeight: '600', marginBottom: '10px', color: '#fff', letterSpacing: '-0.5px' };
+const heroSub = { color: '#999', fontSize: '0.95rem', maxWidth: '550px', padding: '0 20px', lineHeight: '1.5' };
 
 const resultContainer = { maxWidth: '850px', width: '100%', marginTop: '80px', marginBottom: '160px', zIndex: 10, padding: '0 20px' };
 const aiResponseWrapper = { width: '100%', backgroundColor: '#111', padding: '20px', borderRadius: '16px', border: '1px solid #222' };
@@ -279,43 +296,43 @@ const copyBtn = { marginTop: '25px', background: '#222', color: '#fff', border: 
 
 const bottomArea = { position: 'fixed', bottom: 0, left: 0, right: 0, padding: '30px 20px 40px 20px', background: 'transparent', display: 'flex', flexDirection: 'column', alignItems: 'center', zIndex: 20 };
 
-// Zemin yansıması daha yumuşak ve soft
+const neonGradient = 'linear-gradient(90deg, #ff4500, #a020f0, #00ffff, #ff4500, #a020f0, #00ffff)';
+
 const floorGlow = {
   position: 'absolute',
-  bottom: '-30px',
+  bottom: '-25px', 
   left: '50%',
   transform: 'translateX(-50%)',
-  width: '70vw',
-  maxWidth: '900px',
-  height: '120px',
-  background: 'linear-gradient(90deg, #ff4500, #a020f0, #00ffff, #ff4500)',
+  width: '75vw', 
+  maxWidth: '800px',
+  height: '100px', 
+  background: neonGradient, 
   backgroundSize: '200% 100%',
-  filter: 'blur(70px)',
-  opacity: 0.3, // Daha soft ışıltı
+  filter: 'blur(65px)',
+  opacity: 0.45, 
   zIndex: 1,
   pointerEvents: 'none',
-  animation: 'glowingBorder 6s linear infinite'
+  animation: 'glowingBorder 6s linear infinite' 
 };
 
-// 🔥 HAP ŞEKLİNDE VE 2PX İDEAL ÇERÇEVE KALINLIĞI 🔥
 const glowWrapper = {
   position: 'relative',
   width: '100%',
   maxWidth: '750px',
-  borderRadius: '50px', // Tam hap şekli (Pill)
-  background: 'linear-gradient(90deg, #ff4500, #a020f0, #00ffff, #ff4500, #a020f0)',
+  borderRadius: '50px', 
+  background: neonGradient,
   backgroundSize: '200% 100%',
-  animation: 'glowingBorder 4s linear infinite', // Daha soft hareket
-  padding: '2px', // İdeal 2px kalınlık
+  animation: 'glowingBorder 6s linear infinite', 
+  padding: '2px', 
   zIndex: 2,
 };
 
 const inputBoxInner = {
-  backgroundColor: '#050505', // Kutunun içini simsiyah yaptık
-  borderRadius: '48px', // Dış kapsayıcıya tam uyması için
+  backgroundColor: '#050505', 
+  borderRadius: '48px', 
   display: 'flex',
   alignItems: 'center',
-  padding: '10px 12px 10px 20px',
+  padding: '12px 16px 12px 24px', 
   width: '100%',
   height: '100%',
 };
