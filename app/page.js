@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 
-// HERKESİN İLGİSİNİ ÇEKECEK "HAP" PROMPT HAVUZU (Sayısını artırdık ki sürekli yenileri gelsin)
+// İNSANİ VE İLGİ ÇEKİCİ PROMPT HAVUZU
 const allPrompts = [
   "Bana sorular sorarak MBTI kişilik analizimi yap ve içsel potansiyelimi keşfetmemi sağla...",
   "Fincan fotoğrafıma bakarak geleneksel sembollerle, geçmişi ve geleceği yorumlayan derin bir kahve falı bak...",
@@ -17,6 +17,22 @@ const allPrompts = [
   "Stresli bir günün ardından zihnimi boşaltmamı sağlayacak 10 dakikalık rehberli meditasyon metni yaz..."
 ];
 
+// FARKLI PUNTOLAR (Masaüstü için)
+const fontSizes = ['0.85rem', '0.95rem', '1.05rem', '1.15rem', '1.25rem'];
+
+// EKRANIN HER YERİNİ (Merkez Dahil) KAPSAYAN GÜVENLİ KORDİNAT HAVUZU
+const masterPositions = [
+  { top: '5%', left: '5%', maxWidth: '280px' },
+  { top: '35%', left: '10%', maxWidth: '290px' },
+  { top: '65%', left: '6%', maxWidth: '260px' },
+  { top: '8%', left: '50%', maxWidth: '340px', isCenter: true },
+  { top: '40%', left: '50%', maxWidth: '320px', isCenter: true },
+  { top: '75%', left: '50%', maxWidth: '350px', isCenter: true },
+  { top: '10%', right: '5%', maxWidth: '280px', isRight: true },
+  { top: '45%', right: '10%', maxWidth: '290px', isRight: true },
+  { top: '60%', right: '6%', maxWidth: '260px', isRight: true },
+];
+
 export default function Home() {
   const [input, setInput] = useState('');
   const [result, setResult] = useState('');
@@ -24,31 +40,35 @@ export default function Home() {
   const [isListening, setIsListening] = useState(false);
   const [copyStatus, setCopyStatus] = useState('Metni Kopyala');
   
-  // Ekranda aynı anda duracak slotlarımız (4'ten 3'e düşürdük ferahlık için)
   const [slots, setSlots] = useState([]);
 
   useEffect(() => {
-    // Sayfa ilk açıldığında 3 slotu rastgele dolduruyoruz
     const shuffledTexts = [...allPrompts].sort(() => 0.5 - Math.random());
-    const initialSlots = [
-      { id: 0, text: shuffledTexts[0], delay: '0s' },
-      { id: 1, text: shuffledTexts[1], delay: '5s' },
-      { id: 2, text: shuffledTexts[2], delay: '10s' },
-    ];
-    setSlots(initialSlots);
+    const shuffledPos = [...masterPositions].sort(() => 0.5 - Math.random());
+    
+    setSlots([
+      { id: 0, text: shuffledTexts[0], pos: shuffledPos[0], size: fontSizes[2], delay: '0s' },
+      { id: 1, text: shuffledTexts[1], pos: shuffledPos[1], size: fontSizes[1], delay: '4s' },
+      { id: 2, text: shuffledTexts[2], pos: shuffledPos[2], size: fontSizes[4], delay: '8s' },
+      { id: 3, text: shuffledTexts[3], pos: shuffledPos[3], size: fontSizes[0], delay: '12s' },
+    ]);
   }, []);
 
-  // SİHİRLİ FONKSİYON: Yazı silinip görünmez olduğunda anında yerini ve metnini değiştirir
   const handleAnimationIteration = (slotId) => {
     setSlots(prevSlots => {
       const currentTexts = prevSlots.map(s => s.text);
-      
-      // Ekranda olmayan yeni bir prompt seç
+      const currentPositions = prevSlots.map(s => s.pos);
+
       const availablePrompts = allPrompts.filter(p => !currentTexts.includes(p));
       const newText = availablePrompts[Math.floor(Math.random() * availablePrompts.length)] || allPrompts[0];
 
+      const availablePos = masterPositions.filter(p => !currentPositions.includes(p));
+      const newPos = availablePos[Math.floor(Math.random() * availablePos.length)] || masterPositions[0];
+
+      const newSize = fontSizes[Math.floor(Math.random() * fontSizes.length)];
+
       return prevSlots.map(slot =>
-        slot.id === slotId ? { ...slot, text: newText } : slot
+        slot.id === slotId ? { ...slot, text: newText, pos: newPos, size: newSize } : slot
       );
     });
   };
@@ -101,7 +121,6 @@ export default function Home() {
     setTimeout(() => setCopyStatus('Metni Kopyala'), 2000);
   };
 
-  // MOBİL UYUMLU, NEFES ALMA VE SINEMATİK CSS
   useEffect(() => {
     const styleSheet = document.createElement("style");
     styleSheet.innerText = `
@@ -110,20 +129,18 @@ export default function Home() {
         100% { background-position: 200% 50%; }
       }
 
-      /* YENİ NEFES ANİMASYONU: Yavaşça büyür ve silinir (Okunabilirliği artırır) */
-      @keyframes breathingFade {
-        0% { opacity: 0; transform: translateX(var(--translateX, 0)) scale(0.95); filter: blur(10px); }
-        30% { opacity: 0.8; transform: translateX(var(--translateX, 0)) scale(1); filter: blur(0px); }
-        70% { opacity: 0.8; transform: translateX(var(--translateX, 0)) scale(1.05); filter: blur(0px); }
-        100% { opacity: 0; transform: translateX(var(--translateX, 0)) scale(1.2); filter: blur(10px); }
+      @keyframes trueBreathing {
+        0% { opacity: 0; transform: translateX(var(--translateX, 0)) scale(0.8); filter: blur(15px); }
+        30% { opacity: 0.85; transform: translateX(var(--translateX, 0)) scale(1); filter: blur(0px); }
+        70% { opacity: 0.85; transform: translateX(var(--translateX, 0)) scale(1.05); filter: blur(0px); }
+        100% { opacity: 0; transform: translateX(var(--translateX, 0)) scale(1.2); filter: blur(15px); }
       }
 
       .cinematic-text {
         position: absolute;
-        color: #888888;
+        color: #999999;
         cursor: pointer;
-        /* Yavaş nefes alma için 20s'e çıkardık */
-        animation: breathingFade 20s infinite linear;
+        animation: trueBreathing 16s infinite cubic-bezier(0.4, 0, 0.2, 1);
         text-align: center;
         line-height: 1.5;
         font-weight: 300;
@@ -133,7 +150,7 @@ export default function Home() {
       .cinematic-text:hover {
         color: #ffffff !important;
         opacity: 1 !important;
-        text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
+        text-shadow: 0 0 12px rgba(255, 255, 255, 0.6);
         animation-play-state: paused;
         z-index: 50;
       }
@@ -145,44 +162,30 @@ export default function Home() {
         100% { transform: scale(1); }
       }
 
-      /* 🚀 İŞTE HAYAT KURTARAN MOBİL KODLAR 🚀 */
       @media (max-width: 768px) {
+        .hero-section { margin-top: 35vh !important; }
+        .hero-title { font-size: 1.6rem !important; line-height: 1.2 !important; padding: 0 10px !important; }
+        .hero-sub { font-size: 0.9rem !important; padding: 0 15px !important; margin-top: 15px !important; }
+        
         .cinematic-text {
-          font-size: 0.85rem !important; /* Mobilde okunabilir punto */
-          max-width: 85vw !important; /* Metinlerin kesilmesini önler */
-          left: 7.5vw !important; /* Merkeze hizalar */
+          font-size: 0.85rem !important;
+          max-width: 85vw !important;
+          width: 85vw !important;
+          left: 50% !important;
           right: auto !important;
-          transform: none !important;
-          --translateX: 0px !important; /* Animasyon için merkezlemeyi düzeltir */
         }
         
-        /* Mobilde 4.yazıyı gizliyoruz, sadece 3 tanesini alt alta güvenle diziyoruz */
-        .cinematic-text:nth-child(4) { display: none !important; }
-        .cinematic-text:nth-child(1) { top: 5% !important; }
-        .cinematic-text:nth-child(2) { top: 25% !important; }
-        .cinematic-text:nth-child(3) { top: 45% !important; }
+        .slot-0 { top: 0% !important; --translateX: -50% !important; }
+        .slot-1 { top: 30% !important; --translateX: -50% !important; }
+        .slot-2 { top: 60% !important; --translateX: -50% !important; }
+        .slot-3 { display: none !important; } 
         
-        /* Mobilde merkez bölgeyi daha da aşağı iterek yazıların logonun üzerine gelmesini kesin olarak engelledik */
-        .mobile-hero {
-          margin-top: 45vh !important; 
-        }
-        /* Mobilde fontları küçülterek ferah bir görüntü sağladık */
-        .mobile-title {
-          font-size: 1.8rem !important; 
-        }
         .floor-glow { opacity: 0.15 !important; }
       }
     `;
     document.head.appendChild(styleSheet);
     return () => document.head.removeChild(styleSheet);
   }, []);
-
-  // MASAÜSTÜ KORDİNATLARI (Mobilde yukarıdaki CSS ezecek)
-  const positions = [
-    { top: '15%', left: '8%', maxWidth: '280px' },
-    { top: '8%', left: '50%', transform: 'translateX(-50%)', maxWidth: '320px', delay: '4s', isCenter: true },
-    { top: '22%', right: '8%', maxWidth: '280px' }
-  ];
 
   return (
     <main style={container}>
@@ -199,39 +202,35 @@ export default function Home() {
       <div style={contentArea}>
         {!result ? (
           <>
-            {/* HER SEFERİNDE YER VE PUNTO DEĞİŞTİREN DİNAMİK YAZILAR */}
             <div style={floatingContainer}>
-              {slots.map((slot, index) => {
-                const pos = positions[index] || positions[0];
-                return (
-                  <div 
-                    key={slot.id} 
-                    className="cinematic-text"
-                    onClick={() => setInput(slot.text)}
-                    onAnimationIteration={() => handleAnimationIteration(slot.id)}
-                    style={{
-                      top: pos.top,
-                      left: pos.left,
-                      right: pos.right,
-                      maxWidth: pos.maxWidth,
-                      fontSize: '1rem',
-                      animationDelay: slot.delay,
-                      '--translateX': pos.isCenter ? '-50%' : '0px' 
-                    }}
-                  >
-                    "{slot.text}"
-                  </div>
-                );
-              })}
+              {slots.map((slot) => (
+                <div 
+                  key={slot.id} 
+                  className={`cinematic-text slot-${slot.id}`}
+                  onClick={() => setInput(slot.text)}
+                  onAnimationIteration={() => handleAnimationIteration(slot.id)}
+                  style={{
+                    top: slot.pos.top,
+                    left: slot.pos.left || 'auto',
+                    right: slot.pos.isRight ? slot.pos.right : 'auto',
+                    maxWidth: slot.pos.maxWidth,
+                    fontSize: slot.size,
+                    animationDelay: slot.delay,
+                    '--translateX': slot.pos.isCenter ? '-50%' : '0px' 
+                  }}
+                >
+                  "{slot.text}"
+                </div>
+              ))}
             </div>
 
-            {/* className eklendi: Mobilde aşağı itmek için */}
-            <div style={heroSection} className="mobile-hero">
+            <div style={heroSection} className="hero-section">
               <div style={logoFrame}>
                  <img src="/logo.png" alt="Logo" style={centerLogo} />
               </div>
-              <h2 style={heroTitle} className="mobile-title">Doğru promptu burada üret.</h2>
-              <p style={heroSub}>Karmaşık yazabilirsin. Sistem optimize eder. Çıktıyı kopyalayıp diğer AI araçlarında çalıştır.</p>
+              {/* 🚨 SENİN HARİKA METİN GÜNCELLEMEN BURADA 🚨 */}
+              <h2 style={heroTitle} className="hero-title">Doğru promptu oluştur.</h2>
+              <p style={heroSub} className="hero-sub">Metni yaz. Optimize edilmiş promptu al. Kopyala ve diğer AI araçlarında kullan.</p>
             </div>
           </>
         ) : (
@@ -301,7 +300,7 @@ const floatingContainer = { position: 'absolute', top: '70px', left: 0, right: 0
 const heroSection = { display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', zIndex: 10, marginTop: '30vh', width: '100%' };
 const logoFrame = { marginBottom: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center' };
 const centerLogo = { width: '100%', maxWidth: '180px', height: 'auto', display: 'block', objectFit: 'contain' };
-const heroTitle = { fontSize: '2.5rem', fontWeight: '600', marginBottom: '10px', color: '#fff', letterSpacing: '-0.5px' };
+const heroTitle = { fontSize: '2rem', fontWeight: '600', marginBottom: '10px', color: '#fff', letterSpacing: '-0.5px' };
 const heroSub = { color: '#888', fontSize: '1rem', maxWidth: '550px', padding: '0 20px', lineHeight: '1.5' };
 
 const resultContainer = { maxWidth: '850px', width: '100%', marginTop: '80px', marginBottom: '160px', zIndex: 10, padding: '0 20px' };
