@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 
-// HERKESİN İLGİSİNİ ÇEKECEK YENİ "HAP" PROMPT HAVUZU (Doğal, amaca yönelik kelimeler)
+// HERKESİN İLGİSİNİ ÇEKECEK YENİ "HAP" PROMPT HAVUZU
 const allPrompts = [
   "Bana sorular sorarak MBTI kişilik analizimi yap ve içsel potansiyelimi keşfetmemi sağla...",
   "Fincan fotoğrafıma bakarak geleneksel sembollerle, geçmişi ve geleceği yorumlayan derin bir kahve falı bak...",
@@ -76,7 +76,6 @@ export default function Home() {
     setTimeout(() => setCopyStatus('Metni Kopyala'), 2000);
   };
 
-  // MOBİL UYUMLU VE SİNEMATİK CSS
   useEffect(() => {
     const styleSheet = document.createElement("style");
     styleSheet.innerText = `
@@ -107,8 +106,15 @@ export default function Home() {
         50% { transform: scale(1.2); }
         100% { transform: scale(1); }
       }
+      
+      .info-card {
+        transition: transform 0.3s ease, border-color 0.3s ease;
+      }
+      .info-card:hover {
+        transform: translateY(-5px);
+        border-color: #555;
+      }
 
-      /* MOBİL EKRANLAR İÇİN HAYAT KURTARAN AYARLAR */
       @media (max-width: 768px) {
         .cinematic-text {
           font-size: 0.95rem !important;
@@ -125,10 +131,19 @@ export default function Home() {
         .cinematic-text:nth-child(3) { top: 32% !important; animation-delay: 10s !important;}
         
         .mobile-hero {
-          margin-top: 45vh !important; 
+          margin-top: 40vh !important; 
         }
         .mobile-title {
           font-size: 1.8rem !important;
+        }
+        .cards-container {
+          flex-direction: column !important;
+          gap: 15px !important;
+          padding: 0 20px !important;
+        }
+        .info-card {
+          width: 100% !important;
+          padding: 15px !important;
         }
       }
     `;
@@ -186,7 +201,26 @@ export default function Home() {
                  <img src="/logo.png" alt="Logo" style={centerLogo} />
               </div>
               <h2 style={heroTitle} className="mobile-title">Size nasıl yardımcı olabilirim?</h2>
-              <p style={heroSub}>Karmaşık fikirlerinizi profesyonel bir prompta dönüştürün.</p>
+              <p style={heroSub}>Sıradan cümlelerinizi, yapay zekanın anlayacağı kusursuz komutlara dönüştürüyoruz.</p>
+              
+              <div style={cardsContainer} className="cards-container">
+                <div style={infoCard} className="info-card">
+                  <span style={cardIcon}>📝</span>
+                  <h3 style={cardTitle}>Fikrini Yaz</h3>
+                  <p style={cardDesc}>Ne istediğini günlük ve basit bir dille alt kutuya yaz.</p>
+                </div>
+                <div style={infoCard} className="info-card">
+                  <span style={cardIcon}>⚙️</span>
+                  <h3 style={cardTitle}>Sistem İşlesin</h3>
+                  <p style={cardDesc}>Mühendislik altyapımız onu profesyonel bir komuta çevirsin.</p>
+                </div>
+                <div style={infoCard} className="info-card">
+                  <span style={cardIcon}>🚀</span>
+                  <h3 style={cardTitle}>Kopyala & Kullan</h3>
+                  <p style={cardDesc}>Üretilen Master Prompt'u ChatGPT veya Claude'a yapıştır.</p>
+                </div>
+              </div>
+
             </div>
           </>
         ) : (
@@ -236,7 +270,6 @@ export default function Home() {
   );
 }
 
-// STİLLER
 const container = { backgroundColor: '#080808', minHeight: '100vh', color: '#ECECEC', fontFamily: 'Inter, sans-serif', display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden' };
 const topBar = { padding: '20px 25px', position: 'absolute', top: 0, left: 0, right: 0, zIndex: 30, display: 'flex', justifyContent: 'space-between', alignItems: 'center' };
 const logoWrapper = { display: 'flex', alignItems: 'center', gap: '10px', opacity: 0.8, cursor: 'pointer' };
@@ -244,23 +277,29 @@ const miniLogo = { height: '22px', width: 'auto', objectFit: 'contain' };
 const logoText = { fontWeight: '600', fontSize: '0.9rem', letterSpacing: '1px' };
 const backButton = { backgroundColor: 'transparent', color: '#fff', border: '1px solid #333', padding: '8px 16px', borderRadius: '20px', cursor: 'pointer', fontSize: '0.85rem' };
 
-const contentArea = { flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', position: 'relative' };
+const contentArea = { flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', position: 'relative', paddingBottom: '100px' };
 
 const floatingContainer = { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, pointerEvents: 'auto', zIndex: 5, overflow: 'hidden' };
 
-const heroSection = { display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', zIndex: 10, marginTop: '25vh' };
+const heroSection = { display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', zIndex: 10, marginTop: '20vh', width: '100%' };
 const logoFrame = { marginBottom: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center' };
 const centerLogo = { width: '100%', maxWidth: '160px', height: 'auto', display: 'block', objectFit: 'contain' };
 const heroTitle = { fontSize: '2.2rem', fontWeight: '600', marginBottom: '10px', color: '#fff' };
-const heroSub = { color: '#666', fontSize: '1rem', maxWidth: '450px', padding: '0 20px' };
+const heroSub = { color: '#888', fontSize: '0.95rem', maxWidth: '500px', padding: '0 20px', lineHeight: '1.5', marginBottom: '35px' };
 
-const resultContainer = { maxWidth: '850px', width: '100%', marginTop: '120px', marginBottom: '160px', zIndex: 10, padding: '0 20px' };
+const cardsContainer = { display: 'flex', gap: '20px', justifyContent: 'center', maxWidth: '800px', width: '100%', zIndex: 15 };
+const infoCard = { backgroundColor: 'rgba(25, 25, 25, 0.4)', border: '1px solid #222', borderRadius: '16px', padding: '20px', width: '220px', display: 'flex', flexDirection: 'column', alignItems: 'center', backdropFilter: 'blur(10px)', textAlign: 'center' };
+const cardIcon = { fontSize: '1.8rem', marginBottom: '12px' };
+const cardTitle = { fontSize: '0.9rem', fontWeight: '700', color: '#fff', marginBottom: '8px', letterSpacing: '0.5px' };
+const cardDesc = { fontSize: '0.8rem', color: '#777', lineHeight: '1.4' };
+
+const resultContainer = { maxWidth: '850px', width: '100%', marginTop: '80px', marginBottom: '160px', zIndex: 10, padding: '0 20px' };
 const aiResponseWrapper = { width: '100%', backgroundColor: '#111', padding: '20px', borderRadius: '16px', border: '1px solid #222' };
 const aiLabel = { fontSize: '0.75rem', fontWeight: '700', color: '#888', marginBottom: '20px', letterSpacing: '2px' };
 const aiText = { fontSize: '1.05rem', lineHeight: '1.6', color: '#E0E0E0', whiteSpace: 'pre-wrap' };
 const copyBtn = { marginTop: '25px', background: '#222', color: '#fff', border: 'none', padding: '10px 20px', borderRadius: '8px', cursor: 'pointer', fontSize: '0.9rem' };
 
-const bottomArea = { position: 'fixed', bottom: 0, left: 0, right: 0, padding: '20px', background: 'linear-gradient(transparent, #080808 80%)', display: 'flex', flexDirection: 'column', alignItems: 'center', zIndex: 20 };
+const bottomArea = { position: 'fixed', bottom: 0, left: 0, right: 0, padding: '20px', background: 'linear-gradient(transparent, #080808 85%)', display: 'flex', flexDirection: 'column', alignItems: 'center', zIndex: 20 };
 const inputBox = { maxWidth: '750px', width: '100%', backgroundColor: '#1A1A1A', borderRadius: '30px', padding: '8px 12px 8px 20px', display: 'flex', alignItems: 'center', border: '1px solid #2A2A2A' };
 const inputField = { flex: 1, background: 'transparent', border: 'none', color: '#fff', fontSize: '1.05rem', outline: 'none', resize: 'none', padding: '12px 0', maxHeight: '150px', fontFamily: 'inherit' };
 
