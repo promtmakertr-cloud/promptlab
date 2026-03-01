@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 
+// İNSANİ VE İLGİ ÇEKİCİ PROMPT HAVUZU
 const allPrompts = [
   "Bana sorular sorarak MBTI kişilik analizimi yap ve içsel potansiyelimi keşfetmemi sağla...",
   "Fincan fotoğrafıma bakarak geleneksel sembollerle, geçmişi ve geleceği yorumlayan derin bir kahve falı bak...",
@@ -16,12 +17,18 @@ const allPrompts = [
   "Stresli bir günün ardından zihnimi boşaltmamı sağlayacak 10 dakikalık rehberli meditasyon metni yaz..."
 ];
 
-// MERKEZDEN UZAK, SADECE KENARLARDAKİ GÜVENLİ ALANLAR (Asla logoya veya başlığa değmez)
-const safeZones = [
-  { top: '10%', left: '5%', maxWidth: '280px' },
-  { top: '15%', right: '5%', maxWidth: '280px' },
-  { top: '45%', left: '8%', maxWidth: '260px' },
-  { top: '50%', right: '8%', maxWidth: '260px' }
+const fontSizes = ['0.85rem', '0.95rem', '1.05rem', '1.15rem', '1.25rem'];
+
+const masterPositions = [
+  { top: '5%', left: '5%', maxWidth: '280px' },
+  { top: '35%', left: '10%', maxWidth: '290px' },
+  { top: '65%', left: '6%', maxWidth: '260px' },
+  { top: '8%', left: '50%', maxWidth: '340px', isCenter: true },
+  { top: '40%', left: '50%', maxWidth: '320px', isCenter: true },
+  { top: '75%', left: '50%', maxWidth: '350px', isCenter: true },
+  { top: '10%', right: '5%', maxWidth: '280px', isRight: true },
+  { top: '45%', right: '10%', maxWidth: '290px', isRight: true },
+  { top: '60%', right: '6%', maxWidth: '260px', isRight: true },
 ];
 
 export default function Home() {
@@ -35,22 +42,31 @@ export default function Home() {
 
   useEffect(() => {
     const shuffledTexts = [...allPrompts].sort(() => 0.5 - Math.random());
+    const shuffledPos = [...masterPositions].sort(() => 0.5 - Math.random());
+    
     setSlots([
-      { id: 0, text: shuffledTexts[0], pos: safeZones[0], delay: '0s' },
-      { id: 1, text: shuffledTexts[1], pos: safeZones[1], delay: '5s' },
-      { id: 2, text: shuffledTexts[2], pos: safeZones[2], delay: '10s' },
-      { id: 3, text: shuffledTexts[3], pos: safeZones[3], delay: '15s' },
+      { id: 0, text: shuffledTexts[0], pos: shuffledPos[0], size: fontSizes[2], delay: '0s' },
+      { id: 1, text: shuffledTexts[1], pos: shuffledPos[1], size: fontSizes[1], delay: '4s' },
+      { id: 2, text: shuffledTexts[2], pos: shuffledPos[2], size: fontSizes[4], delay: '8s' },
+      { id: 3, text: shuffledTexts[3], pos: shuffledPos[3], size: fontSizes[0], delay: '12s' },
     ]);
   }, []);
 
   const handleAnimationIteration = (slotId) => {
     setSlots(prevSlots => {
       const currentTexts = prevSlots.map(s => s.text);
+      const currentPositions = prevSlots.map(s => s.pos);
+
       const availablePrompts = allPrompts.filter(p => !currentTexts.includes(p));
       const newText = availablePrompts[Math.floor(Math.random() * availablePrompts.length)] || allPrompts[0];
 
+      const availablePos = masterPositions.filter(p => !currentPositions.includes(p));
+      const newPos = availablePos[Math.floor(Math.random() * availablePos.length)] || masterPositions[0];
+
+      const newSize = fontSizes[Math.floor(Math.random() * fontSizes.length)];
+
       return prevSlots.map(slot =>
-        slot.id === slotId ? { ...slot, text: newText } : slot
+        slot.id === slotId ? { ...slot, text: newText, pos: newPos, size: newSize } : slot
       );
     });
   };
@@ -111,30 +127,28 @@ export default function Home() {
         100% { background-position: 200% 50%; }
       }
 
-      /* ÇOK YAVAŞ VE SİLİK NEFES ALMA ANİMASYONU (Sadece arkaplanda bir his) */
-      @keyframes softBreathing {
-        0% { opacity: 0; transform: scale(0.95); filter: blur(10px); }
-        30% { opacity: 0.4; transform: scale(1); filter: blur(0px); }
-        70% { opacity: 0.4; transform: scale(1.02); filter: blur(0px); }
-        100% { opacity: 0; transform: scale(1.05); filter: blur(10px); }
+      @keyframes trueBreathing {
+        0% { opacity: 0; transform: translateX(var(--translateX, 0)) scale(0.8); filter: blur(15px); }
+        30% { opacity: 0.85; transform: translateX(var(--translateX, 0)) scale(1); filter: blur(0px); }
+        70% { opacity: 0.85; transform: translateX(var(--translateX, 0)) scale(1.05); filter: blur(0px); }
+        100% { opacity: 0; transform: translateX(var(--translateX, 0)) scale(1.2); filter: blur(15px); }
       }
 
       .cinematic-text {
         position: absolute;
-        color: #777777; /* Çok silik renk */
+        color: #999999;
         cursor: pointer;
-        animation: softBreathing 20s infinite ease-in-out; /* 20 saniye, çok yavaş */
+        animation: trueBreathing 16s infinite cubic-bezier(0.4, 0, 0.2, 1);
         text-align: center;
         line-height: 1.5;
         font-weight: 300;
-        font-size: 0.95rem;
         transition: color 0.3s ease, text-shadow 0.3s ease;
       }
 
       .cinematic-text:hover {
         color: #ffffff !important;
-        opacity: 0.8 !important;
-        text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+        opacity: 1 !important;
+        text-shadow: 0 0 12px rgba(255, 255, 255, 0.6);
         animation-play-state: paused;
         z-index: 50;
       }
@@ -148,24 +162,26 @@ export default function Home() {
 
       @media (max-width: 768px) {
         .hero-section { margin-top: 35vh !important; }
-        .hero-title { font-size: 1.8rem !important; line-height: 1.2 !important; padding: 0 10px !important; }
+        .hero-title { font-size: 1.6rem !important; line-height: 1.2 !important; padding: 0 10px !important; }
         .hero-sub { font-size: 0.9rem !important; padding: 0 15px !important; margin-top: 15px !important; }
         
         .cinematic-text {
-          font-size: 0.8rem !important;
-          width: 90vw !important;         
-          max-width: 90vw !important;
-          left: 5vw !important;              
-          right: auto !important;             
+          font-size: 0.85rem !important;
+          width: 100vw !important;         
+          max-width: 100vw !important;
+          left: 0 !important;              
+          right: 0 !important;             
+          padding: 0 25px !important;      
+          box-sizing: border-box !important;
+          --translateX: 0px !important;    
         }
         
-        /* Mobilde sadece 2 yazı, en üstte ve en altta, asla ortaya değmez */
-        .slot-0 { top: 5% !important; }
-        .slot-1 { top: 65% !important; }
-        .slot-2 { display: none !important; }
+        .slot-0 { top: 0% !important; }
+        .slot-1 { top: 30% !important; }
+        .slot-2 { top: 60% !important; }
         .slot-3 { display: none !important; } 
         
-        .floor-glow { opacity: 0.25 !important; height: 60px !important; bottom: -10px !important;}
+        .floor-glow { opacity: 0.1 !important; height: 60px !important; bottom: -15px !important;}
       }
     `;
     document.head.appendChild(styleSheet);
@@ -187,7 +203,6 @@ export default function Home() {
       <div style={contentArea}>
         {!result ? (
           <>
-            {/* O KAOTİK YAPI SİLİNDİ. SADECE KENARLARDA 4 TANE SAKİN YAZI VAR */}
             <div style={floatingContainer}>
               {slots.map((slot) => (
                 <div 
@@ -198,9 +213,11 @@ export default function Home() {
                   style={{
                     top: slot.pos.top,
                     left: slot.pos.left || 'auto',
-                    right: slot.pos.right || 'auto',
+                    right: slot.pos.isRight ? slot.pos.right : 'auto',
                     maxWidth: slot.pos.maxWidth,
+                    fontSize: slot.size,
                     animationDelay: slot.delay,
+                    '--translateX': slot.pos.isCenter ? '-50%' : '0px' 
                   }}
                 >
                   "{slot.text}"
@@ -208,7 +225,6 @@ export default function Home() {
               ))}
             </div>
 
-            {/* MERKEZ: SENİN İSTEDİĞİN GİBİ TERTEMİZ VE DOĞRU METİNLERLE */}
             <div style={heroSection} className="hero-section">
               <div style={logoFrame}>
                  <img src="/logo.png" alt="Logo" style={centerLogo} />
@@ -230,7 +246,6 @@ export default function Home() {
 
       <div style={bottomArea}>
         
-        {/* REFERANS GÖRSELİNDEKİ KUSURSUZ ZEMİN YANSIMASI VE KUTU */}
         <div className="floor-glow" style={floorGlow}></div>
 
         <div style={glowWrapper}>
@@ -280,13 +295,13 @@ const backButton = { backgroundColor: 'transparent', color: '#fff', border: '1px
 
 const contentArea = { flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', position: 'relative', paddingBottom: '100px' };
 
-const floatingContainer = { position: 'absolute', top: '70px', left: 0, right: 0, bottom: '150px', pointerEvents: 'auto', zIndex: 5, overflow: 'hidden' };
+const floatingContainer = { position: 'absolute', top: '70px', left: 0, right: 0, height: '40vh', pointerEvents: 'auto', zIndex: 5, overflow: 'hidden' };
 
-const heroSection = { display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', zIndex: 10, marginTop: '25vh', width: '100%' };
+const heroSection = { display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', zIndex: 10, marginTop: '30vh', width: '100%' };
 const logoFrame = { marginBottom: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center' };
 const centerLogo = { width: '100%', maxWidth: '180px', height: 'auto', display: 'block', objectFit: 'contain' };
-const heroTitle = { fontSize: '2.2rem', fontWeight: '600', marginBottom: '10px', color: '#fff', letterSpacing: '-0.5px' };
-const heroSub = { color: '#999', fontSize: '0.95rem', maxWidth: '550px', padding: '0 20px', lineHeight: '1.5' };
+const heroTitle = { fontSize: '2rem', fontWeight: '600', marginBottom: '10px', color: '#fff', letterSpacing: '-0.5px' };
+const heroSub = { color: '#888', fontSize: '1rem', maxWidth: '550px', padding: '0 20px', lineHeight: '1.5' };
 
 const resultContainer = { maxWidth: '850px', width: '100%', marginTop: '80px', marginBottom: '160px', zIndex: 10, padding: '0 20px' };
 const aiResponseWrapper = { width: '100%', backgroundColor: '#111', padding: '20px', borderRadius: '16px', border: '1px solid #222' };
@@ -296,43 +311,44 @@ const copyBtn = { marginTop: '25px', background: '#222', color: '#fff', border: 
 
 const bottomArea = { position: 'fixed', bottom: 0, left: 0, right: 0, padding: '30px 20px 40px 20px', background: 'transparent', display: 'flex', flexDirection: 'column', alignItems: 'center', zIndex: 20 };
 
-const neonGradient = 'linear-gradient(90deg, #ff4500, #a020f0, #00ffff, #ff4500, #a020f0, #00ffff)';
+// 🔥 SOFT VE PASTEL RENKLER (#ff7eb3 pembe, #bf73ff pastel mor, #73d2ff açık mavi) 🔥
+const softGradient = 'linear-gradient(90deg, #ff7eb3, #bf73ff, #73d2ff, #ff7eb3, #bf73ff)';
 
 const floorGlow = {
   position: 'absolute',
-  bottom: '-25px', 
+  bottom: '-20px', 
   left: '50%',
   transform: 'translateX(-50%)',
-  width: '75vw', 
+  width: '60vw', 
   maxWidth: '800px',
-  height: '100px', 
-  background: neonGradient, 
+  height: '80px', 
+  background: softGradient,
   backgroundSize: '200% 100%',
-  filter: 'blur(65px)',
-  opacity: 0.45, 
+  filter: 'blur(60px)',
+  opacity: 0.15, // Işık yansıması çok zayıflatıldı, elit duruş eklendi
   zIndex: 1,
   pointerEvents: 'none',
-  animation: 'glowingBorder 6s linear infinite' 
+  animation: 'glowingBorder 15s linear infinite' // 🔥 15 SANİYE! ÇOK YAVAŞ AKIŞ 🔥
 };
 
 const glowWrapper = {
   position: 'relative',
   width: '100%',
   maxWidth: '750px',
-  borderRadius: '50px', 
-  background: neonGradient,
+  borderRadius: '50px', // Tam hap şekli (Pill)
+  background: softGradient,
   backgroundSize: '200% 100%',
-  animation: 'glowingBorder 6s linear infinite', 
-  padding: '2px', 
-  zIndex: 2,
+  animation: 'glowingBorder 15s linear infinite', // 🔥 ÇOK YAVAŞ AKIŞ 🔥
+  padding: '1px', // En ince ve zarif çerçeve
+  zIndex: 2 
 };
 
 const inputBoxInner = {
-  backgroundColor: '#050505', 
-  borderRadius: '48px', 
+  backgroundColor: '#0a0a0a', 
+  borderRadius: '49px', // Dış kapsayıcı 50px - 1px çerçeve = 49px
   display: 'flex',
   alignItems: 'center',
-  padding: '12px 16px 12px 24px', 
+  padding: '10px 12px 10px 20px',
   width: '100%',
   height: '100%',
 };
