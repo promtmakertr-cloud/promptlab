@@ -162,7 +162,6 @@ export default function Home() {
         100% { transform: scale(1); }
       }
 
-      /* 🚨 MOBİLİN KESİN ÇÖZÜMÜ: TAM GENİŞLİK VE PADDING 🚨 */
       @media (max-width: 768px) {
         .hero-section { margin-top: 35vh !important; }
         .hero-title { font-size: 1.6rem !important; line-height: 1.2 !important; padding: 0 10px !important; }
@@ -170,22 +169,22 @@ export default function Home() {
         
         .cinematic-text {
           font-size: 0.85rem !important;
-          width: 100vw !important;         /* Ekranı tam kapla */
+          width: 100vw !important;         
           max-width: 100vw !important;
-          left: 0 !important;              /* En soldan başla */
-          right: 0 !important;             /* En sağa kadar git */
-          padding: 0 25px !important;      /* Ama yazıları kenarlara 25px'den fazla yaklaştırma */
+          left: 0 !important;              
+          right: 0 !important;             
+          padding: 0 25px !important;      
           box-sizing: border-box !important;
-          --translateX: 0px !important;    /* Kayma hatasını sıfırla */
+          --translateX: 0px !important;    
         }
         
-        /* Artık yatayda kaydırmaya gerek kalmadı, padding ile merkezlendi */
         .slot-0 { top: 0% !important; }
         .slot-1 { top: 30% !important; }
         .slot-2 { top: 60% !important; }
         .slot-3 { display: none !important; } 
         
-        .floor-glow { opacity: 0.15 !important; }
+        /* Mobilde yansıma da biraz daha sönük olur */
+        .floor-glow { opacity: 0.1 !important; height: 60px !important; bottom: -15px !important;}
       }
     `;
     document.head.appendChild(styleSheet);
@@ -221,7 +220,6 @@ export default function Home() {
                     maxWidth: slot.pos.maxWidth,
                     fontSize: slot.size,
                     animationDelay: slot.delay,
-                    // Masaüstü merkezlemesi için CSS Hack'i
                     '--translateX': slot.pos.isCenter ? '-50%' : '0px' 
                   }}
                 >
@@ -251,6 +249,7 @@ export default function Home() {
 
       <div style={bottomArea}>
         
+        {/* 🚨 ZARİFLEŞTİRİLMİŞ ZEMİN YANSIMASI 🚨 */}
         <div className="floor-glow" style={floorGlow}></div>
 
         <div style={glowWrapper}>
@@ -316,38 +315,41 @@ const copyBtn = { marginTop: '25px', background: '#222', color: '#fff', border: 
 
 const bottomArea = { position: 'fixed', bottom: 0, left: 0, right: 0, padding: '30px 20px 40px 20px', background: 'transparent', display: 'flex', flexDirection: 'column', alignItems: 'center', zIndex: 20 };
 
+// 🚨 YANSIMA DAHA İNCE VE ZARİF HALE GETİRİLDİ 🚨
 const floorGlow = {
   position: 'absolute',
-  bottom: '-30px',
+  bottom: '-20px', 
   left: '50%',
   transform: 'translateX(-50%)',
-  width: '70vw',
-  maxWidth: '900px',
-  height: '120px',
-  background: 'linear-gradient(90deg, #ff0055, #7928ca, #00d2ff, #ff0055)',
+  width: '60vw', 
+  maxWidth: '800px',
+  height: '80px', 
+  background: 'linear-gradient(90deg, #ff2a85, #8a2be2, #41d1ff, #ff2a85)', // Daha ruhani renkler
   backgroundSize: '200% 100%',
-  filter: 'blur(70px)',
-  opacity: 0.3,
+  filter: 'blur(60px)',
+  opacity: 0.25, // Şeffaflık azaltıldı, elit duruş eklendi
   zIndex: 1,
   pointerEvents: 'none',
   animation: 'glowingBorder 6s linear infinite'
 };
 
+// 🚨 ÇERÇEVE 1PX'E DÜŞÜRÜLDÜ VE RENKLER YUMUŞATILDI 🚨
 const glowWrapper = {
   position: 'relative',
   width: '100%',
   maxWidth: '750px',
   borderRadius: '32px',
-  background: 'linear-gradient(90deg, #ff0055, #7928ca, #00d2ff, #ff0055, #7928ca)',
+  background: 'linear-gradient(90deg, #ff2a85, #8a2be2, #41d1ff, #ff2a85, #8a2be2)', // Daha yumuşak Siri tonları
   backgroundSize: '200% 100%',
   animation: 'glowingBorder 4s linear infinite',
-  padding: '2px', 
-  zIndex: 2 
+  padding: '1px', // İŞTE O İNCECİK ESTETİK DOKUNUŞ!
+  zIndex: 2,
+  boxShadow: '0 0 20px rgba(138, 43, 226, 0.15)' // Kutuya çok hafif dış ışıltı eklendi
 };
 
 const inputBoxInner = {
   backgroundColor: '#0a0a0a', 
-  borderRadius: '30px',
+  borderRadius: '31px', // 32px dış çevre - 1px çerçeve = 31px (Matematiksel kusursuzluk)
   display: 'flex',
   alignItems: 'center',
   padding: '10px 12px 10px 20px',
