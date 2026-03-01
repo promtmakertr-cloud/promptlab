@@ -1,28 +1,18 @@
 'use client';
 import { useState, useEffect } from 'react';
 
-// VİDEONDAKİ BİREBİR METİNLER VE GÜVENLİ KORDİNATLARI (Asla çarpışmazlar)
-const cinematicPrompts = [
-  { 
-    text: "Bana sorular sorarak MBTI kişilik analizimi yap ve içsel potansiyelimi keşfetmemi sağla...", 
-    top: '18%', left: '8%', maxWidth: '280px', delay: '0s' 
-  },
-  { 
-    text: "Patronuma maaş zammı talebimi ileteceğim; net, ikna edici ve profesyonel bir e-posta taslağı hazırla...", 
-    top: '12%', right: '10%', maxWidth: '320px', delay: '5s' 
-  },
-  { 
-    text: "Sıfır ekipmanla evde sadece 20 dakikada ter atabileceğim, tüm vücut yağ yakıcı antrenman planı...", 
-    top: '8%', left: '50%', transform: 'translateX(-50%)', maxWidth: '380px', delay: '10s' 
-  },
-  { 
-    text: "5 yaşındaki çocuğum için özgüven aşılayan, sürükleyici ve rahatlatıcı bir uyku öncesi masalı yaz...", 
-    top: '28%', right: '20%', maxWidth: '300px', delay: '15s' 
-  },
-  { 
-    text: "Fincan fotoğrafıma bakarak geleneksel sembollerle, geçmişi ve geleceği yorumlayan derin bir kahve falı bak...", 
-    top: '35%', left: '15%', maxWidth: '300px', delay: '20s' 
-  }
+// İNSANİ VE İLGİ ÇEKİCİ PROMPT HAVUZU
+const allPrompts = [
+  "Bana sorular sorarak MBTI kişilik analizimi yap ve içsel potansiyelimi keşfetmemi sağla...",
+  "Fincan fotoğrafıma bakarak geleneksel sembollerle, geçmişi ve geleceği yorumlayan derin bir kahve falı bak...",
+  "Patronuma maaş zammı talebimi ileteceğim; net, ikna edici ve profesyonel bir e-posta taslağı hazırla...",
+  "Doğum haritama göre önümüzdeki 3 aylık süreçte aşk ve kariyer odaklı detaylı astroloji yorumu yap...",
+  "Evdeki yarım tavuk ve patatesle şef elinden çıkmış gibi duran 3 pratik akşam yemeği tarifi ver...",
+  "5 yaşındaki çocuğum için özgüven aşılayan, sürükleyici ve rahatlatıcı bir uyku öncesi masalı yaz...",
+  "Sıfır ekipmanla evde sadece 20 dakikada ter atabileceğim, tüm vücut yağ yakıcı antrenman planı...",
+  "Sevgilimin kalbini kırdım. Samimi, içten ve kendimi affettirecek uzunlukta duygusal bir mesaj yaz...",
+  "Benimle günlük konularda İngilizce sohbet et ve gramer hatalarını Türkçe açıklayarak düzelt...",
+  "Kariyerimde yerimde saydığımı hissediyorum, bana ufuk açacak stratejik tavsiyeler ver..."
 ];
 
 export default function Home() {
@@ -31,6 +21,13 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [copyStatus, setCopyStatus] = useState('Metni Kopyala');
+  const [prompts, setPrompts] = useState([]);
+
+  useEffect(() => {
+    // Sayfa her açıldığında promptları karıştır
+    const shuffled = [...allPrompts].sort(() => 0.5 - Math.random());
+    setPrompts(shuffled);
+  }, []);
 
   const handleReset = () => {
     setResult('');
@@ -80,7 +77,7 @@ export default function Home() {
     setTimeout(() => setCopyStatus('Metni Kopyala'), 2000);
   };
 
-  // VİDEONDAKİ NEON, YANSIMA VE BULUR EFEKTLERİ
+  // 🔥 YENİ NEFES ALMA (BREATHING) VE KUSURSUZ MOBİL CSS 🔥
   useEffect(() => {
     const styleSheet = document.createElement("style");
     styleSheet.innerText = `
@@ -89,30 +86,30 @@ export default function Home() {
         100% { background-position: 200% 50%; }
       }
 
-      /* Yazıların videondaki gibi aşağıdan süzülüp kaybolması */
-      @keyframes floatUpFade {
-        0% { opacity: 0; transform: translateY(15px) scale(0.95) translateX(var(--translateX, 0)); filter: blur(8px); }
-        15% { opacity: 0.5; transform: translateY(0px) scale(1) translateX(var(--translateX, 0)); filter: blur(0px); }
-        85% { opacity: 0.5; transform: translateY(-10px) scale(1) translateX(var(--translateX, 0)); filter: blur(0px); }
-        100% { opacity: 0; transform: translateY(-25px) scale(0.95) translateX(var(--translateX, 0)); filter: blur(8px); }
+      /* NEFES ALMA ANİMASYONU: Büyür, netleşir, silinir */
+      @keyframes breathingFade {
+        0% { opacity: 0; transform: scale(0.9) translateX(var(--translateX, 0)); filter: blur(10px); }
+        25% { opacity: 0.7; transform: scale(1) translateX(var(--translateX, 0)); filter: blur(0px); }
+        75% { opacity: 0.7; transform: scale(1.05) translateX(var(--translateX, 0)); filter: blur(0px); }
+        100% { opacity: 0; transform: scale(1.1) translateX(var(--translateX, 0)); filter: blur(10px); }
       }
 
       .cinematic-text {
         position: absolute;
-        color: #777777;
+        color: #888888;
         cursor: pointer;
-        animation: floatUpFade 25s infinite linear;
+        /* Her biri 12 saniye sürer, senkronize nefes alırlar */
+        animation: breathingFade 12s infinite linear;
         text-align: center;
-        line-height: 1.6;
+        line-height: 1.5;
         font-weight: 300;
-        letter-spacing: 0.3px;
         transition: color 0.3s ease, text-shadow 0.3s ease;
       }
 
       .cinematic-text:hover {
         color: #ffffff !important;
         opacity: 1 !important;
-        text-shadow: 0 0 12px rgba(255, 255, 255, 0.5);
+        text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
         animation-play-state: paused;
         z-index: 50;
       }
@@ -124,27 +121,48 @@ export default function Home() {
         100% { transform: scale(1); }
       }
 
+      /* 🚨 MOBİL TAMİRİ (Ekranı patlatan başlıklar ve karmaşa çözüldü) 🚨 */
       @media (max-width: 768px) {
+        .hero-section {
+          margin-top: 35vh !important;
+        }
+        .hero-title {
+          font-size: 2rem !important; /* Mobilde fontu küçülttük */
+          line-height: 1.2 !important;
+          padding: 0 10px !important;
+        }
+        .hero-sub {
+          font-size: 0.9rem !important;
+          padding: 0 15px !important;
+          margin-top: 15px !important;
+        }
         .cinematic-text {
           font-size: 0.85rem !important;
-          width: 85vw !important;
-          left: 7.5vw !important;
-          right: auto !important;
-          transform: none !important;
-          text-align: center !important;
+          max-width: 80vw !important;
         }
-        .cinematic-text:nth-child(n+4) { display: none !important; }
-        .hero-title { font-size: 1.8rem !important; }
-        .floor-glow { opacity: 0.15 !important; } /* Mobilde yansımayı hafiflettik */
+        /* Mobilde ekran dar olduğu için 3.yazıyı gizliyoruz, sadece 2 tane kalıyor */
+        .cinematic-text:nth-child(3) { display: none !important; }
+        
+        /* Mobilde yazıları logodan uzak, en üst köşelere itiyoruz */
+        .cinematic-text:nth-child(1) { top: 5% !important; left: 5% !important; right: auto !important; transform: none !important; --translateX: 0 !important;}
+        .cinematic-text:nth-child(2) { top: 18% !important; left: auto !important; right: 5% !important; transform: none !important; --translateX: 0 !important;}
+        
+        .floor-glow { opacity: 0.15 !important; }
       }
     `;
     document.head.appendChild(styleSheet);
     return () => document.head.removeChild(styleSheet);
   }, []);
 
+  // EKRANDA SADECE VE SADECE 3 YAZI OLACAK
+  const positions = [
+    { top: '15%', left: '8%', maxWidth: '280px', delay: '0s' }, // Sol Üst
+    { top: '8%', left: '50%', transform: 'translateX(-50%)', maxWidth: '320px', delay: '4s', isCenter: true }, // Orta En Üst
+    { top: '22%', right: '8%', maxWidth: '280px', delay: '8s' } // Sağ Biraz Aşağıda
+  ];
+
   return (
     <main style={container}>
-      {/* Üst Bar Orijinal Logo */}
       <div style={topBar}>
         <div style={logoWrapper} onClick={handleReset}>
           <img src="/logo.png" alt="Logo" style={miniLogo} />
@@ -158,43 +176,38 @@ export default function Home() {
       <div style={contentArea}>
         {!result ? (
           <>
-            {/* VİDEODAKİ GİBİ ASLA ÇARPIŞMAYAN YAZILAR */}
+            {/* SADECE 3 YAZI ÇALIŞACAK VE ASLA ÇARPIŞMAYACAK */}
             <div style={floatingContainer}>
-              {cinematicPrompts.map((prompt, index) => {
-                // Ortadaki text için transform hack'i (CSS değişkeniyle)
-                const isCenter = prompt.transform ? '-50%' : '0';
-                return (
-                  <div 
-                    key={index} 
-                    className="cinematic-text"
-                    onClick={() => setInput(prompt.text)}
-                    style={{
-                      top: prompt.top,
-                      left: prompt.left,
-                      right: prompt.right,
-                      maxWidth: prompt.maxWidth,
-                      fontSize: '1rem',
-                      animationDelay: prompt.delay,
-                      '--translateX': isCenter // Özel CSS değişkeni animasyon için
-                    }}
-                  >
-                    "{prompt.text}"
-                  </div>
-                );
-              })}
+              {prompts.length >= 3 && positions.map((pos, index) => (
+                <div 
+                  key={index} 
+                  className="cinematic-text"
+                  onClick={() => setInput(prompts[index])}
+                  style={{
+                    top: pos.top,
+                    left: pos.left,
+                    right: pos.right,
+                    maxWidth: pos.maxWidth,
+                    animationDelay: pos.delay,
+                    // Ortadaki yazıyı tam merkeze oturtmak için CSS değişkeni hilesi
+                    '--translateX': pos.isCenter ? '-50%' : '0' 
+                  }}
+                >
+                  "{prompts[index]}"
+                </div>
+              ))}
             </div>
 
-            {/* VİDEODAKİ TERTEMİZ, NET MERKEZ */}
-            <div style={heroSection}>
+            {/* MERKEZ (Çok Daha Aşağıya İtildi) */}
+            <div style={heroSection} className="hero-section">
               <div style={logoFrame}>
                  <img src="/logo.png" alt="Logo" style={centerLogo} />
               </div>
               <h2 style={heroTitle} className="hero-title">Doğru promptu burada üret.</h2>
-              <p style={heroSub}>Karmaşık yazabilirsin. Sistem optimize eder. Çıktıyı kopyalayıp diğer AI araçlarında çalıştır.</p>
+              <p style={heroSub} className="hero-sub">Karmaşık yazabilirsin. Sistem optimize eder. Çıktıyı kopyalayıp diğer AI araçlarında çalıştır.</p>
             </div>
           </>
         ) : (
-          /* SONUÇ EKRANI */
           <div style={resultContainer}>
              <div style={aiResponseWrapper}>
                 <div style={aiLabel}>ÜRETİLEN MASTER PROMPT</div>
@@ -207,10 +220,9 @@ export default function Home() {
 
       <div style={bottomArea}>
         
-        {/* 🔥 VİDEONDAKİ YANSIMA (ZEMİN IŞIĞI) 🔥 */}
+        {/* ZEMİN IŞIĞI (VİDEODAKİ GİBİ) */}
         <div className="floor-glow" style={floorGlow}></div>
 
-        {/* NEON IŞIKLI ÇERÇEVE */}
         <div style={glowWrapper}>
           <div style={inputBoxInner}>
             <textarea 
@@ -258,14 +270,15 @@ const backButton = { backgroundColor: 'transparent', color: '#fff', border: '1px
 
 const contentArea = { flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', position: 'relative', paddingBottom: '100px' };
 
-// Yazıların Logoya Çarpmasını Engelleyen Güvenli Alan
-const floatingContainer = { position: 'absolute', top: '70px', left: 0, right: 0, height: '45vh', pointerEvents: 'auto', zIndex: 5, overflow: 'hidden' };
+// Güvenli alan: Sadece üstteki boşluk. Asla logonun seviyesine inmez.
+const floatingContainer = { position: 'absolute', top: '70px', left: 0, right: 0, height: '40vh', pointerEvents: 'auto', zIndex: 5, overflow: 'hidden' };
 
-const heroSection = { display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', zIndex: 10, marginTop: '5vh', width: '100%' };
+// Merkez Bölge: Tasarım gereği çok daha aşağıya (30vh) itildi.
+const heroSection = { display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', zIndex: 10, marginTop: '30vh', width: '100%' };
 const logoFrame = { marginBottom: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center' };
 const centerLogo = { width: '100%', maxWidth: '180px', height: 'auto', display: 'block', objectFit: 'contain' };
 const heroTitle = { fontSize: '2.5rem', fontWeight: '600', marginBottom: '10px', color: '#fff', letterSpacing: '-0.5px' };
-const heroSub = { color: '#888', fontSize: '0.95rem', maxWidth: '500px', padding: '0 20px', lineHeight: '1.5' };
+const heroSub = { color: '#888', fontSize: '1rem', maxWidth: '550px', padding: '0 20px', lineHeight: '1.5' };
 
 const resultContainer = { maxWidth: '850px', width: '100%', marginTop: '80px', marginBottom: '160px', zIndex: 10, padding: '0 20px' };
 const aiResponseWrapper = { width: '100%', backgroundColor: '#111', padding: '20px', borderRadius: '16px', border: '1px solid #222' };
@@ -275,7 +288,6 @@ const copyBtn = { marginTop: '25px', background: '#222', color: '#fff', border: 
 
 const bottomArea = { position: 'fixed', bottom: 0, left: 0, right: 0, padding: '30px 20px 40px 20px', background: 'transparent', display: 'flex', flexDirection: 'column', alignItems: 'center', zIndex: 20 };
 
-// 🔥 ZEMİN YANSIMASI (FLOOR GLOW) 🔥
 const floorGlow = {
   position: 'absolute',
   bottom: '-30px',
@@ -302,7 +314,7 @@ const glowWrapper = {
   backgroundSize: '200% 100%',
   animation: 'glowingBorder 4s linear infinite',
   padding: '2px', 
-  zIndex: 2 // Işık zeminin üstünde kalsın
+  zIndex: 2 
 };
 
 const inputBoxInner = {
