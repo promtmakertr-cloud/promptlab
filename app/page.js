@@ -1,7 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
 
-// İNSANİ VE İLGİ ÇEKİCİ PROMPT HAVUZU
 const allPrompts = [
   "Bana sorular sorarak MBTI kişilik analizimi yap ve içsel potansiyelimi keşfetmemi sağla...",
   "Fincan fotoğrafıma bakarak geleneksel sembollerle, geçmişi ve geleceği yorumlayan derin bir kahve falı bak...",
@@ -153,7 +152,7 @@ export default function Home() {
         z-index: 50;
       }
 
-      .pulse-mic { animation: pulse 1.5s infinite; color: #ff4444 !important; }
+      .pulse-mic { animation: pulse 1.5s infinite; color: #00f2fe !important; }
       @keyframes pulse {
         0% { transform: scale(1); }
         50% { transform: scale(1.2); }
@@ -181,7 +180,8 @@ export default function Home() {
         .slot-2 { top: 60% !important; }
         .slot-3 { display: none !important; } 
         
-        .floor-glow { opacity: 0.1 !important; height: 60px !important; bottom: -15px !important;}
+        /* Mobilde yansıma gücü korundu */
+        .floor-glow { opacity: 0.35 !important; height: 60px !important; bottom: -15px !important;}
       }
     `;
     document.head.appendChild(styleSheet);
@@ -246,6 +246,7 @@ export default function Home() {
 
       <div style={bottomArea}>
         
+        {/* 🔥 YENİDEN GÖRÜNÜR HALE GELEN SİBER MAVİ YANSIMA 🔥 */}
         <div className="floor-glow" style={floorGlow}></div>
 
         <div style={glowWrapper}>
@@ -311,8 +312,8 @@ const copyBtn = { marginTop: '25px', background: '#222', color: '#fff', border: 
 
 const bottomArea = { position: 'fixed', bottom: 0, left: 0, right: 0, padding: '30px 20px 40px 20px', background: 'transparent', display: 'flex', flexDirection: 'column', alignItems: 'center', zIndex: 20 };
 
-// 🔥 SOFT VE PASTEL RENKLER (#ff7eb3 pembe, #bf73ff pastel mor, #73d2ff açık mavi) 🔥
-const softGradient = 'linear-gradient(90deg, #ff7eb3, #bf73ff, #73d2ff, #ff7eb3, #bf73ff)';
+// 🔥 SİBER MAVİ VE NEON CAMGÖBEĞİ TONLARI 🔥
+const cyberGradient = 'linear-gradient(90deg, #00f2fe, #0a64ff, #00f2fe, #0a64ff)';
 
 const floorGlow = {
   position: 'absolute',
@@ -322,30 +323,31 @@ const floorGlow = {
   width: '60vw', 
   maxWidth: '800px',
   height: '80px', 
-  background: softGradient,
+  background: cyberGradient,
   backgroundSize: '200% 100%',
-  filter: 'blur(60px)',
-  opacity: 0.15, // Işık yansıması çok zayıflatıldı, elit duruş eklendi
+  filter: 'blur(50px)',
+  opacity: 0.45, // 🔥 Görünürlük artırıldı, ışık geri döndü! 🔥
   zIndex: 1,
   pointerEvents: 'none',
-  animation: 'glowingBorder 15s linear infinite' // 🔥 15 SANİYE! ÇOK YAVAŞ AKIŞ 🔥
+  animation: 'glowingBorder 15s linear infinite' // Çok yavaş ve ağır akış
 };
 
 const glowWrapper = {
   position: 'relative',
   width: '100%',
   maxWidth: '750px',
-  borderRadius: '50px', // Tam hap şekli (Pill)
-  background: softGradient,
+  borderRadius: '50px', 
+  background: cyberGradient,
   backgroundSize: '200% 100%',
-  animation: 'glowingBorder 15s linear infinite', // 🔥 ÇOK YAVAŞ AKIŞ 🔥
-  padding: '1px', // En ince ve zarif çerçeve
-  zIndex: 2 
+  animation: 'glowingBorder 15s linear infinite', // Çok yavaş ve ağır akış
+  padding: '1px', 
+  zIndex: 2,
+  boxShadow: '0 0 15px rgba(0, 242, 254, 0.2)' // Kutuya da hafif teknolojik bir dış ışıltı eklendi
 };
 
 const inputBoxInner = {
   backgroundColor: '#0a0a0a', 
-  borderRadius: '49px', // Dış kapsayıcı 50px - 1px çerçeve = 49px
+  borderRadius: '49px', 
   display: 'flex',
   alignItems: 'center',
   padding: '10px 12px 10px 20px',
