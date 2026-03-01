@@ -17,13 +17,24 @@ const allPrompts = [
   "Stresli bir günün ardından zihnimi boşaltmamı sağlayacak 10 dakikalık rehberli meditasyon metni yaz..."
 ];
 
-// EKRANI 4 KESİN BÖLGEYE BÖLDÜK (Asla birbirlerinin alanına giremezler)
-const slotZones = {
-  0: [ {top: '0%', left: '5%', maxWidth: '300px'}, {top: '10%', left: '8%', maxWidth: '280px'}, {top: '5%', left: '2%', maxWidth: '320px'} ],   // SOL ÜST
-  1: [ {top: '5%', right: '5%', maxWidth: '300px'}, {top: '15%', right: '8%', maxWidth: '280px'}, {top: '0%', right: '12%', maxWidth: '320px'} ],  // SAĞ ÜST
-  2: [ {top: '40%', left: '12%', maxWidth: '300px'}, {top: '55%', left: '5%', maxWidth: '280px'}, {top: '48%', left: '18%', maxWidth: '320px'} ],  // SOL ALT
-  3: [ {top: '45%', right: '15%', maxWidth: '300px'}, {top: '55%', right: '8%', maxWidth: '280px'}, {top: '35%', right: '5%', maxWidth: '320px'} ]   // SAĞ ALT
-};
+// FARKLI PUNTOLAR (En ufağı bile okunabilir seviyede)
+const fontSizes = ['0.85rem', '0.95rem', '1.05rem', '1.15rem', '1.25rem'];
+
+// EKRANIN HER YERİNİ (Merkez Dahil) KAPSAYAN GÜVENLİ KORDİNAT HAVUZU
+const masterPositions = [
+  // Sol Taraflar
+  { top: '5%', left: '5%', maxWidth: '280px' },
+  { top: '35%', left: '10%', maxWidth: '290px' },
+  { top: '65%', left: '6%', maxWidth: '260px' },
+  // 🚀 Yeni Eklenen: MERKEZ (Tam Ortalar) 🚀
+  { top: '8%', left: '50%', maxWidth: '340px', isCenter: true },
+  { top: '40%', left: '50%', maxWidth: '320px', isCenter: true },
+  { top: '75%', left: '50%', maxWidth: '350px', isCenter: true },
+  // Sağ Taraflar
+  { top: '10%', right: '5%', maxWidth: '280px', isRight: true },
+  { top: '45%', right: '10%', maxWidth: '290px', isRight: true },
+  { top: '60%', right: '6%', maxWidth: '260px', isRight: true },
+];
 
 export default function Home() {
   const [input, setInput] = useState('');
@@ -35,29 +46,37 @@ export default function Home() {
   const [slots, setSlots] = useState([]);
 
   useEffect(() => {
-    // Sayfa açıldığında 4 bölgeye 4 rastgele yazı atıyoruz
-    const shuffled = [...allPrompts].sort(() => 0.5 - Math.random());
+    // Sayfa açıldığında 4 slotu farklı konumlara, farklı boyutlarda dağıtıyoruz
+    const shuffledTexts = [...allPrompts].sort(() => 0.5 - Math.random());
+    const shuffledPos = [...masterPositions].sort(() => 0.5 - Math.random());
+    
     setSlots([
-      { id: 0, text: shuffled[0], pos: slotZones[0][0], delay: '0s' },
-      { id: 1, text: shuffled[1], pos: slotZones[1][0], delay: '4s' },
-      { id: 2, text: shuffled[2], pos: slotZones[2][0], delay: '8s' },
-      { id: 3, text: shuffled[3], pos: slotZones[3][0], delay: '12s' },
+      { id: 0, text: shuffledTexts[0], pos: shuffledPos[0], size: fontSizes[2], delay: '0s' },
+      { id: 1, text: shuffledTexts[1], pos: shuffledPos[1], size: fontSizes[1], delay: '4s' },
+      { id: 2, text: shuffledTexts[2], pos: shuffledPos[2], size: fontSizes[4], delay: '8s' },
+      { id: 3, text: shuffledTexts[3], pos: shuffledPos[3], size: fontSizes[0], delay: '12s' },
     ]);
   }, []);
 
-  // YAZI SİLİNDİĞİNDE: Sadece kendi bölgesinde yeni bir konuma ve metne geçer
+  // YAZI SİLİNDİĞİNDE: Tamamen yeni bir yere ışınlanır, yeni bir punto alır!
   const handleAnimationIteration = (slotId) => {
     setSlots(prevSlots => {
       const currentTexts = prevSlots.map(s => s.text);
-      
+      const currentPositions = prevSlots.map(s => s.pos);
+
+      // Ekranda olmayan yeni bir yazı seç
       const availablePrompts = allPrompts.filter(p => !currentTexts.includes(p));
       const newText = availablePrompts[Math.floor(Math.random() * availablePrompts.length)] || allPrompts[0];
 
-      const zonesForThisSlot = slotZones[slotId];
-      const newZone = zonesForThisSlot[Math.floor(Math.random() * zonesForThisSlot.length)];
+      // Ekranda DOLU OLMAYAN yepyeni bir bölge seç (Böylece hep geziyorlar)
+      const availablePos = masterPositions.filter(p => !currentPositions.includes(p));
+      const newPos = availablePos[Math.floor(Math.random() * availablePos.length)] || masterPositions[0];
+
+      // Yepyeni rastgele bir punto seç
+      const newSize = fontSizes[Math.floor(Math.random() * fontSizes.length)];
 
       return prevSlots.map(slot =>
-        slot.id === slotId ? { ...slot, text: newText, pos: newZone } : slot
+        slot.id === slotId ? { ...slot, text: newText, pos: newPos, size: newSize } : slot
       );
     });
   };
@@ -118,20 +137,18 @@ export default function Home() {
         100% { background-position: 200% 50%; }
       }
 
-      /* 🔥 GERÇEK NEFES ALMA (BREATHING) EFEKTİ 🔥 */
-      /* Yazı küçücük ve bulanık doğar, normal boyuta netleşir, daha da büyüyerek sise karışır. */
+      /* NEFES ALMA ANİMASYONU: Yavaşça büyür ve silinir */
       @keyframes trueBreathing {
         0% { opacity: 0; transform: translateX(var(--translateX, 0)) scale(0.8); filter: blur(15px); }
-        30% { opacity: 0.8; transform: translateX(var(--translateX, 0)) scale(1); filter: blur(0px); }
-        70% { opacity: 0.8; transform: translateX(var(--translateX, 0)) scale(1.05); filter: blur(0px); }
+        30% { opacity: 0.85; transform: translateX(var(--translateX, 0)) scale(1); filter: blur(0px); }
+        70% { opacity: 0.85; transform: translateX(var(--translateX, 0)) scale(1.05); filter: blur(0px); }
         100% { opacity: 0; transform: translateX(var(--translateX, 0)) scale(1.2); filter: blur(15px); }
       }
 
       .cinematic-text {
         position: absolute;
-        color: #888888;
+        color: #999999;
         cursor: pointer;
-        /* Gerçek bir nefes gibi 16 saniyelik uzun, yavaş döngü */
         animation: trueBreathing 16s infinite cubic-bezier(0.4, 0, 0.2, 1);
         text-align: center;
         line-height: 1.5;
@@ -142,7 +159,7 @@ export default function Home() {
       .cinematic-text:hover {
         color: #ffffff !important;
         opacity: 1 !important;
-        text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
+        text-shadow: 0 0 12px rgba(255, 255, 255, 0.6);
         animation-play-state: paused;
         z-index: 50;
       }
@@ -154,25 +171,25 @@ export default function Home() {
         100% { transform: scale(1); }
       }
 
-      /* 🚨 MOBİL AKILLI DİZİLİM 🚨 */
+      /* 🚨 MOBİL AKILLI DİZİLİM: Masaüstündeki karmaşık kordinatları ve puntoları mobilde eziyoruz 🚨 */
       @media (max-width: 768px) {
         .hero-section { margin-top: 35vh !important; }
         .hero-title { font-size: 2rem !important; line-height: 1.2 !important; padding: 0 10px !important; }
         .hero-sub { font-size: 0.9rem !important; padding: 0 15px !important; margin-top: 15px !important; }
         
         .cinematic-text {
-          font-size: 0.85rem !important;
+          font-size: 0.85rem !important; /* Mobilde hep okunabilir sabit punto */
           max-width: 85vw !important;
           width: 85vw !important;
           left: 50% !important;
           right: auto !important;
         }
         
-        /* Mobilde yerleri sabit, merkezli ve alt alta. */
+        /* Mobilde alt alta 3 tane güvenli slot */
         .slot-0 { top: 0% !important; --translateX: -50% !important; }
         .slot-1 { top: 30% !important; --translateX: -50% !important; }
         .slot-2 { top: 60% !important; --translateX: -50% !important; }
-        .slot-3 { display: none !important; } /* Mobilde 4. yazı kalabalık yapar, gizliyoruz */
+        .slot-3 { display: none !important; } 
         
         .floor-glow { opacity: 0.15 !important; }
       }
@@ -196,7 +213,7 @@ export default function Home() {
       <div style={contentArea}>
         {!result ? (
           <>
-            {/* 4 BÖLGELİ KUSURSUZ YAZI SLOTLARI */}
+            {/* HER SEFERİNDE YER VE PUNTO DEĞİŞTİREN PROMPTLAR */}
             <div style={floatingContainer}>
               {slots.map((slot) => (
                 <div 
@@ -206,12 +223,12 @@ export default function Home() {
                   onAnimationIteration={() => handleAnimationIteration(slot.id)}
                   style={{
                     top: slot.pos.top,
-                    left: slot.pos.left,
-                    right: slot.pos.right,
+                    left: slot.pos.left || 'auto',
+                    right: slot.pos.isRight ? slot.pos.right : 'auto',
                     maxWidth: slot.pos.maxWidth,
+                    fontSize: slot.size, // Dinamik Punto!
                     animationDelay: slot.delay,
-                    // Masaüstü için varsayılan X ekseni değeri (Mobilde CSS ezecek)
-                    '--translateX': '0px' 
+                    '--translateX': slot.pos.isCenter ? '-50%' : '0px' 
                   }}
                 >
                   "{slot.text}"
