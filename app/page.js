@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 
-// İNSANİ VE İLGİ ÇEKİCİ PROMPT HAVUZU
+// İNSANİ VE İLGİ ÇEKİCİ PROMPT HAVUZU (Sayısını artırdım ki sürekli yenileri gelsin)
 const allPrompts = [
   "Bana sorular sorarak MBTI kişilik analizimi yap ve içsel potansiyelimi keşfetmemi sağla...",
   "Fincan fotoğrafıma bakarak geleneksel sembollerle, geçmişi ve geleceği yorumlayan derin bir kahve falı bak...",
@@ -12,7 +12,21 @@ const allPrompts = [
   "Sıfır ekipmanla evde sadece 20 dakikada ter atabileceğim, tüm vücut yağ yakıcı antrenman planı...",
   "Sevgilimin kalbini kırdım. Samimi, içten ve kendimi affettirecek uzunlukta duygusal bir mesaj yaz...",
   "Benimle günlük konularda İngilizce sohbet et ve gramer hatalarını Türkçe açıklayarak düzelt...",
-  "Kariyerimde yerimde saydığımı hissediyorum, bana ufuk açacak stratejik tavsiyeler ver..."
+  "Kariyerimde yerimde saydığımı hissediyorum, bana ufuk açacak stratejik tavsiyeler ver...",
+  "Yeni kuracağım e-ticaret sitesi için akılda kalıcı, 2 heceli ve modern marka isimleri türet...",
+  "Stresli bir günün ardından zihnimi boşaltmamı sağlayacak 10 dakikalık rehberli meditasyon metni yaz..."
+];
+
+// YAZILARIN ÇIKABİLECEĞİ 8 GÜVENLİ BÖLGE (Logoya asla değmezler)
+const safeZones = [
+  { top: '5%', left: '5%', maxWidth: '280px' },
+  { top: '15%', right: '5%', maxWidth: '300px' },
+  { top: '25%', left: '15%', maxWidth: '290px' },
+  { top: '5%', left: '50%', transform: 'translateX(-50%)', maxWidth: '320px', isCenter: true },
+  { top: '35%', right: '15%', maxWidth: '280px' },
+  { top: '20%', left: '40%', maxWidth: '300px' },
+  { top: '10%', right: '35%', maxWidth: '290px' },
+  { top: '45%', left: '8%', maxWidth: '270px' },
 ];
 
 export default function Home() {
@@ -21,13 +35,40 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [copyStatus, setCopyStatus] = useState('Metni Kopyala');
-  const [prompts, setPrompts] = useState([]);
+  
+  // Ekranda aynı anda duracak 4 slotumuz
+  const [slots, setSlots] = useState([]);
 
+  // Sayfa ilk açıldığında 4 slotu rastgele dolduruyoruz
   useEffect(() => {
-    // Sayfa her açıldığında promptları karıştır
-    const shuffled = [...allPrompts].sort(() => 0.5 - Math.random());
-    setPrompts(shuffled);
+    const initialSlots = [
+      { id: 0, text: allPrompts[0], pos: safeZones[0], delay: '0s' },
+      { id: 1, text: allPrompts[1], pos: safeZones[1], delay: '4s' },
+      { id: 2, text: allPrompts[2], pos: safeZones[2], delay: '8s' },
+      { id: 3, text: allPrompts[3], pos: safeZones[3], delay: '12s' },
+    ];
+    setSlots(initialSlots);
   }, []);
+
+  // SİHİRLİ FONKSİYON: Yazı silinip görünmez olduğunda anında yerini ve metnini değiştirir
+  const handleAnimationIteration = (slotId) => {
+    setSlots(prevSlots => {
+      const currentTexts = prevSlots.map(s => s.text);
+      const currentZones = prevSlots.map(s => s.pos);
+
+      // Ekranda olmayan yeni bir prompt seç
+      const availablePrompts = allPrompts.filter(p => !currentTexts.includes(p));
+      const newText = availablePrompts[Math.floor(Math.random() * availablePrompts.length)] || allPrompts[0];
+
+      // Ekranda dolu olmayan yeni bir güvenli bölge seç
+      const availableZones = safeZones.filter(z => !currentZones.includes(z));
+      const newZone = availableZones[Math.floor(Math.random() * availableZones.length)] || safeZones[0];
+
+      return prevSlots.map(slot =>
+        slot.id === slotId ? { ...slot, text: newText, pos: newZone } : slot
+      );
+    });
+  };
 
   const handleReset = () => {
     setResult('');
@@ -77,7 +118,6 @@ export default function Home() {
     setTimeout(() => setCopyStatus('Metni Kopyala'), 2000);
   };
 
-  // 🔥 YENİ NEFES ALMA (BREATHING) VE KUSURSUZ MOBİL CSS 🔥
   useEffect(() => {
     const styleSheet = document.createElement("style");
     styleSheet.innerText = `
@@ -86,20 +126,19 @@ export default function Home() {
         100% { background-position: 200% 50%; }
       }
 
-      /* NEFES ALMA ANİMASYONU: Büyür, netleşir, silinir */
+      /* NEFES ALMA: 16 saniyelik kusursuz döngü */
       @keyframes breathingFade {
-        0% { opacity: 0; transform: scale(0.9) translateX(var(--translateX, 0)); filter: blur(10px); }
-        25% { opacity: 0.7; transform: scale(1) translateX(var(--translateX, 0)); filter: blur(0px); }
-        75% { opacity: 0.7; transform: scale(1.05) translateX(var(--translateX, 0)); filter: blur(0px); }
-        100% { opacity: 0; transform: scale(1.1) translateX(var(--translateX, 0)); filter: blur(10px); }
+        0% { opacity: 0; transform: scale(0.95) translateX(var(--translateX, 0)); filter: blur(10px); }
+        15% { opacity: 0.7; transform: scale(1) translateX(var(--translateX, 0)); filter: blur(0px); }
+        85% { opacity: 0.7; transform: scale(1.02) translateX(var(--translateX, 0)); filter: blur(0px); }
+        100% { opacity: 0; transform: scale(1.05) translateX(var(--translateX, 0)); filter: blur(10px); }
       }
 
       .cinematic-text {
         position: absolute;
         color: #888888;
         cursor: pointer;
-        /* Her biri 12 saniye sürer, senkronize nefes alırlar */
-        animation: breathingFade 12s infinite linear;
+        animation: breathingFade 16s infinite linear;
         text-align: center;
         line-height: 1.5;
         font-weight: 300;
@@ -121,13 +160,13 @@ export default function Home() {
         100% { transform: scale(1); }
       }
 
-      /* 🚨 MOBİL TAMİRİ (Ekranı patlatan başlıklar ve karmaşa çözüldü) 🚨 */
+      /* 🚨 MOBİL AKILLI DİZİLİM 🚨 */
       @media (max-width: 768px) {
         .hero-section {
           margin-top: 35vh !important;
         }
         .hero-title {
-          font-size: 2rem !important; /* Mobilde fontu küçülttük */
+          font-size: 2rem !important; 
           line-height: 1.2 !important;
           padding: 0 10px !important;
         }
@@ -138,14 +177,17 @@ export default function Home() {
         }
         .cinematic-text {
           font-size: 0.85rem !important;
-          max-width: 80vw !important;
+          max-width: 85vw !important;
+          left: 50% !important;
+          right: auto !important;
+          transform: translateX(-50%) !important;
+          --translateX: -50% !important; /* Animasyon için merkezleme */
         }
-        /* Mobilde ekran dar olduğu için 3.yazıyı gizliyoruz, sadece 2 tane kalıyor */
-        .cinematic-text:nth-child(3) { display: none !important; }
-        
-        /* Mobilde yazıları logodan uzak, en üst köşelere itiyoruz */
-        .cinematic-text:nth-child(1) { top: 5% !important; left: 5% !important; right: auto !important; transform: none !important; --translateX: 0 !important;}
-        .cinematic-text:nth-child(2) { top: 18% !important; left: auto !important; right: 5% !important; transform: none !important; --translateX: 0 !important;}
+        /* Mobilde kalabalık olmasın diye sadece 3 tanesini alt alta güvenle diziyoruz */
+        .cinematic-text:nth-child(4) { display: none !important; }
+        .cinematic-text:nth-child(1) { top: 5% !important; }
+        .cinematic-text:nth-child(2) { top: 25% !important; }
+        .cinematic-text:nth-child(3) { top: 45% !important; }
         
         .floor-glow { opacity: 0.15 !important; }
       }
@@ -153,13 +195,6 @@ export default function Home() {
     document.head.appendChild(styleSheet);
     return () => document.head.removeChild(styleSheet);
   }, []);
-
-  // EKRANDA SADECE VE SADECE 3 YAZI OLACAK
-  const positions = [
-    { top: '15%', left: '8%', maxWidth: '280px', delay: '0s' }, // Sol Üst
-    { top: '8%', left: '50%', transform: 'translateX(-50%)', maxWidth: '320px', delay: '4s', isCenter: true }, // Orta En Üst
-    { top: '22%', right: '8%', maxWidth: '280px', delay: '8s' } // Sağ Biraz Aşağıda
-  ];
 
   return (
     <main style={container}>
@@ -176,29 +211,29 @@ export default function Home() {
       <div style={contentArea}>
         {!result ? (
           <>
-            {/* SADECE 3 YAZI ÇALIŞACAK VE ASLA ÇARPIŞMAYACAK */}
+            {/* 4 ADET DİNAMİK YAZI SLOTU */}
             <div style={floatingContainer}>
-              {prompts.length >= 3 && positions.map((pos, index) => (
+              {slots.map((slot) => (
                 <div 
-                  key={index} 
+                  key={slot.id} 
                   className="cinematic-text"
-                  onClick={() => setInput(prompts[index])}
+                  onClick={() => setInput(slot.text)}
+                  onAnimationIteration={() => handleAnimationIteration(slot.id)}
                   style={{
-                    top: pos.top,
-                    left: pos.left,
-                    right: pos.right,
-                    maxWidth: pos.maxWidth,
-                    animationDelay: pos.delay,
-                    // Ortadaki yazıyı tam merkeze oturtmak için CSS değişkeni hilesi
-                    '--translateX': pos.isCenter ? '-50%' : '0' 
+                    top: slot.pos.top,
+                    left: slot.pos.left,
+                    right: slot.pos.right,
+                    maxWidth: slot.pos.maxWidth,
+                    animationDelay: slot.delay,
+                    // Eğer pozisyon ortada olmayı gerektiriyorsa CSS hack'ini uyguluyoruz
+                    '--translateX': slot.pos.isCenter ? '-50%' : '0' 
                   }}
                 >
-                  "{prompts[index]}"
+                  "{slot.text}"
                 </div>
               ))}
             </div>
 
-            {/* MERKEZ (Çok Daha Aşağıya İtildi) */}
             <div style={heroSection} className="hero-section">
               <div style={logoFrame}>
                  <img src="/logo.png" alt="Logo" style={centerLogo} />
@@ -220,7 +255,6 @@ export default function Home() {
 
       <div style={bottomArea}>
         
-        {/* ZEMİN IŞIĞI (VİDEODAKİ GİBİ) */}
         <div className="floor-glow" style={floorGlow}></div>
 
         <div style={glowWrapper}>
@@ -270,10 +304,8 @@ const backButton = { backgroundColor: 'transparent', color: '#fff', border: '1px
 
 const contentArea = { flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', position: 'relative', paddingBottom: '100px' };
 
-// Güvenli alan: Sadece üstteki boşluk. Asla logonun seviyesine inmez.
 const floatingContainer = { position: 'absolute', top: '70px', left: 0, right: 0, height: '40vh', pointerEvents: 'auto', zIndex: 5, overflow: 'hidden' };
 
-// Merkez Bölge: Tasarım gereği çok daha aşağıya (30vh) itildi.
 const heroSection = { display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', zIndex: 10, marginTop: '30vh', width: '100%' };
 const logoFrame = { marginBottom: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center' };
 const centerLogo = { width: '100%', maxWidth: '180px', height: 'auto', display: 'block', objectFit: 'contain' };
