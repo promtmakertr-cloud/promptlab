@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 
-// HERKESİN İLGİSİNİ ÇEKECEK YENİ "HAP" PROMPT HAVUZU
+// İNSANİ VE İLGİ ÇEKİCİ PROMPT HAVUZU
 const allPrompts = [
   "Bana sorular sorarak MBTI kişilik analizimi yap ve içsel potansiyelimi keşfetmemi sağla...",
   "Fincan fotoğrafıma bakarak geleneksel sembollerle, geçmişi ve geleceği yorumlayan derin bir kahve falı bak...",
@@ -76,6 +76,7 @@ export default function Home() {
     setTimeout(() => setCopyStatus('Metni Kopyala'), 2000);
   };
 
+  // MOBİL UYUMLU VE SİNEMATİK CSS (Apple Style animasyonlar eklendi)
   useEffect(() => {
     const styleSheet = document.createElement("style");
     styleSheet.innerText = `
@@ -107,43 +108,47 @@ export default function Home() {
         100% { transform: scale(1); }
       }
       
-      .info-card {
-        transition: transform 0.3s ease, border-color 0.3s ease;
+      /* Apple Tarzı Hover Efekti */
+      .apple-card {
+        transition: opacity 0.3s ease, transform 0.3s ease;
+        opacity: 0.7;
       }
-      .info-card:hover {
-        transform: translateY(-5px);
-        border-color: #555;
+      .apple-card:hover {
+        opacity: 1;
+        transform: translateY(-2px);
       }
 
+      /* MOBİL EKRANLAR (İç içe geçmeyi ve kalabalığı önleme) */
       @media (max-width: 768px) {
         .cinematic-text {
-          font-size: 0.95rem !important;
+          font-size: 0.9rem !important;
           max-width: 85vw !important;
           left: 7.5vw !important;
           right: auto !important;
           text-align: center !important;
         }
-        .cinematic-text:nth-child(n+4) {
+        /* Mobilde sadece 2 yazı çıksın, temiz dursun */
+        .cinematic-text:nth-child(n+3) {
           display: none !important;
         }
-        .cinematic-text:nth-child(1) { top: 12% !important; animation-delay: 0s !important;}
-        .cinematic-text:nth-child(2) { top: 22% !important; animation-delay: 5s !important;}
-        .cinematic-text:nth-child(3) { top: 32% !important; animation-delay: 10s !important;}
+        /* Yazılar sadece en üst %20'lik alanda çıksın */
+        .cinematic-text:nth-child(1) { top: 8% !important; animation-delay: 0s !important;}
+        .cinematic-text:nth-child(2) { top: 18% !important; animation-delay: 6s !important;}
         
         .mobile-hero {
-          margin-top: 40vh !important; 
+          margin-top: 35vh !important; 
         }
         .mobile-title {
-          font-size: 1.8rem !important;
+          font-size: 1.6rem !important;
         }
         .cards-container {
           flex-direction: column !important;
-          gap: 15px !important;
+          gap: 25px !important;
           padding: 0 20px !important;
+          margin-top: 20px !important;
         }
-        .info-card {
+        .apple-card {
           width: 100% !important;
-          padding: 15px !important;
         }
       }
     `;
@@ -151,13 +156,14 @@ export default function Home() {
     return () => document.head.removeChild(styleSheet);
   }, []);
 
+  // YAZILARIN YENİ KORDİNATLARI: Artık %30'dan aşağıya inemezler!
   const positions = [
-    { top: '8%', left: '10%', maxWidth: '25%', animationDuration: '14s', delay: '0s', fontSize: '1.2rem' },
-    { top: '15%', right: '8%', maxWidth: '28%', animationDuration: '18s', delay: '4s', fontSize: '1.3rem' },
-    { top: '30%', left: '5%', maxWidth: '22%', animationDuration: '16s', delay: '8s', fontSize: '1.1rem' },
-    { top: '25%', right: '12%', maxWidth: '24%', animationDuration: '15s', delay: '2s', fontSize: '1.1rem' },
-    { top: '40%', left: '20%', maxWidth: '26%', animationDuration: '17s', delay: '6s', fontSize: '1rem' },
-    { top: '35%', right: '25%', maxWidth: '25%', animationDuration: '19s', delay: '10s', fontSize: '1rem' },
+    { top: '5%', left: '10%', maxWidth: '25%', animationDuration: '14s', delay: '0s', fontSize: '1.2rem' },
+    { top: '12%', right: '8%', maxWidth: '28%', animationDuration: '18s', delay: '4s', fontSize: '1.3rem' },
+    { top: '22%', left: '5%', maxWidth: '22%', animationDuration: '16s', delay: '8s', fontSize: '1.1rem' },
+    { top: '18%', right: '12%', maxWidth: '24%', animationDuration: '15s', delay: '2s', fontSize: '1.1rem' },
+    { top: '28%', left: '20%', maxWidth: '26%', animationDuration: '17s', delay: '6s', fontSize: '1rem' },
+    { top: '25%', right: '25%', maxWidth: '25%', animationDuration: '19s', delay: '10s', fontSize: '1rem' },
   ];
 
   return (
@@ -203,21 +209,22 @@ export default function Home() {
               <h2 style={heroTitle} className="mobile-title">Size nasıl yardımcı olabilirim?</h2>
               <p style={heroSub}>Sıradan cümlelerinizi, yapay zekanın anlayacağı kusursuz komutlara dönüştürüyoruz.</p>
               
+              {/* YENİ EKLENEN: APPLE TARZI MİNİMAL KARTLAR */}
               <div style={cardsContainer} className="cards-container">
-                <div style={infoCard} className="info-card">
-                  <span style={cardIcon}>📝</span>
+                <div style={appleCard} className="apple-card">
+                  <span style={cardIcon}>✍️</span>
                   <h3 style={cardTitle}>Fikrini Yaz</h3>
-                  <p style={cardDesc}>Ne istediğini günlük ve basit bir dille alt kutuya yaz.</p>
+                  <p style={cardDesc}>Günlük dilde ne istediğini belirt.</p>
                 </div>
-                <div style={infoCard} className="info-card">
-                  <span style={cardIcon}>⚙️</span>
+                <div style={appleCard} className="apple-card">
+                  <span style={cardIcon}>🧠</span>
                   <h3 style={cardTitle}>Sistem İşlesin</h3>
-                  <p style={cardDesc}>Mühendislik altyapımız onu profesyonel bir komuta çevirsin.</p>
+                  <p style={cardDesc}>Profesyonel bir komuta dönüşsün.</p>
                 </div>
-                <div style={infoCard} className="info-card">
-                  <span style={cardIcon}>🚀</span>
+                <div style={appleCard} className="apple-card">
+                  <span style={cardIcon}>✨</span>
                   <h3 style={cardTitle}>Kopyala & Kullan</h3>
-                  <p style={cardDesc}>Üretilen Master Prompt'u ChatGPT veya Claude'a yapıştır.</p>
+                  <p style={cardDesc}>ChatGPT veya Claude'a yapıştır.</p>
                 </div>
               </div>
 
@@ -270,6 +277,7 @@ export default function Home() {
   );
 }
 
+// STİLLER
 const container = { backgroundColor: '#080808', minHeight: '100vh', color: '#ECECEC', fontFamily: 'Inter, sans-serif', display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden' };
 const topBar = { padding: '20px 25px', position: 'absolute', top: 0, left: 0, right: 0, zIndex: 30, display: 'flex', justifyContent: 'space-between', alignItems: 'center' };
 const logoWrapper = { display: 'flex', alignItems: 'center', gap: '10px', opacity: 0.8, cursor: 'pointer' };
@@ -277,21 +285,22 @@ const miniLogo = { height: '22px', width: 'auto', objectFit: 'contain' };
 const logoText = { fontWeight: '600', fontSize: '0.9rem', letterSpacing: '1px' };
 const backButton = { backgroundColor: 'transparent', color: '#fff', border: '1px solid #333', padding: '8px 16px', borderRadius: '20px', cursor: 'pointer', fontSize: '0.85rem' };
 
-const contentArea = { flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', position: 'relative', paddingBottom: '100px' };
+const contentArea = { flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', position: 'relative', paddingBottom: '120px' };
 
-const floatingContainer = { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, pointerEvents: 'auto', zIndex: 5, overflow: 'hidden' };
+const floatingContainer = { position: 'absolute', top: 0, left: 0, right: 0, height: '35vh', pointerEvents: 'auto', zIndex: 5, overflow: 'hidden' }; // SADECE ÜST KISMA HAPSEDİLDİ
 
-const heroSection = { display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', zIndex: 10, marginTop: '20vh', width: '100%' };
+const heroSection = { display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', zIndex: 10, marginTop: '25vh', width: '100%' };
 const logoFrame = { marginBottom: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center' };
 const centerLogo = { width: '100%', maxWidth: '160px', height: 'auto', display: 'block', objectFit: 'contain' };
 const heroTitle = { fontSize: '2.2rem', fontWeight: '600', marginBottom: '10px', color: '#fff' };
-const heroSub = { color: '#888', fontSize: '0.95rem', maxWidth: '500px', padding: '0 20px', lineHeight: '1.5', marginBottom: '35px' };
+const heroSub = { color: '#888', fontSize: '0.95rem', maxWidth: '450px', padding: '0 20px', lineHeight: '1.5', marginBottom: '40px' };
 
-const cardsContainer = { display: 'flex', gap: '20px', justifyContent: 'center', maxWidth: '800px', width: '100%', zIndex: 15 };
-const infoCard = { backgroundColor: 'rgba(25, 25, 25, 0.4)', border: '1px solid #222', borderRadius: '16px', padding: '20px', width: '220px', display: 'flex', flexDirection: 'column', alignItems: 'center', backdropFilter: 'blur(10px)', textAlign: 'center' };
-const cardIcon = { fontSize: '1.8rem', marginBottom: '12px' };
-const cardTitle = { fontSize: '0.9rem', fontWeight: '700', color: '#fff', marginBottom: '8px', letterSpacing: '0.5px' };
-const cardDesc = { fontSize: '0.8rem', color: '#777', lineHeight: '1.4' };
+// YENİ EKLENEN APPLE STYLE KART STİLLERİ (Kutusuz, Çizgisiz, Minimal)
+const cardsContainer = { display: 'flex', gap: '40px', justifyContent: 'center', width: '100%', zIndex: 15, flexWrap: 'wrap' };
+const appleCard = { display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', width: '180px', padding: '10px' };
+const cardIcon = { fontSize: '1.6rem', marginBottom: '10px', opacity: 0.9 };
+const cardTitle = { fontSize: '0.85rem', fontWeight: '600', color: '#d1d1d1', marginBottom: '6px', letterSpacing: '0.5px' };
+const cardDesc = { fontSize: '0.75rem', color: '#666', lineHeight: '1.4' };
 
 const resultContainer = { maxWidth: '850px', width: '100%', marginTop: '80px', marginBottom: '160px', zIndex: 10, padding: '0 20px' };
 const aiResponseWrapper = { width: '100%', backgroundColor: '#111', padding: '20px', borderRadius: '16px', border: '1px solid #222' };
