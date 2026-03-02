@@ -1,7 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
 
-// İNSANİ VE İLGİ ÇEKİCİ PROMPT HAVUZU
 const allPrompts = [
   "Bana sorular sorarak MBTI kişilik analizimi yap ve içsel potansiyelimi keşfetmemi sağla...",
   "Fincan fotoğrafıma bakarak geleneksel sembollerle, geçmişi ve geleceği yorumlayan derin bir kahve falı bak...",
@@ -19,11 +18,12 @@ const allPrompts = [
 
 const fontSizes = ['0.85rem', '0.95rem', '1.05rem', '1.1rem'];
 
+// 🚨 MUTLAK ÇAPA KORDİNATLARI (vH ile ekranın en üstüne ve en altına kilitlendi) 🚨
 const slotZones = {
-  0: [ {top: '12%', left: '5%', maxWidth: '260px'} ],   
-  1: [ {top: '15%', right: '5%', maxWidth: '260px'} ],  
-  2: [ {top: '65%', left: '8%', maxWidth: '260px'} ],   
-  3: [ {top: '60%', right: '8%', maxWidth: '260px'} ]   
+  0: [ {top: '12vh', left: '5%', maxWidth: '260px'} ],          // Üst Sol
+  1: [ {top: '15vh', right: '5%', maxWidth: '260px'} ],         // Üst Sağ
+  2: [ {bottom: '25vh', left: '8%', maxWidth: '260px'} ],       // Alt Sol (Komut kutusunun üstü)
+  3: [ {bottom: '22vh', right: '8%', maxWidth: '260px'} ]       // Alt Sağ (Komut kutusunun üstü)
 };
 
 export default function Home() {
@@ -133,6 +133,7 @@ export default function Home() {
         line-height: 1.5;
         font-weight: 300;
         transition: color 0.3s ease, text-shadow 0.3s ease;
+        pointer-events: auto; /* Tıklanabilmesi için */
       }
 
       .cinematic-text:hover {
@@ -150,6 +151,7 @@ export default function Home() {
         100% { transform: scale(1); }
       }
 
+      /* 🚨 MOBİLİN YASAK BÖLGE (NO-FLY ZONE) KODLARI 🚨 */
       @media (max-width: 768px) {
         .hero-section { margin-top: 35vh !important; }
         .hero-title { font-size: 1.8rem !important; line-height: 1.2 !important; padding: 0 10px !important; }
@@ -163,8 +165,11 @@ export default function Home() {
           right: auto !important;             
         }
         
-        .slot-0 { top: 15% !important; } 
-        .slot-1 { top: 72% !important; } 
+        /* Yazı 0 kesinlikle ekranın en üstünde (logonun hemen altında, başlığa değmez)
+          Yazı 1 kesinlikle ekranın en altında (komut kutusunun üstünde, alt metne değmez) 
+        */
+        .slot-0 { top: 12vh !important; bottom: auto !important; } 
+        .slot-1 { top: auto !important; bottom: 22vh !important; } 
         .slot-2 { display: none !important; }
         .slot-3 { display: none !important; } 
         
@@ -179,8 +184,8 @@ export default function Home() {
     <main style={container}>
       <div style={topBar}>
         <div style={logoWrapper} onClick={handleReset}>
+          {/* YAZI KALDIRILDI, SADECE LOGO KALDI */}
           <img src="/logo.png" alt="Logo" style={miniLogo} />
-          <span style={logoText}>PromptLab</span>
         </div>
         {result && (
           <button onClick={handleReset} style={backButton}>← Yeni Prompt</button>
@@ -198,7 +203,8 @@ export default function Home() {
                   onClick={() => setInput(slot.text)}
                   onAnimationIteration={() => handleAnimationIteration(slot.id)}
                   style={{
-                    top: slot.pos.top,
+                    top: slot.pos.top || 'auto',
+                    bottom: slot.pos.bottom || 'auto',
                     left: slot.pos.left || 'auto',
                     right: slot.pos.right || 'auto',
                     maxWidth: slot.pos.maxWidth,
@@ -235,7 +241,6 @@ export default function Home() {
         <div className="floor-glow" style={floorGlow}></div>
 
         <div style={glowWrapper}>
-          {/* 🚨 KUTU DİYETE SOKULDU: DAHA İNCE VE ZARİF 🚨 */}
           <div style={inputBoxInner} className="input-box-inner">
             <textarea 
               style={inputField} 
@@ -276,15 +281,15 @@ export default function Home() {
 const container = { backgroundColor: '#050505', minHeight: '100vh', color: '#ECECEC', fontFamily: 'Inter, sans-serif', display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden' };
 const topBar = { padding: '20px 25px', position: 'absolute', top: 0, left: 0, right: 0, zIndex: 100, display: 'flex', justifyContent: 'space-between', alignItems: 'center' };
 const logoWrapper = { display: 'flex', alignItems: 'center', gap: '10px', opacity: 0.8, cursor: 'pointer' };
-const miniLogo = { height: '20px', width: 'auto', objectFit: 'contain' };
-const logoText = { fontWeight: '600', fontSize: '0.9rem', letterSpacing: '1px' };
+const miniLogo = { height: '22px', width: 'auto', objectFit: 'contain' }; // Logoyu bir tık belirginleştirdim
 const backButton = { backgroundColor: 'transparent', color: '#fff', border: '1px solid #333', padding: '8px 16px', borderRadius: '20px', cursor: 'pointer', fontSize: '0.85rem' };
 
 const contentArea = { flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', position: 'relative', paddingBottom: '100px' };
 
-const floatingContainer = { position: 'absolute', top: '70px', left: 0, right: 0, height: '70vh', pointerEvents: 'auto', zIndex: 5, overflow: 'hidden' };
+// Kapsayıcıyı tam ekran yaptık ki VH (Viewport Height) hesaplamaları şaşmasın.
+const floatingContainer = { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, pointerEvents: 'none', zIndex: 5, overflow: 'hidden' };
 
-const heroSection = { display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', zIndex: 10, marginTop: '28vh', width: '100%' };
+const heroSection = { display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', zIndex: 10, marginTop: '30vh', width: '100%' };
 const logoFrame = { marginBottom: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center' };
 const centerLogo = { width: '100%', maxWidth: '180px', height: 'auto', display: 'block', objectFit: 'contain' };
 const heroTitle = { fontSize: '2.2rem', fontWeight: '600', marginBottom: '10px', color: '#fff', letterSpacing: '-0.5px' };
@@ -313,7 +318,6 @@ const floorGlow = {
   pointerEvents: 'none',
 };
 
-// 🚨 DAHA KOMPAKT GENİŞLİK (750px -> 680px) 🚨
 const glowWrapper = {
   position: 'relative',
   width: '100%',
@@ -321,7 +325,6 @@ const glowWrapper = {
   zIndex: 2,
 };
 
-// 🚨 İNCECİK İÇ BOŞLUKLAR (Padding azaltıldı) 🚨
 const inputBoxInner = {
   backgroundColor: '#0a0a0a', 
   borderRadius: '40px', 
@@ -329,26 +332,24 @@ const inputBoxInner = {
   animation: 'elegantGlow 8s infinite alternate',
   display: 'flex',
   alignItems: 'center',
-  padding: '6px 10px 6px 18px', // KUTUYU İNCELTEN SİHİRLİ DOKUNUŞ BURASI!
+  padding: '6px 10px 6px 18px', 
   width: '100%',
   height: '100%',
 };
 
-// 🚨 YAZI ALANI DA İNCELDİ VE ZARİFLEŞTİ 🚨
 const inputField = { 
   flex: 1, 
   background: 'transparent', 
   border: 'none', 
   color: '#fff', 
-  fontSize: '1rem', // Font bir tık küçüldü
+  fontSize: '1rem', 
   outline: 'none', 
   resize: 'none', 
-  padding: '8px 0', // Yukarıdan ve aşağıdan boşluklar azaltıldı
+  padding: '8px 0', 
   maxHeight: '150px', 
   fontFamily: 'inherit' 
 };
 
 const actionButtons = { display: 'flex', alignItems: 'center', gap: '6px' };
 const iconButton = { background: 'none', border: 'none', cursor: 'pointer', padding: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center' };
-// 🚨 BUTONLAR DA KUTUYA UYUM SAĞLASIN DİYE KÜÇÜLTÜLDÜ (38px -> 32px) 🚨
 const sendButton = { width: '32px', height: '32px', borderRadius: '50%', border: 'none', backgroundColor: '#fff', color: '#000', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.1rem', fontWeight: 'bold' };
