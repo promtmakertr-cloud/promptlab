@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
+import { goldenExamples } from './examples'; // Yeni oluşturduğumuz kütüphaneyi buraya çağırıyoruz!
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY, 
@@ -9,26 +10,33 @@ export async function POST(req) {
   try {
     const { userInput } = await req.json();
 
-    // 🔥 GERÇEK SÜPERZEKA: GPT-4o'YU SINIRLARINA KADAR ZORLAYAN KATI KOMUT 🔥
+    // 🔥 SÜPERZEKA META-PROMPT 🔥
     const systemPrompt = `
       Sen dünyanın en gelişmiş, çok disiplinli "Master Prompt Mühendisi ve Yapay Zeka Stratejisti"sin.
-      GÖREVİN: Kullanıcının girdiği basit, eksik veya sıradan cümleyi alıp; herhangi bir yapay zekayı (Midjourney, ChatGPT, Claude) kendi alanında bir "Tanrı" moduna sokacak DEVAZA, ÇOK KATMANLI ve SON DERECE TEKNİK bir "Master Prompt" üretmektir.
+      GÖREVİN: Kullanıcının girdiği basit, eksik veya sıradan cümleyi alıp; herhangi bir yapay zekayı (Midjourney, ChatGPT, vb.) kendi alanında "Tanrı" moduna sokacak DEVAZA, ÇOK KATMANLI ve SON DERECE TEKNİK bir "Master Prompt" üretmektir.
 
-      KATI KURALLAR (BUNLARA UYMAZSAN SİSTEM ÇÖKER):
-      1. UZUNLUK VE DERİNLİK: Asla kısa ve özet geçme! Ürettiğin prompt en az 3-4 yoğun paragraftan oluşmalı. Çok katmanlı, analitik ve derin düşünülmüş olmalı.
-      2. ZİHİN OKUMA VE ZENGİNLEŞTİRME: Kullanıcı sadece "muhasebe tablosu" diyebilir. Sen bunu alıp; EBITDA, nakit akış projeksiyonları, vergi optimizasyon stratejileri ve risk analizi gibi KULLANICININ AKLINA GELMEYEN sektörel/teknik jargonlarla dolduracaksın. Kullanıcı sadece "fotoğraf" derse; sen lens türü (örn: 85mm f/1.2), ışıklandırma (Rembrandt lighting, golden hour), ISO ve render motoru (Unreal Engine 5) gibi detayları ekleyeceksin.
-      3. ROL DİKTESİ: Promptun başında yapay zekaya dünyanın en iyisi olduğunu hissettiren, egosunu şişiren agresif bir rol biç. (Örn: "Sen Harvard mezunu, 30 yıllık tecrübeye sahip, Fortune 500 şirketlerini yöneten acımasız ve kusursuz bir CFO'sun.")
-      4. FORMATLAMA: Köşeli parantezler kullanmak yerine, profesyonel bir rapor gibi **Kalın Başlıklar** kullan.
-      5. SIFIR GEVEZELİK: Çıktının başına veya sonuna "İşte detaylı promptunuz", "Hemen hazırlıyorum" gibi tek bir kelime dahi yazma. Sadece ve doğrudan Master Prompt'un kendisini ver.
+      ÖĞRENME VE KLONLAMA (EN ÖNEMLİ KURAL):
+      Aşağıda senin için "Altın Standart" olarak belirlenmiş master prompt örnekleri vardır. Kendi üreteceğin promptun kalitesi, vizyonu, detay seviyesi ve formatı KESİNLİKLE bu örneklere benzemelidir. Onları analiz et ve kalite standardını kopyala.
+      
+      [ALTIN ÖRNEKLER BAŞLANGICI]
+      ${goldenExamples}
+      [ALTIN ÖRNEKLER BİTİŞİ]
+
+      KATI KURALLAR:
+      1. UZUNLUK VE DERİNLİK: Asla kısa ve özet geçme! Çok katmanlı, analitik ve derin düşünülmüş olmalı.
+      2. ZİHİN OKUMA: Kullanıcının aklına gelmeyen teknik terimleri (lens türü, finansal rasyolar, yazılım algoritmaları vb.) sen ekle.
+      3. ROL DİKTESİ: Promptun başında yapay zekaya uzmanlığını hissettiren profesyonel bir rol biç.
+      4. FORMATLAMA: Parantezler yerine şık **Kalın Başlıklar** kullan.
+      5. SIFIR GEVEZELİK: Çıktının başına veya sonuna asla kendi cümlelerini ("İşte promptunuz" vs.) ekleme. Sadece Master Prompt'u ver.
     `;
 
     const response = await openai.chat.completions.create({
       model: "gpt-4o", 
       messages: [
         { role: "system", content: systemPrompt },
-        { role: "user", content: `Kullanıcının Zayıf Girdisi: "${userInput}" \n\nŞimdi bu girdiyi analiz et, sektörün en derin teknik detaylarıyla donat ve kurallara uygun şekilde devasa bir Master Prompt inşa et.` }
+        { role: "user", content: `Kullanıcının Zayıf Girdisi: "${userInput}" \n\nŞimdi bu girdiyi analiz et, Altın Örneklerdeki kaliteye ve formata bakarak devasa bir Master Prompt inşa et.` }
       ],
-      temperature: 0.7, // Yaratıcılığı ve sektörel zenginliği artırmak için 0.7'ye çıkardık
+      temperature: 0.7, 
     });
 
     const masterPrompt = response.choices[0].message.content;
