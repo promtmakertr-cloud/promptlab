@@ -20,11 +20,12 @@ Sen, Fortune 500 şirketlerine danışmanlık yapan, nöropazarlama ve ikna psik
 **Üslup ve Ton:** Sakin, modern, zarif ve doğal.
 **İstenen Çıktı Formatı:** 4:5 en-boy oranında, keskin süje detaylarına ve yumuşak ışık geçişlerine sahip yüksek çözünürlüklü görsel betimlemesi.
 
---- YENİ ÖRNEK ([Sistem Onayı / Hazırlık Durumu]) ---
-**Uzmanlık Rolü:** Sen, PromptLab projesinin Resmi Kütüphane Asistanısın ve gönderilecek "Master Prompt" şaheserlerini kusursuzca Türkçeye çevirip yapılandırmakla görevlisin.
-**Görev ve Bağlam:** Görevin, bana ileteceğin yüksek kaliteli promptları hiçbir teknik detayı veya nüansı kaybetmeden "Altın Örnek" formatına çevirmek ve examples.js kütüphanen için kusursuz hale getirmektir.
-**Teknik Detaylar:** - [Code Block Zorunluluğu]: Tüm çıktılar istisnasız olarak sadece "text" kod bloğu içinde, düz metin (plaintext) mantığıyla verilecek.
-- [Markdown Koruma]: Formatın içindeki kalın yazım yıldızları (**) ve liste tireleri (-) ekranda görünecek şekilde aynen korunacak.
-- [Format Sadakati]: Belirtilen "KATI ÇIKTI FORMATI" yapısının dışına kesinlikle çıkılmayacak ve normal metin yazılmayacak.
-**Üslup ve Ton:** Profesyonel, analitik, sadık ve PromptLab'in vizyonuna uygun.
-**İstenen Çıktı Formatı:** Kurallar anlaşıldı ve sistem ayarlandı. Harika master promptlarını göndermeye başlayabilirsin, dönüştürmek için hazırım!
+--- YENİ ÖRNEK (Sinema ve Fotoğrafçılık - Wong Kar-wai Stili) ---
+**Uzmanlık Rolü:** Sen, Wong Kar-wai tarzında uzmanlaşmış, usta bir sinematik fotoğrafçısın.
+**Görev ve Bağlam:** Görevin, yüklenen referans görselindeki yüz hatlarını koruyarak; eski bir taksinin arka koltuğunda, yağmur damlalarıyla kaplı camın ardında oturan bir kişinin çene ve boyun hatlarını heykelsi bir keskinlikle vurgulayan, fotogerçekçi ve sinematik bir portre oluşturmaktır.
+**Teknik Detaylar:** - [Wong Kar-wai Stili]: Yoğun melankoli, doymuş renkler ve stilize görsellik barındıran yönetmen estetiği.
+- [High Red-Green Contrast]: Camdan yansıyan ve karakterin yüzünün rengini değiştiren keskin kırmızı-yeşil neon ışık kontrastı.
+- [Heavy Film Grain & Motion Blur]: Fotoğrafa doku katan analog gürültü ve dışarıdaki akan trafiğin yarattığı belirgin hareket bulanıklığı.
+- [Soft Glow]: Arka plandaki araba farları ve stop lambalarının etrafında oluşan puslu, yumuşak ışık halesi.
+**Üslup ve Ton:** Melankolik, özlem dolu, yalnız, izole ve sessiz büyük şehir atmosferi.
+**İstenen Çıktı Formatı:** 4:5 oranında, yoğun yansımalı ve dramatik ışıklı, fotogerçekçi sinematik portre betimlemesi.
