@@ -19,12 +19,12 @@ const allPrompts = [
 
 const fontSizes = ['0.85rem', '0.95rem', '1.05rem', '1.1rem'];
 
-// Masaüstü için daha geniş alanlar (Uzun yazılar sığsın diye)
+// 🔥 KUSURSUZ KADRAN DAĞILIMI (Sol Üst, Sağ Alt, Sol Alt, Sağ Üst) 🔥
 const slotZones = {
-  0: [ {top: '10%', left: '5%', maxWidth: '320px'} ],   
-  1: [ {top: '15%', right: '5%', maxWidth: '320px'} ],  
+  0: [ {top: '12%', left: '5%', maxWidth: '320px'} ],   
+  1: [ {top: '65%', right: '5%', maxWidth: '320px'} ],  
   2: [ {top: '65%', left: '5%', maxWidth: '320px'} ],   
-  3: [ {top: '60%', right: '5%', maxWidth: '320px'} ]   
+  3: [ {top: '12%', right: '5%', maxWidth: '320px'} ]   
 };
 
 export default function Home() {
@@ -38,11 +38,11 @@ export default function Home() {
 
   useEffect(() => {
     const shuffledTexts = [...allPrompts].sort(() => 0.5 - Math.random());
-    // Gecikme süreleri (delay) matematiksel olarak birbirine asla çarpmayacak şekilde ayarlandı (24 saniyelik döngüde)
+    // 24 saniyelik döngüde 6'şar saniye arayla nöbet değişimi (Asla çakışmaz)
     setSlots([
       { id: 0, text: shuffledTexts[0], pos: slotZones[0][0], size: fontSizes[2], delay: '0s' },
-      { id: 1, text: shuffledTexts[1], pos: slotZones[1][0], size: fontSizes[1], delay: '12s' },
-      { id: 2, text: shuffledTexts[2], pos: slotZones[2][0], size: fontSizes[3], delay: '6s' },
+      { id: 1, text: shuffledTexts[1], pos: slotZones[1][0], size: fontSizes[1], delay: '6s' },
+      { id: 2, text: shuffledTexts[2], pos: slotZones[2][0], size: fontSizes[3], delay: '12s' },
       { id: 3, text: shuffledTexts[3], pos: slotZones[3][0], size: fontSizes[0], delay: '18s' },
     ]);
   }, []);
@@ -118,21 +118,20 @@ export default function Home() {
         100% { box-shadow: 0 0 8px rgba(0, 242, 254, 0.1), inset 0 0 4px rgba(0, 242, 254, 0.05); border-color: rgba(0, 242, 254, 0.15); }
       }
 
-      /* 🔥 KUSURSUZ ZAMANLAMA (Çakışmayı önleyen asıl büyü burada) 🔥 */
+      /* 🔥 %100 ÇAKIŞMASIZ ANİMASYON (24 Saniyede sadece 6 saniye ekranda kalır) 🔥 */
       @keyframes perfectBreathing {
-        0%   { opacity: 0; filter: blur(8px); transform: translateY(8px); }
-        15%  { opacity: 0; filter: blur(8px); transform: translateY(8px); }
-        25%  { opacity: 0.7; filter: blur(0px); transform: translateY(0px); }
-        45%  { opacity: 0.7; filter: blur(0px); transform: translateY(0px); }
-        55%  { opacity: 0; filter: blur(8px); transform: translateY(-8px); }
-        100% { opacity: 0; filter: blur(8px); transform: translateY(-8px); }
+        0%   { opacity: 0; filter: blur(10px); transform: translateY(10px); }
+        10%  { opacity: 1; filter: blur(0px); transform: translateY(0px); }
+        25%  { opacity: 1; filter: blur(0px); transform: translateY(0px); }
+        35%  { opacity: 0; filter: blur(10px); transform: translateY(-10px); }
+        100% { opacity: 0; filter: blur(10px); transform: translateY(-10px); }
       }
 
       .cinematic-text {
         position: absolute;
         color: #888888;
         cursor: pointer;
-        animation: perfectBreathing 24s infinite linear; /* Çok yavaş, pürüzsüz ve matematiksel geçiş */
+        animation: perfectBreathing 24s infinite linear; 
         text-align: center;
         line-height: 1.5;
         font-weight: 300;
@@ -159,22 +158,20 @@ export default function Home() {
         .hero-title { font-size: 1.8rem !important; line-height: 1.2 !important; padding: 0 10px !important; }
         .hero-sub { font-size: 0.9rem !important; padding: 0 15px !important; margin-top: 15px !important; }
         
+        /* 🔥 MOBİL DÜZEN: Yazılar ekrana ortalanır ve sadece 2 tanesi çalışır 🔥 */
         .cinematic-text {
           font-size: 0.85rem !important;
           width: 90vw !important;         
           max-width: 90vw !important;
           left: 5vw !important;              
-          right: auto !important;             
+          right: 5vw !important;             
+          margin: 0 auto !important;
         }
         
-        /* 🔥 MOBİL DÜZEN: Sadece iki slot çalışır. Biri tamamen yok olmadan diğeri gelmez 🔥 */
-        .slot-0, .slot-1 { 
-          top: 8% !important; 
-          bottom: auto !important; 
-        } 
-        
-        /* Kalabalıklığı önlemek için alt kısımdaki fazlalıkları mobilde gizliyoruz */
-        .slot-2, .slot-3 { display: none !important; } 
+        .slot-0 { top: 8% !important; bottom: auto !important; } 
+        .slot-1 { top: 78% !important; bottom: auto !important; } 
+        .slot-2 { display: none !important; }
+        .slot-3 { display: none !important; } 
         
         .floor-glow { opacity: 0.2 !important; height: 50px !important; bottom: -5px !important;}
       }
@@ -205,9 +202,10 @@ export default function Home() {
                   onClick={() => setInput(slot.text)}
                   onAnimationIteration={() => handleAnimationIteration(slot.id)}
                   style={{
-                    top: slot.pos.top,
+                    top: slot.pos.top || 'auto',
+                    bottom: slot.pos.bottom || 'auto',
                     left: slot.pos.left || 'auto',
-                    right: slot.pos.isRight ? slot.pos.right : 'auto',
+                    right: slot.pos.right || 'auto', // İŞTE HATAYI ÇÖZEN HAYATİ KOD BURASI
                     maxWidth: slot.pos.maxWidth,
                     fontSize: slot.size,
                     animationDelay: slot.delay,
