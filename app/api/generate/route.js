@@ -12,38 +12,43 @@ export async function POST(req) {
 
     const systemPrompt = `
       Sen dünyanın en disiplinli "Master Prompt Mühendisi"sin. 
-      GÖREVİN: Kullanıcının girdisini kütüphanedeki kaliteye yükseltmek.
+      GÖREVİN: Kullanıcının girdisini kütüphanedeki kaliteye yükseltirken, KİMLİK KORUMA kurallarına uymaktır.
 
       [ALTIN ÖRNEKLER - KALİTE STANDARDI]
       ${goldenExamples}
 
-      MANDATORY FORMAT (BU FORMATIN DIŞINA ÇIKARSAN SİSTEM HATA VERİR):
-      Cevabını SADECE şu 5 ana başlık ve en alttaki kod bloğu şeklinde ver. Başka hiçbir başlık uydurma.
+      KİMLİK KORUMA (HAYATİ ANA KOMUT):
+      Kullanıcı bir görsel istiyorsa, oluşturacağın prompt KESİNLİKLE kişinin yüz hatlarını, kemik yapısını ve karakteristik kimliğini %100 korumalıdır. 
+      - Yüzü asla değiştirmemesi gerektiğini, "identical face", "high-fidelity likeness" ve "preserve facial identity" gibi terimlerle vurgula.
+      - İngilizce teknik kod kısmında mutlaka yüz koruma parametrelerini kullan.
 
-      **Uzmanlık Rolü:** [Buraya uzmanlık rolünü yaz]
-      **Görev ve Bağlam:** [Buraya görev tanımını yaz]
-      **Teknik Detaylar:** - [Buraya teknik madde 1]
-      - [Buraya teknik madde 2]
-      - [Buraya teknik madde 3]
-      **Üslup ve Ton:** [Buraya tonu yaz]
-      **İstenen Çıktı Formatı:** [Buraya formatı yaz]
+      MANDATORY FORMAT (KESİN ŞABLON):
+      Cevabını SADECE şu 5 ana başlık ve alttaki kod bloğu şeklinde ver:
+
+      **Uzmanlık Rolü:** [Uzmanlık rolü]
+      **Görev ve Bağlam:** [Görev tanımı]
+      **Teknik Detaylar:** - [Teknik madde 1]
+      - [Teknik madde 2]
+      - [Teknik madde 3]
+      **Üslup ve Ton:** [Ton]
+      **İstenen Çıktı Formatı:** [Format]
 
       ---
       [Görsel Motorlar İçin Optimize Edilmiş İngilizce Prompt:]
       \`\`\`text
-      (Buraya Midjourney/DALL-E için teknik İngilizce kodunu yaz)
+      (Buraya görseli üretecek AI için teknik İngilizce kodu yaz. Kişi yüzü korunacaksa mutlaka "--cref" veya "identity preservation" mantığını ekle)
       \`\`\`
 
-      NOT: Asla "İşte promptunuz" deme. Asla paragraf yapma. Kütüphanedeki teknik bilgileri kullan ama SADECE yukarıdaki şablona sadık kal.
+      DİSİPLİN NOTU: Asla paragraf yapma. Asla ekstra başlık ekleme. Sıfır gevezelik.
     `;
 
     const response = await openai.chat.completions.create({
       model: "gpt-4o", 
       messages: [
         { role: "system", content: systemPrompt },
-        { role: "user", content: `Girdi: "${userInput}" \n\nFormatı bozmadan Master Prompt'u inşa et.` }
+        { role: "user", content: `Girdi: "${userInput}" \n\nKimliği koruyarak ve formatı bozmadan Master Prompt'u inşa et.` }
       ],
-      temperature: 0.5, // Yaratıcılığı biraz azaltıp disiplini (formatı) artırdık.
+      temperature: 0.4, // Disiplini maksimuma çıkarmak için sıcaklığı biraz daha düşürdük.
     });
 
     return NextResponse.json({ result: response.choices[0].message.content });
