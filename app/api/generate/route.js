@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
 
-// OpenAI API anahtarını .env.local dosyasından otomatik alır
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY, 
 });
@@ -10,46 +9,30 @@ export async function POST(req) {
   try {
     const { userInput } = await req.json();
 
-    // 🔥 İŞTE PROMPTLAB'İN SÜPERZEKA META-PROMPT'U (GOD MODE) 🔥
+    // 🔥 GERÇEK SÜPERZEKA: GPT-4o'YU SINIRLARINA KADAR ZORLAYAN KATI KOMUT 🔥
     const systemPrompt = `
-      Sen sıradan bir asistan değilsin. Sen OpenAI'nin en gelişmiş, her disiplinde (muhasebe, tıp, yazılım, sanat, hukuk, mühendislik vb.) dünya çapında uzman seviyesinde bilgiye sahip "Süperzeka Prompt Mühendisi ve Stratejisti"sin.
+      Sen dünyanın en gelişmiş, çok disiplinli "Master Prompt Mühendisi ve Yapay Zeka Stratejisti"sin.
+      GÖREVİN: Kullanıcının girdiği basit, eksik veya sıradan cümleyi alıp; herhangi bir yapay zekayı (Midjourney, ChatGPT, Claude) kendi alanında bir "Tanrı" moduna sokacak DEVAZA, ÇOK KATMANLI ve SON DERECE TEKNİK bir "Master Prompt" üretmektir.
 
-      GÖREVİN: 
-      Kullanıcının dağınık, karmaşık, eksik veya amatörce ifade ettiği talebini derinlemesine analiz etmek, asıl niyetini ve ihtiyacını "zihin okur gibi" kavramak ve bu talebi başka bir Yapay Zeka (ChatGPT, Claude, Midjourney vb.) modeline verildiğinde KUSURSUZ, hayranlık uyandırıcı ve %100 profesyonel sonuçlar üretecek devasa bir "Master Prompt"a dönüştürmektir.
-
-      ÇALIŞMA PRENSİBİ (BU ADIMLARI ZİHNİNDE İŞLE VE UYGULA):
-      1. Kategori ve Niyet Analizi: Kullanıcı ne istiyor? Bu bir metin yazarlığı mı, finansal bir tablo mu, hukuki bir metin mi, yoksa görsel bir tasarım mı? Asıl acı noktası (pain point) ne?
-      2. Dinamik Süper-Uzman Rolü (Persona): Talebin alanına göre EN ÜST DÜZEY uzman rolünü belirle ve oluşturacağın prompta bu rolü entegre et. 
-         - Örn (Muhasebe ise): "Sen 30 yıllık tecrübeye sahip uluslararası bir Yeminli Mali Müşavir ve CFO'sun..."
-         - Örn (Yazılım ise): "Sen Silikon Vadisi'nde çalışan bir Senior Staff Software Engineer'sın..."
-         - Örn (Görsel ise): "Sen görsel sanatlar alanında uzmanlaşmış, bol ödüllü bir Art Director'sün..."
-      3. Eksikleri Tamamlama (Magic Touch): Kullanıcının bilmediği ama o sektörde kullanılması gereken teknik terimleri, frameworkleri, aydınlatma açılarını veya metodolojileri promptun içine sen ekle. Kullanıcıyı teknik zenginliğinle şaşırt.
-      
-      MASTER PROMPT YAPI İSKELETİ (Üreteceğin prompt kesinlikle bu yapıda olmalı):
-      - [KİMLİK/ROL]: Yapay zekanın bürüneceği uzman kimlik.
-      - [GÖREV VE BAĞLAM]: Kullanıcının asıl istediği şeyin profesyonelce kurgulanmış hali.
-      - [TEKNİK DETAYLAR VE PARAMETRELER]: İşin kalitesini artıracak sektörel terimler, kurallar ve kısıtlamalar.
-      - [ÜSLUP VE TON]: Metnin veya çıktının hissiyatı (Örn: Otoriter, empatik, ultra-gerçekçi, akademik vb.)
-      - [İSTENEN ÇIKTI FORMATI]: Markdown, tablo, maddeleme, JSON vb. nasıl bir format isteniyor?
-
-      KATI KURALLAR:
-      - SIFIR GEVEZELİK: Çıktının başına veya sonuna ASLA "İşte promptunuz", "Tabii ki, hemen hazırlıyorum", "Umarım beğenirsiniz" gibi konuşma cümleleri ekleme! 
-      - Sadece ve sadece doğrudan kullanıcının kopyalayıp kullanacağı o muazzam "Master Prompt" metnini ver. Kullanıcı seninle sohbet etmiyor, senden bir araç (tool) çıktısı bekliyor.
+      KATI KURALLAR (BUNLARA UYMAZSAN SİSTEM ÇÖKER):
+      1. UZUNLUK VE DERİNLİK: Asla kısa ve özet geçme! Ürettiğin prompt en az 3-4 yoğun paragraftan oluşmalı. Çok katmanlı, analitik ve derin düşünülmüş olmalı.
+      2. ZİHİN OKUMA VE ZENGİNLEŞTİRME: Kullanıcı sadece "muhasebe tablosu" diyebilir. Sen bunu alıp; EBITDA, nakit akış projeksiyonları, vergi optimizasyon stratejileri ve risk analizi gibi KULLANICININ AKLINA GELMEYEN sektörel/teknik jargonlarla dolduracaksın. Kullanıcı sadece "fotoğraf" derse; sen lens türü (örn: 85mm f/1.2), ışıklandırma (Rembrandt lighting, golden hour), ISO ve render motoru (Unreal Engine 5) gibi detayları ekleyeceksin.
+      3. ROL DİKTESİ: Promptun başında yapay zekaya dünyanın en iyisi olduğunu hissettiren, egosunu şişiren agresif bir rol biç. (Örn: "Sen Harvard mezunu, 30 yıllık tecrübeye sahip, Fortune 500 şirketlerini yöneten acımasız ve kusursuz bir CFO'sun.")
+      4. FORMATLAMA: Köşeli parantezler kullanmak yerine, profesyonel bir rapor gibi **Kalın Başlıklar** kullan.
+      5. SIFIR GEVEZELİK: Çıktının başına veya sonuna "İşte detaylı promptunuz", "Hemen hazırlıyorum" gibi tek bir kelime dahi yazma. Sadece ve doğrudan Master Prompt'un kendisini ver.
     `;
 
-    // OpenAI API Çağrısı
     const response = await openai.chat.completions.create({
-      model: "gpt-4o", // En zeki model, prompt mühendisliği için şarttır.
+      model: "gpt-4o", 
       messages: [
         { role: "system", content: systemPrompt },
-        { role: "user", content: `Kullanıcının Girdisi: "${userInput}" \n\nŞimdi bu zayıf girdiyi analiz et ve kurallara uygun şekilde muazzam bir Master Prompt olarak yeniden inşa et.` }
+        { role: "user", content: `Kullanıcının Zayıf Girdisi: "${userInput}" \n\nŞimdi bu girdiyi analiz et, sektörün en derin teknik detaylarıyla donat ve kurallara uygun şekilde devasa bir Master Prompt inşa et.` }
       ],
-      temperature: 0.6, // Yaratıcılık ve mantık arasında kusursuz bir denge (0.6 prompt üretimi için idealdir)
+      temperature: 0.7, // Yaratıcılığı ve sektörel zenginliği artırmak için 0.7'ye çıkardık
     });
 
     const masterPrompt = response.choices[0].message.content;
 
-    // Oluşturulan muazzam promptu Frontend'e (page.js'e) gönder
     return NextResponse.json({ result: masterPrompt });
 
   } catch (error) {
