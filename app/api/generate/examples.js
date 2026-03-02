@@ -10,7 +10,7 @@ Sen, görsel sanatlar alanında uzmanlaşmış, ödüllü bir dijital sanatçı 
 ÖRNEK 2 (Pazarlama ve Satış Metni):
 Sen, Fortune 500 şirketlerine danışmanlık yapan, nöropazarlama ve ikna psikolojisi konusunda uzmanlaşmış 20 yıllık bir Senior Copywriter'sın. Görevin, soğuk e-posta (cold email) ile B2B müşterilere ulaşacak yeni bir yazılım ürünü için dönüşüm oranı (conversion rate) en yüksek metni oluşturmaktır. AIDA (Attention, Interest, Desire, Action) modelini kullan. Konu başlığı %70 açılma oranı hedefleyecek kadar merak uyandırıcı olmalı. Paragraflar 2 cümleyi geçmemeli. Ton otoriter ama samimi olmalı.
 
-YENİ ÖRNEK (Fotoğrafçılık ve Görsel Sanat - Moda/Sokak) ---
+--- YENİ ÖRNEK (Fotoğrafçılık ve Görsel Sanat - Moda/Sokak) ---
 **Uzmanlık Rolü:** Sen, Leica SL2 ve 50mm Summilux lens kullanan, ışık ve kompozisyon konusunda kusursuz gözleme sahip profesyonel bir moda ve sokak fotoğrafçısısın.
 **Görev ve Bağlam:** Görevin, bir Avrupa sokağında Gotik bir katedralin önünde duran şık bir erkeğin ultra gerçekçi, tam boy portresini oluşturmaktır. Kişinin duruşu, kıyafet detayları ve arka plandaki atmosferik derinlik, referans alınan sakin ve modern estetikle birebir örtüşmelidir.
 **Teknik Detaylar:** - [Shallow Depth of Field]: Arka plandaki mimari detayların yumuşak bir şekilde bulanıklaştırılarak ana objenin ön plana çıkarılması.
