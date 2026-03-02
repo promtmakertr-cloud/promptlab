@@ -17,15 +17,13 @@ const allPrompts = [
   "Stresli bir günün ardından zihnimi boşaltmamı sağlayacak 10 dakikalık rehberli meditasyon metni yaz..."
 ];
 
-// FARKLI PUNTOLAR
-const fontSizes = ['0.85rem', '0.95rem', '1.05rem', '1.15rem'];
+const fontSizes = ['0.85rem', '0.95rem', '1.05rem', '1.1rem'];
 
-// İZOLE KADRANLAR: 4 farklı slot, SADECE kendi bölgesinde kalır. Asla çakışmazlar.
 const slotZones = {
-  0: [ {top: '8%', left: '5%', maxWidth: '280px'}, {top: '12%', left: '8%', maxWidth: '250px'} ],   // SOL ÜST
-  1: [ {top: '10%', right: '5%', maxWidth: '280px'}, {top: '15%', right: '8%', maxWidth: '250px'} ],  // SAĞ ÜST
-  2: [ {top: '60%', left: '6%', maxWidth: '280px'}, {top: '65%', left: '10%', maxWidth: '250px'} ],  // SOL ALT
-  3: [ {top: '55%', right: '6%', maxWidth: '280px'}, {top: '62%', right: '10%', maxWidth: '250px'} ]   // SAĞ ALT
+  0: [ {top: '12%', left: '5%', maxWidth: '260px'} ],   
+  1: [ {top: '15%', right: '5%', maxWidth: '260px'} ],  
+  2: [ {top: '65%', left: '8%', maxWidth: '260px'} ],   
+  3: [ {top: '60%', right: '8%', maxWidth: '260px'} ]   
 };
 
 export default function Home() {
@@ -38,31 +36,24 @@ export default function Home() {
   const [slots, setSlots] = useState([]);
 
   useEffect(() => {
-    // Sayfa ilk açıldığında her kadrana bir yazı atıyoruz
     const shuffledTexts = [...allPrompts].sort(() => 0.5 - Math.random());
-    
     setSlots([
       { id: 0, text: shuffledTexts[0], pos: slotZones[0][0], size: fontSizes[2], delay: '0s' },
-      { id: 1, text: shuffledTexts[1], pos: slotZones[1][0], size: fontSizes[1], delay: '5s' },
-      { id: 2, text: shuffledTexts[2], pos: slotZones[2][0], size: fontSizes[3], delay: '10s' },
-      { id: 3, text: shuffledTexts[3], pos: slotZones[3][0], size: fontSizes[0], delay: '15s' },
+      { id: 1, text: shuffledTexts[1], pos: slotZones[1][0], size: fontSizes[1], delay: '4s' },
+      { id: 2, text: shuffledTexts[2], pos: slotZones[2][0], size: fontSizes[3], delay: '8s' },
+      { id: 3, text: shuffledTexts[3], pos: slotZones[3][0], size: fontSizes[0], delay: '12s' },
     ]);
   }, []);
 
-  // KARANLIK DEĞİŞİM (DARK SWAP): Yazı tamamen görünmezken (opacity:0) çalışır.
   const handleAnimationIteration = (slotId) => {
     setSlots(prevSlots => {
       const currentTexts = prevSlots.map(s => s.text);
       const availablePrompts = allPrompts.filter(p => !currentTexts.includes(p));
       const newText = availablePrompts[Math.floor(Math.random() * availablePrompts.length)] || allPrompts[0];
-
-      // Slot sadece kendi bölgesindeki kordinatları seçebilir (Çakışma fiziken imkansız)
-      const zonesForThisSlot = slotZones[slotId];
-      const newZone = zonesForThisSlot[Math.floor(Math.random() * zonesForThisSlot.length)];
       const newSize = fontSizes[Math.floor(Math.random() * fontSizes.length)];
 
       return prevSlots.map(slot =>
-        slot.id === slotId ? { ...slot, text: newText, pos: newZone, size: newSize } : slot
+        slot.id === slotId ? { ...slot, text: newText, pos: slotZones[slotId][0], size: newSize } : slot
       );
     });
   };
@@ -118,25 +109,26 @@ export default function Home() {
   useEffect(() => {
     const styleSheet = document.createElement("style");
     styleSheet.innerText = `
-      @keyframes glowingBorder {
-        0% { background-position: 0% 50%; }
-        100% { background-position: 200% 50%; }
+      @keyframes elegantGlow {
+        0%   { box-shadow: 0 0 8px rgba(0, 242, 254, 0.1), inset 0 0 4px rgba(0, 242, 254, 0.05); border-color: rgba(0, 242, 254, 0.15); }
+        50%  { box-shadow: 0 0 20px rgba(10, 100, 255, 0.25), inset 0 0 8px rgba(10, 100, 255, 0.1); border-color: rgba(10, 100, 255, 0.35); }
+        100% { box-shadow: 0 0 8px rgba(0, 242, 254, 0.1), inset 0 0 4px rgba(0, 242, 254, 0.05); border-color: rgba(0, 242, 254, 0.15); }
       }
 
-      /* 🚨 KUSURSUZ NEFES: Son %20'lik kısımda tamamen karanlıkta kalır, değişim iz bırakmaz. 🚨 */
-      @keyframes trueBreathing {
-        0%   { opacity: 0; transform: scale(0.95) translateY(10px); filter: blur(10px); }
-        20%  { opacity: 0.6; transform: scale(1) translateY(0px); filter: blur(0px); }
-        60%  { opacity: 0.6; transform: scale(1.02) translateY(-5px); filter: blur(0px); }
-        80%  { opacity: 0; transform: scale(1.05) translateY(-10px); filter: blur(10px); }
-        100% { opacity: 0; transform: scale(0.95) translateY(10px); filter: blur(10px); }
+      @keyframes perfectBreathing {
+        0%   { opacity: 0; filter: blur(10px); transform: translateY(10px); }
+        15%  { opacity: 0; filter: blur(10px); transform: translateY(10px); }
+        35%  { opacity: 0.5; filter: blur(0px); transform: translateY(0px); }
+        65%  { opacity: 0.5; filter: blur(0px); transform: translateY(0px); }
+        85%  { opacity: 0; filter: blur(10px); transform: translateY(-10px); }
+        100% { opacity: 0; filter: blur(10px); transform: translateY(-10px); }
       }
 
       .cinematic-text {
         position: absolute;
         color: #888888;
         cursor: pointer;
-        animation: trueBreathing 18s infinite cubic-bezier(0.4, 0, 0.2, 1);
+        animation: perfectBreathing 20s infinite ease-in-out;
         text-align: center;
         line-height: 1.5;
         font-weight: 300;
@@ -153,12 +145,11 @@ export default function Home() {
 
       .pulse-mic { animation: pulse 1.5s infinite; color: #00f2fe !important; }
       @keyframes pulse {
-        0% { transform: scale(1); }
-        50% { transform: scale(1.2); }
+        0%   { transform: scale(1); }
+        50%  { transform: scale(1.1); }
         100% { transform: scale(1); }
       }
 
-      /* 🚨 MOBİL AKILLI VE İZOLE DİZİLİM 🚨 */
       @media (max-width: 768px) {
         .hero-section { margin-top: 35vh !important; }
         .hero-title { font-size: 1.8rem !important; line-height: 1.2 !important; padding: 0 10px !important; }
@@ -170,18 +161,14 @@ export default function Home() {
           max-width: 90vw !important;
           left: 5vw !important;              
           right: auto !important;             
-          padding: 0 !important;      
-          box-sizing: border-box !important;
-          --translateX: 0px !important;    
         }
         
-        /* Mobilde birbirine değmeleri imkansız 3 izole şerit */
-        .slot-0 { top: 5% !important; }
-        .slot-1 { top: 20% !important; }
-        .slot-2 { top: 60% !important; }
+        .slot-0 { top: 15% !important; } 
+        .slot-1 { top: 72% !important; } 
+        .slot-2 { display: none !important; }
         .slot-3 { display: none !important; } 
         
-        .floor-glow { opacity: 0.3 !important; height: 70px !important; bottom: -15px !important;}
+        .floor-glow { opacity: 0.2 !important; height: 50px !important; bottom: -5px !important;}
       }
     `;
     document.head.appendChild(styleSheet);
@@ -248,7 +235,8 @@ export default function Home() {
         <div className="floor-glow" style={floorGlow}></div>
 
         <div style={glowWrapper}>
-          <div style={inputBoxInner}>
+          {/* 🚨 KUTU DİYETE SOKULDU: DAHA İNCE VE ZARİF 🚨 */}
+          <div style={inputBoxInner} className="input-box-inner">
             <textarea 
               style={inputField} 
               placeholder="Mesajınızı buraya yazın..." 
@@ -265,7 +253,7 @@ export default function Home() {
                 className={isListening ? "pulse-mic" : ""}
                 title="Sesle Yaz"
               >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#888" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#888" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path>
                   <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
                   <line x1="12" y1="19" x2="12" y2="22"></line>
@@ -310,51 +298,57 @@ const copyBtn = { marginTop: '25px', background: '#222', color: '#fff', border: 
 
 const bottomArea = { position: 'fixed', bottom: 0, left: 0, right: 0, padding: '30px 20px 40px 20px', background: 'transparent', display: 'flex', flexDirection: 'column', alignItems: 'center', zIndex: 20 };
 
-// 🔥 KUSURSUZ SİBER ZEYKA MAVİSİ (CYBER BLUE) 🔥
-const cyberGradient = 'linear-gradient(90deg, #00f2fe, #0a64ff, #00f2fe, #0a64ff)';
-
 const floorGlow = {
   position: 'absolute',
-  bottom: '-20px', 
+  bottom: '-10px', 
   left: '50%',
   transform: 'translateX(-50%)',
-  width: '65vw', 
-  maxWidth: '850px',
-  height: '90px', 
-  background: cyberGradient,
-  backgroundSize: '200% 100%',
-  filter: 'blur(55px)',
-  opacity: 0.45, // Işık harika bir şekilde ekrana vuracak
+  width: '50vw', 
+  maxWidth: '600px',
+  height: '60px', 
+  background: 'linear-gradient(90deg, rgba(0, 242, 254, 0.4), rgba(10, 100, 255, 0.4))',
+  filter: 'blur(45px)',
+  opacity: 0.35, 
   zIndex: 1,
   pointerEvents: 'none',
-  animation: 'glowingBorder 15s linear infinite' // Çok asil ve yavaş dönüş
 };
 
+// 🚨 DAHA KOMPAKT GENİŞLİK (750px -> 680px) 🚨
 const glowWrapper = {
   position: 'relative',
   width: '100%',
-  maxWidth: '750px',
-  borderRadius: '50px', // Hap şekli
-  background: cyberGradient,
-  backgroundSize: '200% 100%',
-  animation: 'glowingBorder 15s linear infinite', 
-  padding: '1px', // İncecik zarif sınır
+  maxWidth: '680px', 
   zIndex: 2,
-  boxShadow: '0 0 18px rgba(0, 242, 254, 0.2)' 
 };
 
+// 🚨 İNCECİK İÇ BOŞLUKLAR (Padding azaltıldı) 🚨
 const inputBoxInner = {
   backgroundColor: '#0a0a0a', 
-  borderRadius: '49px', 
+  borderRadius: '40px', 
+  border: '1px solid rgba(0, 242, 254, 0.2)', 
+  animation: 'elegantGlow 8s infinite alternate',
   display: 'flex',
   alignItems: 'center',
-  padding: '12px 16px 12px 24px',
+  padding: '6px 10px 6px 18px', // KUTUYU İNCELTEN SİHİRLİ DOKUNUŞ BURASI!
   width: '100%',
   height: '100%',
 };
 
-const inputField = { flex: 1, background: 'transparent', border: 'none', color: '#fff', fontSize: '1.05rem', outline: 'none', resize: 'none', padding: '12px 0', maxHeight: '150px', fontFamily: 'inherit' };
+// 🚨 YAZI ALANI DA İNCELDİ VE ZARİFLEŞTİ 🚨
+const inputField = { 
+  flex: 1, 
+  background: 'transparent', 
+  border: 'none', 
+  color: '#fff', 
+  fontSize: '1rem', // Font bir tık küçüldü
+  outline: 'none', 
+  resize: 'none', 
+  padding: '8px 0', // Yukarıdan ve aşağıdan boşluklar azaltıldı
+  maxHeight: '150px', 
+  fontFamily: 'inherit' 
+};
 
-const actionButtons = { display: 'flex', alignItems: 'center', gap: '8px' };
-const iconButton = { background: 'none', border: 'none', cursor: 'pointer', padding: '5px', display: 'flex', alignItems: 'center', justifyContent: 'center' };
-const sendButton = { width: '38px', height: '38px', borderRadius: '50%', border: 'none', backgroundColor: '#fff', color: '#000', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem', fontWeight: 'bold' };
+const actionButtons = { display: 'flex', alignItems: 'center', gap: '6px' };
+const iconButton = { background: 'none', border: 'none', cursor: 'pointer', padding: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center' };
+// 🚨 BUTONLAR DA KUTUYA UYUM SAĞLASIN DİYE KÜÇÜLTÜLDÜ (38px -> 32px) 🚨
+const sendButton = { width: '32px', height: '32px', borderRadius: '50%', border: 'none', backgroundColor: '#fff', color: '#000', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.1rem', fontWeight: 'bold' };
