@@ -1,29 +1,29 @@
 'use client';
 import { useState, useEffect } from 'react';
 
+// 🔥 VİZYONER VE SÜPERZEKA PROMPT HAVUZU 🔥
 const allPrompts = [
-  "Bana sorular sorarak MBTI kişilik analizimi yap ve içsel potansiyelimi keşfetmemi sağla...",
-  "Fincan fotoğrafıma bakarak geleneksel sembollerle, geçmişi ve geleceği yorumlayan derin bir kahve falı bak...",
-  "Patronuma maaş zammı talebimi ileteceğim; net, ikna edici ve profesyonel bir e-posta taslağı hazırla...",
-  "Doğum haritama göre önümüzdeki 3 aylık süreçte aşk ve kariyer odaklı detaylı astroloji yorumu yap...",
-  "Evdeki yarım tavuk ve patatesle şef elinden çıkmış gibi duran 3 pratik akşam yemeği tarifi ver...",
-  "5 yaşındaki çocuğum için özgüven aşılayan, sürükleyici ve rahatlatıcı bir uyku öncesi masalı yaz...",
-  "Sıfır ekipmanla evde sadece 20 dakikada ter atabileceğim, tüm vücut yağ yakıcı antrenman planı...",
-  "Sevgilimin kalbini kırdım. Samimi, içten ve kendimi affettirecek uzunlukta duygusal bir mesaj yaz...",
-  "Benimle günlük konularda İngilizce sohbet et ve gramer hatalarını Türkçe açıklayarak düzelt...",
-  "Kariyerimde yerimde saydığımı hissediyorum, bana ufuk açacak stratejik tavsiyeler ver...",
-  "Yeni kuracağım e-ticaret sitesi için akılda kalıcı, 2 heceli ve modern marka isimleri türet...",
-  "Stresli bir günün ardından zihnimi boşaltmamı sağlayacak 10 dakikalık rehberli meditasyon metni yaz..."
+  "Wong Kar-wai sinematografisinde, neon ışıkların yağmurlu sokaklara yansıdığı, melankolik ve ultra gerçekçi bir sahne kurgula...",
+  "Mental sağlık odaklı, kullanıcıyla empati kurabilen yapay zeka destekli bir mobil uygulamanın tüm UX/UI ve backend mimarisini tasarla...",
+  "Premium bir su markası için 'buz gibi ferahlık' hissini 8K çözünürlükte yansıtan ödüllü bir reklam kompozisyonu yarat...",
+  "Mevcut piyasa koşullarında 'death cross' formasyonunu analiz ederek, likidite ve risk yönetimi odaklı kurumsal bir kripto portföy stratejisi çiz...",
+  "2. sınıf öğrencileri için pedagojik olarak onaylanmış, 'mini kedi mavi'nin balonla olan maceralarını anlatan sürükleyici bir seri başlat...",
+  "Toplumsal koşullanmanın getirdiği 'öğrenilmiş benlik' ile 'gerçek benlik' arasındaki çatışmayı inceleyen, derin bir felsefi makale yaz...",
+  "Aşık Mahzuni Şerif ekolünden ilham alan, geleneksel Türk halk müziği motiflerini modern ve evrensel bir altyapıyla analiz et...",
+  "Yüksek trafikli bir platform için mikroservis mimarisine dayalı, sıfır kesinti (zero-downtime) hedefleyen bir DevOps altyapısı kur...",
+  "Karar vericileri hedefleyen ve dönüşüm oranını maksimize eden B2B soğuk e-posta (cold email) sekansları oluştur...",
+  "Uluslararası veri gizliliği standartlarına (GDPR) tam uyumlu, şirketi olası risklerden koruyacak kapsamlı bir sözleşme taslağı hazırla...",
+  "Rick and Morty evreninin ironik bilimkurgu dinamiklerini kullanarak, varoluşsal bir krizi mizahi bir dille anlatan kısa bir senaryo yaz...",
+  "Kullanıcının karmaşık düşüncelerini analiz edip, her sektör için milyon dolarlık sonuçlar doğuracak 'Süperzeka' seviyesinde Master Promptlar üret..."
 ];
 
 const fontSizes = ['0.85rem', '0.95rem', '1.05rem', '1.1rem'];
 
-// 🚨 MUTLAK ÇAPA KORDİNATLARI (vH ile ekranın en üstüne ve en altına kilitlendi) 🚨
 const slotZones = {
-  0: [ {top: '12vh', left: '5%', maxWidth: '260px'} ],          // Üst Sol
-  1: [ {top: '15vh', right: '5%', maxWidth: '260px'} ],         // Üst Sağ
-  2: [ {bottom: '25vh', left: '8%', maxWidth: '260px'} ],       // Alt Sol (Komut kutusunun üstü)
-  3: [ {bottom: '22vh', right: '8%', maxWidth: '260px'} ]       // Alt Sağ (Komut kutusunun üstü)
+  0: [ {top: '12%', left: '5%', maxWidth: '260px'} ],   
+  1: [ {top: '15%', right: '5%', maxWidth: '260px'} ],  
+  2: [ {top: '65%', left: '8%', maxWidth: '260px'} ],   
+  3: [ {top: '60%', right: '8%', maxWidth: '260px'} ]   
 };
 
 export default function Home() {
@@ -66,6 +66,7 @@ export default function Home() {
   const handleGenerate = async () => {
     if (!input.trim() || loading) return;
     setLoading(true);
+    
     try {
       const res = await fetch('/api/generate', {
         method: 'POST',
@@ -133,7 +134,6 @@ export default function Home() {
         line-height: 1.5;
         font-weight: 300;
         transition: color 0.3s ease, text-shadow 0.3s ease;
-        pointer-events: auto; /* Tıklanabilmesi için */
       }
 
       .cinematic-text:hover {
@@ -151,7 +151,6 @@ export default function Home() {
         100% { transform: scale(1); }
       }
 
-      /* 🚨 MOBİLİN YASAK BÖLGE (NO-FLY ZONE) KODLARI 🚨 */
       @media (max-width: 768px) {
         .hero-section { margin-top: 35vh !important; }
         .hero-title { font-size: 1.8rem !important; line-height: 1.2 !important; padding: 0 10px !important; }
@@ -165,11 +164,8 @@ export default function Home() {
           right: auto !important;             
         }
         
-        /* Yazı 0 kesinlikle ekranın en üstünde (logonun hemen altında, başlığa değmez)
-          Yazı 1 kesinlikle ekranın en altında (komut kutusunun üstünde, alt metne değmez) 
-        */
-        .slot-0 { top: 12vh !important; bottom: auto !important; } 
-        .slot-1 { top: auto !important; bottom: 22vh !important; } 
+        .slot-0 { top: 12% !important; bottom: auto !important; } 
+        .slot-1 { top: auto !important; bottom: 22% !important; } 
         .slot-2 { display: none !important; }
         .slot-3 { display: none !important; } 
         
@@ -184,7 +180,6 @@ export default function Home() {
     <main style={container}>
       <div style={topBar}>
         <div style={logoWrapper} onClick={handleReset}>
-          {/* YAZI KALDIRILDI, SADECE LOGO KALDI */}
           <img src="/logo.png" alt="Logo" style={miniLogo} />
         </div>
         {result && (
@@ -203,10 +198,9 @@ export default function Home() {
                   onClick={() => setInput(slot.text)}
                   onAnimationIteration={() => handleAnimationIteration(slot.id)}
                   style={{
-                    top: slot.pos.top || 'auto',
-                    bottom: slot.pos.bottom || 'auto',
+                    top: slot.pos.top,
                     left: slot.pos.left || 'auto',
-                    right: slot.pos.right || 'auto',
+                    right: slot.pos.isRight ? slot.pos.right : 'auto',
                     maxWidth: slot.pos.maxWidth,
                     fontSize: slot.size,
                     animationDelay: slot.delay,
@@ -281,27 +275,28 @@ export default function Home() {
 const container = { backgroundColor: '#050505', minHeight: '100vh', color: '#ECECEC', fontFamily: 'Inter, sans-serif', display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden' };
 const topBar = { padding: '20px 25px', position: 'absolute', top: 0, left: 0, right: 0, zIndex: 100, display: 'flex', justifyContent: 'space-between', alignItems: 'center' };
 const logoWrapper = { display: 'flex', alignItems: 'center', gap: '10px', opacity: 0.8, cursor: 'pointer' };
-const miniLogo = { height: '22px', width: 'auto', objectFit: 'contain' }; // Logoyu bir tık belirginleştirdim
+const miniLogo = { height: '20px', width: 'auto', objectFit: 'contain' };
 const backButton = { backgroundColor: 'transparent', color: '#fff', border: '1px solid #333', padding: '8px 16px', borderRadius: '20px', cursor: 'pointer', fontSize: '0.85rem' };
 
 const contentArea = { flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', position: 'relative', paddingBottom: '100px' };
 
-// Kapsayıcıyı tam ekran yaptık ki VH (Viewport Height) hesaplamaları şaşmasın.
-const floatingContainer = { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, pointerEvents: 'none', zIndex: 5, overflow: 'hidden' };
+const floatingContainer = { position: 'absolute', top: '70px', left: 0, right: 0, height: '70vh', pointerEvents: 'auto', zIndex: 5, overflow: 'hidden' };
 
 const heroSection = { display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', zIndex: 10, marginTop: '30vh', width: '100%' };
 const logoFrame = { marginBottom: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center' };
 const centerLogo = { width: '100%', maxWidth: '180px', height: 'auto', display: 'block', objectFit: 'contain' };
 const heroTitle = { fontSize: '2.2rem', fontWeight: '600', marginBottom: '10px', color: '#fff', letterSpacing: '-0.5px' };
-const heroSub = { color: '#999', fontSize: '0.95rem', maxWidth: '550px', padding: '0 20px', lineHeight: '1.5' };
+const heroSub = { color: '#888', fontSize: '1rem', maxWidth: '550px', padding: '0 20px', lineHeight: '1.5' };
 
 const resultContainer = { maxWidth: '850px', width: '100%', marginTop: '80px', marginBottom: '160px', zIndex: 10, padding: '0 20px' };
-const aiResponseWrapper = { width: '100%', backgroundColor: '#111', padding: '20px', borderRadius: '16px', border: '1px solid #222' };
-const aiLabel = { fontSize: '0.75rem', fontWeight: '700', color: '#888', marginBottom: '20px', letterSpacing: '2px' };
-const aiText = { fontSize: '1.05rem', lineHeight: '1.6', color: '#E0E0E0', whiteSpace: 'pre-wrap' };
-const copyBtn = { marginTop: '25px', background: '#222', color: '#fff', border: 'none', padding: '10px 20px', borderRadius: '8px', cursor: 'pointer', fontSize: '0.9rem' };
+const aiResponseWrapper = { width: '100%', backgroundColor: '#0a0a0a', padding: '25px', borderRadius: '16px', border: '1px solid rgba(0, 242, 254, 0.2)', boxShadow: '0 0 20px rgba(10, 100, 255, 0.15)' };
+const aiLabel = { fontSize: '0.75rem', fontWeight: '700', color: '#00f2fe', marginBottom: '20px', letterSpacing: '2px' };
+const aiText = { fontSize: '1rem', lineHeight: '1.6', color: '#E0E0E0', whiteSpace: 'pre-wrap', fontFamily: 'monospace', opacity: 0.9 };
+const copyBtn = { marginTop: '25px', background: '#fff', color: '#000', border: 'none', padding: '10px 20px', borderRadius: '8px', cursor: 'pointer', fontSize: '0.9rem', fontWeight: 'bold' };
 
 const bottomArea = { position: 'fixed', bottom: 0, left: 0, right: 0, padding: '30px 20px 40px 20px', background: 'transparent', display: 'flex', flexDirection: 'column', alignItems: 'center', zIndex: 20 };
+
+const cyberGradient = 'linear-gradient(90deg, #00f2fe, #0a64ff, #00f2fe, #0a64ff)';
 
 const floorGlow = {
   position: 'absolute',
@@ -311,11 +306,13 @@ const floorGlow = {
   width: '50vw', 
   maxWidth: '600px',
   height: '60px', 
-  background: 'linear-gradient(90deg, rgba(0, 242, 254, 0.4), rgba(10, 100, 255, 0.4))',
+  background: cyberGradient,
+  backgroundSize: '200% 100%',
   filter: 'blur(45px)',
   opacity: 0.35, 
   zIndex: 1,
   pointerEvents: 'none',
+  animation: 'glowingBorder 15s linear infinite' 
 };
 
 const glowWrapper = {
