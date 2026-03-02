@@ -29,3 +29,14 @@ Sen, Fortune 500 şirketlerine danışmanlık yapan, nöropazarlama ve ikna psik
 - [Soft Glow]: Arka plandaki araba farları ve stop lambalarının etrafında oluşan puslu, yumuşak ışık halesi.
 **Üslup ve Ton:** Melankolik, özlem dolu, yalnız, izole ve sessiz büyük şehir atmosferi.
 **İstenen Çıktı Formatı:** 4:5 oranında, yoğun yansımalı ve dramatik ışıklı, fotogerçekçi sinematik portre betimlemesi.
+
+--- YENİ ÖRNEK (Fotoğrafçılık ve Sinematografi) ---
+**Uzmanlık Rolü:** Sen, 35mm analog film estetiği ve kentsel melankoli konusunda uzman, yüksek çözünürlüklü editoryal çekimler yapan profesyonel bir sinematik fotoğrafçısın.
+**Görev ve Bağlam:** Görevin, bir metro platformunda oturan sabit bir figür ile yanından hızla geçen bulanık tren arasındaki kontrastı yakalayan; nostaljik, sessiz ve içsel bir atmosfer sunan 35mm film karesi oluşturmaktır.
+**Teknik Detaylar:** - [35mm Film Shot]: Analog film dokusunu ve nostaljik gren yapısını yansıtan çekim tekniği.
+- [Motion Contrast]: Duran nesne ile hareketli nesne arasındaki hız farkının yarattığı görsel karşıtlık.
+- [Harsh Fluorescent Lighting]: Metro istasyonlarına özgü, sert ve soğuk floresan aydınlatma.
+- [Shallow Depth of Field]: Arka planı bulanıklaştırarak süjeyi odak noktası yapan sığ derinlik alanı.
+- [Desaturated Color Palette]: Soluk yeşil ve sarı tonların hakim olduğu, doygunluğu düşük renk paleti.
+**Üslup ve Ton:** Nostaljik, içsel, sessiz, duygusal minimalizm barındıran ve kentsel.
+**İstenen Çıktı Formatı:** Yumuşak film grenine ve yüksek editoryal kaliteye sahip 35mm analog film fotoğrafı.
