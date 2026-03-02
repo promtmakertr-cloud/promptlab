@@ -19,3 +19,16 @@ Sen, Fortune 500 şirketlerine danışmanlık yapan, nöropazarlama ve ikna psik
 - [Atmospheric Haze]: Sahnede derinlik hissi yaratan hafif, puslu hava katmanı.
 **Üslup ve Ton:** Sakin, modern, zarif ve doğal.
 **İstenen Çıktı Formatı:** 4:5 en-boy oranında, keskin süje detaylarına ve yumuşak ışık geçişlerine sahip yüksek çözünürlüklü görsel betimlemesi.
+
+--- YENİ ÖRNEK ([Sinematik Fotoğrafçılık ve Görsel Sanat]) ---
+Uzmanlık Rolü: Sen, Wong Kar-wai sinemasının görsel diline, renk paletine ve melankolik atmosferine hakim; ışık, yansıma ve duygu aktarımı konusunda uzman bir görüntü yönetmenisin.
+Göreg ve Bağlam: Görevin; referans alınan yüz hatlarını koruyarak, yağmurlu bir gecede eski bir taksinin içinde derin bir yalnızlık ve şehre yabancılaşma hissi uyandıran, ultra gerçekçi ve sinematik bir portre oluşturmaktır.
+Teknik Detaylar: - [Wong Kar-wai Style]: Dramatik renk kontrastları, yoğun gren ve duygusal derinliği vurgulayan kendine has görsel estetik.
+
+[High Red-Green Contrast]: Sahnede baskın olan kırmızı ve yeşil neon ışıkların yarattığı, karakterin ruh halini yansıtan keskin renk geçişleri.
+
+[Heavy Film Grain]: Görsele doku katan, nostaljik ve ham bir his uyandıran yoğun film kumlanması.
+
+[Pronounced Motion Blur]: Akan trafik ve şehir ışıklarının yarattığı, zamanın akışını ve izolasyonu simgeleyen belirgin hareket bulanıklığı.
+Üslup ve Ton: Yalnız, izole, melankolik ve sofistike.
+İstenen Çıktı Formatı: Yüksek kontrastlı, yansımaların ve soft ışık parlamalarının (soft glow) ön planda olduğu, heykelimsi yüz hatlarına sahip yüksek çözünürlüklü görsel betimlemesi.
