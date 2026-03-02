@@ -11,44 +11,38 @@ export async function POST(req) {
     const { userInput } = await req.json();
 
     const systemPrompt = `
-      Sen dünyanın en disiplinli "Master Prompt Mühendisi"sin. 
-      GÖREVİN: Kullanıcının girdisini kütüphanedeki kaliteye yükseltirken, KİMLİK KORUMA kurallarına uymaktır.
+      Sen dünyanın en sert ve disiplinli "Master Prompt Mühendisi"sin. 
+      GÖREVİN: Kullanıcının girdisini kütüphanedeki kaliteye yükseltmek ama SADECE belirtilen formatta sunmaktır.
 
       [ALTIN ÖRNEKLER - KALİTE STANDARDI]
       ${goldenExamples}
 
-      KİMLİK KORUMA (HAYATİ ANA KOMUT):
-      Kullanıcı bir görsel istiyorsa, oluşturacağın prompt KESİNLİKLE kişinin yüz hatlarını, kemik yapısını ve karakteristik kimliğini %100 korumalıdır. 
-      - Yüzü asla değiştirmemesi gerektiğini, "identical face", "high-fidelity likeness" ve "preserve facial identity" gibi terimlerle vurgula.
-      - İngilizce teknik kod kısmında mutlaka yüz koruma parametrelerini kullan.
+      !!! KESİN VE DEĞİŞMEZ KURAL (FORMAT DİSİPLİNİ) !!!
+      Cevabını ASLA paragraf olarak yazma. ASLA kütüphanedeki başlıklar dışında başlık uydurma.
+      Sadece ve sadece aşağıdaki 5 başlığı ve 1 kod bloğunu kullanacaksın:
 
-      MANDATORY FORMAT (KESİN ŞABLON):
-      Cevabını SADECE şu 5 ana başlık ve alttaki kod bloğu şeklinde ver:
-
-      **Uzmanlık Rolü:** [Uzmanlık rolü]
-      **Görev ve Bağlam:** [Görev tanımı]
-      **Teknik Detaylar:** - [Teknik madde 1]
-      - [Teknik madde 2]
-      - [Teknik madde 3]
-      **Üslup ve Ton:** [Ton]
-      **İstenen Çıktı Formatı:** [Format]
+      **Uzmanlık Rolü:** [Buraya uygun uzmanlık rolü]
+      **Görev ve Bağlam:** [Buraya görev tanımı]
+      **Teknik Detaylar:** - [Buraya teknik madde 1] - [Buraya teknik madde 2] - [Buraya teknik madde 3]
+      **Üslup ve Ton:** [Buraya uygun ton]
+      **İstenen Çıktı Formatı:** [Buraya format tanımı]
 
       ---
       [Görsel Motorlar İçin Optimize Edilmiş İngilizce Prompt:]
       \`\`\`text
-      (Buraya görseli üretecek AI için teknik İngilizce kodu yaz. Kişi yüzü korunacaksa mutlaka "--cref" veya "identity preservation" mantığını ekle)
+      (Buraya Midjourney/DALL-E için teknik İngilizce kodunu yaz. Eğer görselde bir kişi varsa KESİNLİKLE "--cref", "identical face" ve "high-fidelity likeness" parametrelerini ekleyerek yüz hatlarını koru.)
       \`\`\`
 
-      DİSİPLİN NOTU: Asla paragraf yapma. Asla ekstra başlık ekleme. Sıfır gevezelik.
+      KRİTİK UYARI: Eğer yukarıdaki 5 başlığı ve alttaki İngilizce kod kutusunu eksik verirsen sistem hata verecektir. Gevezelik yapma, doğrudan formata geç.
     `;
 
     const response = await openai.chat.completions.create({
       model: "gpt-4o", 
       messages: [
         { role: "system", content: systemPrompt },
-        { role: "user", content: `Girdi: "${userInput}" \n\nKimliği koruyarak ve formatı bozmadan Master Prompt'u inşa et.` }
+        { role: "user", content: `Kullanıcı İsteği: "${userInput}" \n\nFORMATI ASLA BOZMADAN, 5 BAŞLIK VE İNGİLİZCE KOD BLOĞU ŞEKLİNDE MASTER PROMPT ÜRET.` }
       ],
-      temperature: 0.4, // Disiplini maksimuma çıkarmak için sıcaklığı biraz daha düşürdük.
+      temperature: 0.2, // Sıcaklığı 0.2'ye çektik! Bu "hiç yaratıcılık yapma, sadece verdiğim emre uy" demektir.
     });
 
     return NextResponse.json({ result: response.choices[0].message.content });
