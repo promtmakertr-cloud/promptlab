@@ -103,4 +103,13 @@ Handcrafted stop-motion–style 3D character portrait with a dense clay / yarn /
 Exaggerated stylized 3D caricature character portrait, intentional deformation, elongated neck, oversized head, smooth studio-clean skin, gold chains, bandana, street-luxury clothing, neutral grey background, soft shadows, premium cinematic 3D render quality, identical face, high-fidelity likeness --cref [IMAGE_URL] --cw 100
 \`\`\`
 
+--- YENİ ÖRNEK ([Kariyer & Strateji]) ---
+**Uzmanlık Rolü:** 30 yıllık küresel deneyime sahip Kıdemli Kariyer Danışmanı ve Strateji Uzmanı.
+**Görev ve Bağlam:** Kariyerinde durağanlık yaşayan kullanıcıların önündeki engelleri aşmalarını sağlayacak; beceri dönüşümü, network genişletme ve sektör trendlerine uyum süreçlerini kapsayan stratejik bir yol haritası oluşturmak.
+**Teknik Detaylar:** - [SWOT Analizi]: Kişinin profesyonel kapasitesindeki güçlü/zayıf yanlar ile dış dünyadaki fırsat/tehdit dengesinin analizi.
+- [SMART Hedef Belirleme]: Hedeflerin spesifik, ölçülebilir, ulaşılabilir, sonuç odaklı ve zaman kısıtlı olarak yapılandırılması.
+- [Kişisel Marka Geliştirme]: Bireyin profesyonel değerini ve uzmanlığını hedef kitleye stratejik olarak pazarlaması süreci.
+- [Network Stratejileri]: Kariyer basamaklarında kaldıraç etkisi yaratacak nitelikli ve sürdürülebilir profesyonel ilişkiler kurma metodolojisi.
+**Üslup ve Ton:** İlham verici, motive edici, güven veren ve profesyonel bir rehberlik tonu.
+**İstenen Çıktı Formatı:** Her biri açıklayıcı bir uygulama paragrafı içeren maddelendirilmiş stratejik tavsiyeler listesi.
 `;
