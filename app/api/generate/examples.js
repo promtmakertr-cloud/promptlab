@@ -57,3 +57,17 @@ stylish man standing in front of a Gothic cathedral in a European street, full b
 cinematic portrait of a person sitting in the backseat of an old taxi, looking through a rain-streaked window, heavy rain, Wong Kar-wai style, high red-green contrast, neon lights reflecting on face and wet glass, heavy film grain, motion blur from outside traffic, deep melancholy, 8k resolution, identical face, high-fidelity likeness --cref [IMAGE_URL] --cw 100 --ar 4:5
 \`\`\`
 `;
+
+--- YENİ ÖRNEK (Fotoğrafçılık ve Görsel Sanat - Editoryal Portre) ---
+**Uzmanlık Rolü:** Sen, dramatik ve renkli stüdyo aydınlatmasında uzmanlaşmış, dünya çapında ödüllü bir editoryal portre fotoğrafçısısın.
+**Görev ve Bağlam:** Görevin, referans görseldeki kişinin yüz hatlarını, ten rengini ve saç stilini %100 oranında koruyarak; siyah pike polo yaka tişört giymiş, kadraj dışına yoğun bir ifadeyle bakan, canlı turuncu-kırmızı bir arka plan önünde "kahramanca" hissi veren bir stüdyo portresini oluşturmaktır.
+**Teknik Detaylar:** - [Chiaroscuro Effect]: Yüz yapısını belirginleştiren, derin ve dramatik gölgeler yaratan güçlü, yönlü aydınlatma.
+- [Low-Angle Shot]: Modeli daha güçlü ve baskın göstermek için aşağıdan yukarıya doğru ayarlanan kamera açısı.
+- [Rim Light]: Objenin başını ve omuzlarını yoğun aydınlatılmış arka plandan ayırarak derinlik katan keskin kenar ışığı.
+- [Realistic Skin Textures]: Doğal gözeneklerin ve cilt dokusunun yüksek çözünürlükte, keskin odakla (sharp focus) korunması.
+**Üslup ve Ton:** Gizemli, yoğun, yüksek kontrastlı, dramatik ve güçlü.
+**İstenen Çıktı Formatı:** Yüksek çözünürlüklü, fotogerçekçi stüdyo portresi.
+
+---
+[Görsel Motorlar İçin Optimize Edilmiş İngilizce Prompt:]
+powerful heroic editorial portrait, medium close-up, low-angle shot looking up at the subject, subject wearing a premium deep matte black pique polo shirt with visible cotton mesh texture, serious intense expression looking off-camera, vibrant solid orange-red backdrop with smooth intense color gradients, dramatic colorful studio lighting, strong directional key light, deep shadows, chiaroscuro effect, strong dramatic rim light, mysterious high-contrast studio aesthetic, photorealistic, highly detailed, sharp focus on face, realistic skin textures and natural pores, identical face, high-fidelity likeness --cref [IMAGE_URL] --cw 100
