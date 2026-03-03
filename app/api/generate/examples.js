@@ -87,5 +87,17 @@ powerful heroic editorial portrait, medium close-up, low-angle shot looking up a
 \`\`\`text
 Handcrafted stop-motion–style 3D character portrait with a dense clay / yarn / bead-like micro-texture, inspired by Van Gogh–like painterly motion, blocky geometric caricature form, tactile surface depth, visible handcrafted material detail, identical face, high-fidelity likeness, swirling expressive night-sky background, soft gallery-style lighting, museum-grade aesthetic, 8k resolution --cref [IMAGE_URL] --cw 100
 \`\`\`
+--- YENİ ÖRNEK ([Görsel / Karikatür]) ---
+**Uzmanlık Rolü:** 3D Karakter Tasarımcısı ve Stilize Karikatür Sanatçısı.
+**Görev ve Bağlam:** Referans fotoğraftaki kişinin kimliğini, yüz benzerliğini ve cilt tonunu koruyarak; onu abartılı deformasyonlara sahip, moda odaklı ve koleksiyonluk bir 3D karikatür figürüne dönüştürmek.
+**Teknik Detaylar:** - [Kasıtlı Deformasyon]: Uzatılmış boyun, büyük kafa-boyun oranı, düşük göz kapakları ve asimetrik yüz yapısı ile karakterize edilen yapısal stilizasyon.
+- [Yüzey Bitişi]: Pürüzsüz, lekesiz, kumlanma ve rastgele doku içermeyen "stüdyo temizliğinde" yüzey kalitesi.
+- [Aksesuar ve Stil]: Yuvarlak gözlükler, altın zincirler ve bandana gibi sokak lüksü kıyafetlerle harmanlanmış moda ögeleri.
+- [Render Kalitesi]: Nötr gri arka planda, yumuşak gölgeli ve eşit dağılımlı stüdyo aydınlatmasıyla sunulan premium sinematik görünüm.
+**Üslup ve Ton:** Tuhaf, moda öncüsü, karakter odaklı ve sanatsal açıdan iddialı.
+**İstenen Çıktı Formatı:** Kusursuz materyallere sahip, ultra yüksek çözünürlüklü 3D render görüntüsü.
 
-`;
+---
+[Görsel Motorlar İçin Optimize Edilmiş İngilizce Prompt:]
+```text
+Exaggerated stylized 3D caricature character portrait with strong intentional deformation and a clean, controlled surface finish. Reinterpret the person from [IMAGE_URL] into a bold caricatured 3D form with an elongated neck, oversized head-to-neck ratio, droopy eyelids, heavy lips, and slightly asymmetrical facial structure. Human-like 3D character with smooth, studio-clean skin and intentionally designed detail, avoiding random texture or noise. Styled with bold accessories such as round or oval glasses, hoop earrings, gold chains, headscarves or bandanas, and street-luxury clothing. Neutral studio lighting with soft shadows and even illumination against a plain neutral grey or off-white background. Weird, fashion-forward, collectible, and character-driven. Ultra high definition, premium cinematic 3D render quality, clean materials, no freckles, no dirt, no grain, no noise, no text, no logos, identical face, high-fidelity likeness --cref [IMAGE_URL] --cw 100 `;
