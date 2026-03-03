@@ -72,20 +72,20 @@ cinematic portrait of a person sitting in the backseat of an old taxi, looking t
 \`\`\`text
 powerful heroic editorial portrait, medium close-up, low-angle shot looking up at the subject, subject wearing a premium deep matte black pique polo shirt with visible cotton mesh texture, serious intense expression looking off-camera, vibrant solid orange-red backdrop with smooth intense color gradients, dramatic colorful studio lighting, strong directional key light, deep shadows, chiaroscuro effect, strong dramatic rim light, mysterious high-contrast studio aesthetic, photorealistic, highly detailed, sharp focus on face, realistic skin textures and natural pores, identical face, high-fidelity likeness --cref [IMAGE_URL] --cw 100
 \`\`\`
-`;
 
---- YENİ ÖRNEK ([Görsel / Stil Transferi]) ---
+--- YENİ ÖRNEK (Görsel / Stil Transferi - Stop-Motion & Van Gogh) ---
 **Uzmanlık Rolü:** Stop-motion ve El Sanatları Tarzı 3D Karakter Sanatçısı.
-**Görev ve Bağlam:** Verilen referans fotoğraftaki kişinin yüz kimliğini, yapısını ve oranlarını koruyarak, onu bloklu, yontulmuş, geometrik bir karikatür formuna dönüştürmek. Karakter ve ortam, Van Gogh tarzı post-izlenimci hareketli fırça darbelerinden ilham alan yoğun kil, iplik ve boncuk benzeri mikro dokularla kaplanmalıdır.
-**Teknik Detaylar:** - [Stop-motion Estetiği]: Fiziksel olarak yontulmuş hissi veren, kasıtlı sırtlar, oluklar ve dokunsal deformasyonlar içeren fotogerçekçi olmayan yapı.
-- [Mikro Doku]: Konunun ve ortamın tamamında yoğun kil, iplik ve boncuk benzeri karmaşık yüzey detayları.
-- [Geometrik Karikatür]: Basitleştirilmiş düzlemlerle oluşturulmuş yontulmuş form.
-- [Van Gogh Tarzı Arka Plan]: Kalın yönlü darbeler, parlayan küreler ve ritmik hareket içeren dönen, dışavurumcu, resimsel bir gece gökyüzü kompozisyonu.
-- [Galeri Aydınlatması]: Gerçekçilikten ziyade doku derinliğini ve malzeme kabartmasını vurgulayan yumuşak aydınlatma.
-**Üslup ve Ton:** Sanatsal, müze kalitesinde, tuhaf, sürreal, el yapımı heykel hissi veren.
-**İstenen Çıktı Formatı:** Ultra yüksek detaylı, metinsiz ve logosuz 3D render görüntüsü.
+**Görev ve Bağlam:** Verilen referans fotoğraftaki kişinin yüz kimliğini koruyarak; onu bloklu, yontulmuş, geometrik bir karikatür formuna dönüştürmek ve Van Gogh tarzı fırça darbelerinden ilham alan mikro dokularla kaplamaktır.
+**Teknik Detaylar:** - [Stop-motion Estetiği]: Fiziksel olarak yontulmuş hissi veren, kasıtlı oluklar ve dokunsal deformasyonlar içeren yapı.
+- [Mikro Doku]: Karakterin yüzeyinde yoğun kil, iplik ve boncuk benzeri karmaşık yüzey detayları.
+- [Van Gogh Style Sky]: Kalın yönlü darbeler ve parlayan küreler içeren dönen, resimsel bir arka plan.
+**Üslup ve Ton:** Sanatsal, sürreal, el yapımı heykel hissi veren ve tuhaf.
+**İstenen Çıktı Formatı:** Ultra yüksek detaylı, dokusal derinliğe sahip 3D render görüntüsü.
 
 ---
 [Görsel Motorlar İçin Optimize Edilmiş İngilizce Prompt:]
-```text
-Handcrafted stop-motion–style 3D character portrait with a dense clay / yarn / bead-like micro-texture across the entire subject and environment, inspired by post-impressionist Van Gogh–like painterly motion. Use the person from the [IMAGE_URL]. The character is a blocky, sculpted, geometric caricature form with simplified planes, tactile surface depth, and visible handcrafted material detail, maintaining an identical face and high-fidelity likeness to the person. The subject feels physically sculpted, with intentional ridges, grooves, and tactile deformation. The background is a swirling, expressive, painterly night-sky composition with thick directional strokes, glowing orbs, and rhythmic motion, fully integrated with the subject. Lighting is soft, gallery-style, enhancing texture depth and material relief. The overall aesthetic is artisanal, museum-grade, whimsical, and surreal, like a handcrafted sculpture placed inside a living painting. Ultra-high detail, intentional stylization, no realism drift. --cref [IMAGE_URL] --cw 100
+\`\`\`text
+Handcrafted stop-motion–style 3D character portrait with a dense clay / yarn / bead-like micro-texture, inspired by Van Gogh–like painterly motion, blocky geometric caricature form, tactile surface depth, visible handcrafted material detail, identical face, high-fidelity likeness, swirling expressive night-sky background, soft gallery-style lighting, museum-grade aesthetic, 8k resolution --cref [IMAGE_URL] --cw 100
+\`\`\`
+
+`;
