@@ -198,19 +198,6 @@ export default function Home() {
     finally { setLoading(false); }
   };
 
-  // 🔥 ÇALIŞAN ZIRHLI MOTOR: 404'Ü KESİN OLARAK ENGELLER 🔥
-  const handleQuickLaunch = (e, url, name) => {
-    e.preventDefault(); // Sayfa yenilemesini KESİNLİKLE yasaklar
-    navigator.clipboard.writeText(result); // Önce metni kopyalar
-    setCopyStatus(name + ' Açılıyor...');
-    
-    // 1 saniyelik bekleme ile hedef sayfayı sorunsuzca açar (Senin çalışan sistemin birebir aynısı)
-    setTimeout(() => {
-        window.open(url, '_blank');
-        setCopyStatus('Metni Kopyala');
-    }, 1000);
-  };
-
   const handleVoiceTyping = () => {
     if (!('webkitSpeechRecognition' in window)) { alert("Tarayıcınız sesli yazmayı desteklemiyor. Lütfen Chrome veya Safari kullanın."); return; }
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -227,6 +214,17 @@ export default function Home() {
     navigator.clipboard.writeText(result);
     setCopyStatus('Kopyalandı! ✓');
     setTimeout(() => setCopyStatus('Metni Kopyala'), 2000);
+  };
+
+  // 🔥 ARTIK SADECE KOPYALAMA YAPIYOR (YÖNLENDİRME HTML'E BIRAKILDI) 🔥
+  const handleQuickCopy = () => {
+    try {
+      navigator.clipboard.writeText(result);
+      setCopyStatus('Kopyalandı & Açılıyor!');
+      setTimeout(() => setCopyStatus('Metni Kopyala'), 2000);
+    } catch(err) {
+      console.log('Kopyalama hatası');
+    }
   };
 
   useEffect(() => {
@@ -254,7 +252,7 @@ export default function Home() {
       @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
       .edit-btn:hover { background: rgba(0, 242, 254, 0.2) !important; color: #fff !important; }
 
-      /* 🔥 YENİ NESİL ŞIK AI BUTONLARI 🔥 */
+      /* 🔥 YENİ NESİL ŞIK AI BUTONLARI (ARTIK GERÇEK LİNKLER) 🔥 */
       .ai-brand-btn {
         display: inline-flex;
         align-items: center;
@@ -270,7 +268,7 @@ export default function Home() {
         transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
         font-family: inherit;
         backdrop-filter: blur(10px);
-        outline: none;
+        text-decoration: none; /* Linklerin altını çizmeyi engeller */
       }
       .ai-brand-btn:hover {
         background: rgba(0, 242, 254, 0.1);
@@ -367,7 +365,7 @@ export default function Home() {
                     {loading && <span className="cursor-blink"></span>}
                   </div>
                   
-                  {/* 🔥 KUSURSUZ VE ZIRHLI YÖNETİM PANELİ 🔥 */}
+                  {/* 🔥 GERÇEK HTML LİNKLERİ (ASLA HATA VERMEZ) 🔥 */}
                   {!loading && result && (
                     <div style={{ marginTop: '35px', paddingTop: '20px', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
                       
@@ -381,40 +379,40 @@ export default function Home() {
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
                         {!isVisual ? (
                           <>
-                            {/* type="button" KESİNLİKLE EKLENDİ, 404 ASLA YAŞANMAYACAK */}
-                            <button type="button" className="ai-brand-btn" onClick={(e) => handleQuickLaunch(e, '[https://chatgpt.com](https://chatgpt.com)', 'ChatGPT')}>
+                            {/* BUNLAR ARTIK BUTON DEĞİL, GERÇEK BAĞLANTILARDIR (<a>) */}
+                            <a href="[https://chatgpt.com](https://chatgpt.com)" target="_blank" rel="noopener noreferrer" className="ai-brand-btn" onClick={handleQuickCopy}>
                               {IconChatGPT} <span>ChatGPT</span>
-                            </button>
-                            <button type="button" className="ai-brand-btn" onClick={(e) => handleQuickLaunch(e, '[https://gemini.google.com](https://gemini.google.com)', 'Gemini')}>
+                            </a>
+                            <a href="[https://gemini.google.com](https://gemini.google.com)" target="_blank" rel="noopener noreferrer" className="ai-brand-btn" onClick={handleQuickCopy}>
                               {IconGemini} <span>Gemini</span>
-                            </button>
-                            <button type="button" className="ai-brand-btn" onClick={(e) => handleQuickLaunch(e, '[https://claude.ai](https://claude.ai)', 'Claude')}>
+                            </a>
+                            <a href="[https://claude.ai](https://claude.ai)" target="_blank" rel="noopener noreferrer" className="ai-brand-btn" onClick={handleQuickCopy}>
                               {IconClaude} <span>Claude</span>
-                            </button>
-                            <button type="button" className="ai-brand-btn" onClick={(e) => handleQuickLaunch(e, '[https://www.perplexity.ai](https://www.perplexity.ai)', 'Perplexity')}>
+                            </a>
+                            <a href="[https://www.perplexity.ai](https://www.perplexity.ai)" target="_blank" rel="noopener noreferrer" className="ai-brand-btn" onClick={handleQuickCopy}>
                               {IconPerplexity} <span>Perplexity</span>
-                            </button>
-                            <button type="button" className="ai-brand-btn" onClick={(e) => handleQuickLaunch(e, '[https://copilot.microsoft.com](https://copilot.microsoft.com)', 'Copilot')}>
+                            </a>
+                            <a href="[https://copilot.microsoft.com](https://copilot.microsoft.com)" target="_blank" rel="noopener noreferrer" className="ai-brand-btn" onClick={handleQuickCopy}>
                               {IconCopilot} <span>Copilot</span>
-                            </button>
+                            </a>
                           </>
                         ) : (
                           <>
-                            <button type="button" className="ai-brand-btn" onClick={(e) => handleQuickLaunch(e, '[https://discord.com/channels/@me](https://discord.com/channels/@me)', 'Midjourney')}>
+                            <a href="[https://discord.com/channels/@me](https://discord.com/channels/@me)" target="_blank" rel="noopener noreferrer" className="ai-brand-btn" onClick={handleQuickCopy}>
                               {IconMidjourney} <span>Midjourney</span>
-                            </button>
-                            <button type="button" className="ai-brand-btn" onClick={(e) => handleQuickLaunch(e, '[https://chatgpt.com](https://chatgpt.com)', 'DALL-E 3')}>
+                            </a>
+                            <a href="[https://chatgpt.com](https://chatgpt.com)" target="_blank" rel="noopener noreferrer" className="ai-brand-btn" onClick={handleQuickCopy}>
                               {IconChatGPT} <span>DALL-E 3</span>
-                            </button>
-                            <button type="button" className="ai-brand-btn" onClick={(e) => handleQuickLaunch(e, '[https://leonardo.ai](https://leonardo.ai)', 'Leonardo')}>
+                            </a>
+                            <a href="[https://leonardo.ai](https://leonardo.ai)" target="_blank" rel="noopener noreferrer" className="ai-brand-btn" onClick={handleQuickCopy}>
                               {IconLeonardo} <span>Leonardo</span>
-                            </button>
-                            <button type="button" className="ai-brand-btn" onClick={(e) => handleQuickLaunch(e, '[https://firefly.adobe.com](https://firefly.adobe.com)', 'Adobe Firefly')}>
+                            </a>
+                            <a href="[https://firefly.adobe.com](https://firefly.adobe.com)" target="_blank" rel="noopener noreferrer" className="ai-brand-btn" onClick={handleQuickCopy}>
                               {IconAdobe} <span>Adobe Firefly</span>
-                            </button>
-                            <button type="button" className="ai-brand-btn" onClick={(e) => handleQuickLaunch(e, '[https://www.canva.com](https://www.canva.com)', 'Canva')}>
+                            </a>
+                            <a href="[https://www.canva.com](https://www.canva.com)" target="_blank" rel="noopener noreferrer" className="ai-brand-btn" onClick={handleQuickCopy}>
                               {IconCanva} <span>Canva</span>
-                            </button>
+                            </a>
                           </>
                         )}
                       </div>
