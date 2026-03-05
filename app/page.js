@@ -63,19 +63,10 @@ const parsePromptData = (fullText) => {
   return { category: '', promptText: fullText };
 };
 
-// 🔥 YÜKLEME MESAJLARI 🔥
-const loadingMessages = [
-  "🧠 Fikriniz yapay zeka tarafından analiz ediliyor...",
-  "📚 Master Kütüphane standartlarına uyarlanıyor...",
-  "⚙️ Sektörel jargon ve teknik detaylar ekleniyor...",
-  "✨ Son rötuşlar yapılıyor, promptunuz hazır olmak üzere..."
-];
-
 export default function Home() {
   const [input, setInput] = useState('');
   const [result, setResult] = useState('');
   const [loading, setLoading] = useState(false);
-  const [loadingStep, setLoadingStep] = useState(0); // Yükleme animasyonu için State
   const [isListening, setIsListening] = useState(false);
   const [copyStatus, setCopyStatus] = useState('Metni Kopyala');
   const [slots, setSlots] = useState([]);
@@ -87,18 +78,7 @@ export default function Home() {
   const [typewriterIndex, setTypewriterIndex] = useState(0);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  // Yükleme Animasyonu Döngüsü
-  useEffect(() => {
-    let interval;
-    if (loading) {
-      setLoadingStep(0);
-      interval = setInterval(() => {
-        setLoadingStep((prev) => (prev + 1) % loadingMessages.length);
-      }, 1800); // Her 1.8 saniyede bir mesaj değişir
-    }
-    return () => clearInterval(interval);
-  }, [loading]);
-
+  // Daktilo Efekti Motoru
   useEffect(() => {
     const currentFullText = typewriterExamples[typewriterIndex];
     let typingSpeed = isDeleting ? 30 : 50; 
@@ -153,25 +133,46 @@ export default function Home() {
     setIsPromptExpanded(false);
   };
 
+  // 🔥 YENİ STREAMING (AKIŞ) MOTORU 🔥
   const handleGenerate = async () => {
     if (!input.trim() || loading) return;
+    
     setLoading(true);
     setSubmittedPrompt(input);
     setIsPromptExpanded(false);
+    setResult(''); // Önceki sonucu temizle
+    
+    // Girdiyi anında temizle
+    const currentInput = input;
+    setInput(''); 
     
     try {
       const res = await fetch('/api/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userInput: input }),
+        body: JSON.stringify({ userInput: currentInput }),
       });
-      const data = await res.json();
-      setResult(data.result);
-      setInput(''); 
+
+      if (!res.body) throw new Error("Tarayıcı Streaming desteklemiyor.");
+
+      // Kelimeleri havada yakalama mekanizması
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder("utf-8");
+      let done = false;
+
+      while (!done) {
+        const { value, done: readerDone } = await reader.read();
+        done = readerDone;
+        if (value) {
+          const chunk = decoder.decode(value, { stream: true });
+          setResult((prev) => prev + chunk); // Gelen her heceyi ekrana bas
+        }
+      }
     } catch (err) {
       alert("Sistemde bir aksama oldu.");
+      setSubmittedPrompt(''); // Hata olursa başa dön
     } finally {
-      setLoading(false);
+      setLoading(false); // Yazma işlemi tamamen bitince yüklemeyi durdur
     }
   };
 
@@ -216,31 +217,19 @@ export default function Home() {
         100% { opacity: 0; filter: blur(10px); transform: translateY(-10px); }
       }
 
-      /* Yükleme Animasyonu (Nefes Alma) */
-      @keyframes loadingPulse {
-        0% { opacity: 0.6; transform: scale(0.98); }
-        50% { opacity: 1; transform: scale(1); }
-        100% { opacity: 0.6; transform: scale(0.98); }
+      /* 🔥 YAZMA İMLECİ (BLINKING CURSOR) 🔥 */
+      @keyframes blink {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0; }
       }
-
-      .loading-box {
-        width: 100%;
-        max-width: 600px;
-        background: rgba(10, 10, 10, 0.8);
-        border: 1px solid rgba(0, 242, 254, 0.3);
-        border-radius: 16px;
-        padding: 40px 20px;
-        text-align: center;
-        box-shadow: 0 0 30px rgba(0, 242, 254, 0.1);
-        animation: loadingPulse 2s infinite ease-in-out;
-      }
-
-      .loading-text {
-        font-size: 1.1rem;
-        color: #00f2fe;
-        font-weight: 500;
-        margin-top: 15px;
-        letter-spacing: 0.5px;
+      .cursor-blink {
+        display: inline-block;
+        width: 8px;
+        height: 1.2em;
+        background-color: #00f2fe;
+        vertical-align: middle;
+        margin-left: 4px;
+        animation: blink 1s step-end infinite;
       }
 
       .cinematic-text { position: absolute; color: #888888; cursor: pointer; animation: perfectBreathing 24s infinite linear; text-align: left; line-height: 1.5; font-weight: 300; transition: transform 0.3s ease, filter 0.3s ease; }
@@ -277,13 +266,13 @@ export default function Home() {
         <div style={logoWrapper} onClick={handleReset}>
           <img src="/logo.png" alt="Logo" style={miniLogo} />
         </div>
-        {(result || loading) && (
+        {(submittedPrompt) && (
           <button onClick={handleReset} style={backButton}>← Ana Sayfa</button>
         )}
       </div>
       
       <div style={contentArea}>
-        {!result && !loading ? (
+        {!submittedPrompt ? (
           <>
             <div style={floatingContainer}>
               {slots.map((slot) => {
@@ -319,27 +308,10 @@ export default function Home() {
               <p style={heroSub} className="hero-sub">Metni yaz. Optimize edilmiş promptu al. Kopyala ve diğer AI araçlarında kullan.</p>
             </div>
           </>
-        ) : loading ? (
-          
-          /* 🔥 YENİ: DİNAMİK YÜKLEME EKRANI 🔥 */
-          <div style={resultContainer} className="flex flex-col items-center justify-center">
-            <div className="loading-box">
-              {/* Spinner İkonu */}
-              <svg className="animate-spin" style={{ margin: '0 auto', width: '40px', height: '40px', color: '#00f2fe' }} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-              {/* Değişen Yazılar */}
-              <div className="loading-text">
-                {loadingMessages[loadingStep]}
-              </div>
-            </div>
-          </div>
-
         ) : (
           <div style={resultContainer}>
              
-             {/* Akordeon Kullanıcı Promptu */}
+             {/* 1. KULLANICININ PROMPTU (AKORDEON YAPI) */}
              <div style={userPromptWrapper}>
                <div style={userPromptHeader} onClick={() => setIsPromptExpanded(!isPromptExpanded)}>
                  <div style={userPromptTitle}>
@@ -374,11 +346,24 @@ export default function Home() {
                )}
              </div>
 
-             {/* Yapay Zeka Çıktısı */}
+             {/* 2. YAPAY ZEKA ÇIKTISI (AKAN YAZI - STREAMING) */}
              <div style={aiResponseWrapper}>
                 <div style={aiLabel}>ÜRETİLEN MASTER PROMPT</div>
-                <div style={aiText}>{result}</div>
-                <button onClick={handleCopy} style={copyBtn}>{copyStatus}</button>
+                
+                {/* Yükleniyor ama henüz harf gelmediyse Bağlanıyor yaz, yoksa akan metni göster */}
+                {(!result && loading) ? (
+                  <div style={{ color: '#888', fontStyle: 'italic', fontSize: '0.95rem' }}>
+                    Yapay zeka analiz ediyor... <span className="cursor-blink"></span>
+                  </div>
+                ) : (
+                  <div style={aiText}>
+                    {result}
+                    {loading && <span className="cursor-blink"></span>}
+                  </div>
+                )}
+
+                {/* Yazma bittiğinde kopyala butonu çıkar */}
+                {!loading && result && <button onClick={handleCopy} style={copyBtn}>{copyStatus}</button>}
              </div>
           </div>
         )}
