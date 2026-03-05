@@ -1,30 +1,58 @@
 'use client';
 import { useState, useEffect } from 'react';
 
-// 🔥 VİZYONER VE SÜPERZEKA PROMPT HAVUZU 🔥
+// 🔥 25'Lİ SÜPERZEKA PROMPT HAVUZU (Arka plan animasyonları için) 🔥
 const allPrompts = [
-  "Wong Kar-wai sinematografisinde, neon ışıkların yağmurlu sokaklara yansıdığı, melankolik ve ultra gerçekçi bir sahne kurgula...",
-  "Mental sağlık odaklı, kullanıcıyla empati kurabilen yapay zeka destekli bir mobil uygulamanın tüm UX/UI ve backend mimarisini tasarla...",
-  "Premium bir su markası için 'buz gibi ferahlık' hissini 8K çözünürlükte yansıtan ödüllü bir reklam kompozisyonu yarat...",
-  "Mevcut piyasa koşullarında 'death cross' formasyonunu analiz ederek, likidite ve risk yönetimi odaklı kurumsal bir kripto portföy stratejisi çiz...",
-  "2. sınıf öğrencileri için pedagojik olarak onaylanmış, 'mini kedi mavi'nin balonla olan maceralarını anlatan sürükleyici bir seri başlat...",
-  "Toplumsal koşullanmanın getirdiği 'öğrenilmiş benlik' ile 'gerçek benlik' arasındaki çatışmayı inceleyen, derin bir felsefi makale yaz...",
-  "Aşık Mahzuni Şerif ekolünden ilham alan, geleneksel Türk halk müziği motiflerini modern ve evrensel bir altyapıyla analiz et...",
-  "Yüksek trafikli bir platform için mikroservis mimarisine dayalı, sıfır kesinti (zero-downtime) hedefleyen bir DevOps altyapısı kur...",
-  "Karar vericileri hedefleyen ve dönüşüm oranını maksimize eden B2B soğuk e-posta (cold email) sekansları oluştur...",
-  "Uluslararası veri gizliliği standartlarına (GDPR) tam uyumlu, şirketi olası risklerden koruyacak kapsamlı bir sözleşme taslağı hazırla...",
-  "Rick and Morty evreninin ironik bilimkurgu dinamiklerini kullanarak, varoluşsal bir krizi mizahi bir dille anlatan kısa bir senaryo yaz...",
-  "Kullanıcının karmaşık düşüncelerini analiz edip, her sektör için milyon dolarlık sonuçlar doğuracak 'Süperzeka' seviyesinde Master Promptlar üret..."
+  "[Sinema] Wong Kar-wai estetiğinde, neon ışıkların yağmurlu sokaklara yansıdığı melankolik bir şehir sahnesi kurgula.",
+  "[Ürün Tasarımı] Yapay zekâ destekli bir mental sağlık uygulaması için kullanıcı odaklı UX akışı ve ölçeklenebilir backend mimarisi tasarla.",
+  "[Reklam] Premium bir su markası için 'buz gibi ferahlık' hissini yansıtan 8K sinematik reklam konsepti oluştur.",
+  "[Kripto Analizi] Güncel piyasa verilerini kullanarak death cross formasyonunu analiz et ve risk odaklı bir kripto portföy stratejisi geliştir.",
+  "[Çocuk Hikâyesi] 2. sınıf öğrencileri için pedagojik olarak uygun, Mini Kedi Mavi'nin balonla yaşadığı maceraları anlatan bir hikâye yaz.",
+  "[Felsefe] Öğrenilmiş benlik ile gerçek benlik arasındaki çatışmayı inceleyen derin bir felsefi makale yaz.",
+  "[Müzik] Aşık Mahzuni Şerif geleneğinden ilham alarak Türk halk müziği motiflerini modern bir düzenlemeyle yorumla.",
+  "[DevOps] Yüksek trafikli bir platform için mikroservis tabanlı ve zero-downtime hedefleyen bir DevOps mimarisi tasarla.",
+  "[Pazarlama] Karar vericileri hedefleyen ve dönüşüm oranını artıran etkili B2B cold email sekansları oluştur.",
+  "[Hukuk] GDPR standartlarına tam uyumlu, şirketi hukuki risklerden koruyan kapsamlı bir veri gizliliği sözleşmesi hazırla.",
+  "[Senaryo] Rick and Morty tarzında, varoluşsal bir krizi mizahi bir bilimkurgu hikâyesiyle anlatan kısa bir senaryo yaz.",
+  "[Prompt Engineering] Karmaşık bir fikri analiz edip yüksek performanslı bir master prompta dönüştür.",
+  "[Startup] Yapay zekâ tabanlı bir SaaS ürünü için yatırımcıları etkileyecek pitch deck taslağı oluştur.",
+  "[UX Yazımı] Bir mobil uygulama için kullanıcıyı yönlendiren net ve sade onboarding metinleri yaz.",
+  "[Marka Stratejisi] Yeni bir teknoloji markası için konumlandırma, slogan ve marka hikâyesi oluştur.",
+  "[İçerik Üretimi] Bir YouTube kanalı için dikkat çekici video başlıkları ve açıklamaları üret.",
+  "[Kod] Gerçek zamanlı veri işleyen ölçeklenebilir bir Node.js mikroservis mimarisi oluştur.",
+  "[Veri Analizi] Satış verilerini analiz ederek büyüme fırsatlarını ortaya çıkaran bir rapor hazırla.",
+  "[UI Tasarımı] Minimal ve modern bir AI dashboard arayüzü için tasarım prensipleri oluştur.",
+  "[Yazarlık] Distopik bir gelecekte geçen kısa ama etkileyici bir bilimkurgu hikâyesi yaz.",
+  "[SEO] Bir teknoloji blogu için yüksek trafik potansiyeline sahip SEO odaklı içerik planı oluştur.",
+  "[Sunum] Karmaşık bir konuyu yöneticilere anlatan ikna edici bir sunum yapısı hazırla.",
+  "[Eğitim] Yeni başlayanlar için yapay zekâ kavramlarını basit örneklerle anlatan bir ders planı hazırla.",
+  "[Finans] Bir startup için sürdürülebilir gelir modeli ve finansal projeksiyon planı oluştur.",
+  "[Strateji] Yeni bir dijital ürünün pazara giriş stratejisini adım adım planla."
+];
+
+// 🔥 %25 DENGELİ DAKTİLO (TYPEWRITER) ROTASYONU 🔥
+// (Sırayla: Yaratıcı -> İş/Pazarlama -> Teknoloji/Kod -> Analiz/Strateji)
+const typewriterExamples = [
+  "Wong Kar-wai estetiğinde melankolik bir sahne kurgula", // Yaratıcı
+  "Premium bir su markası için reklam konsepti oluştur", // İş
+  "Mental sağlık uygulaması için UX ve backend tasarla", // Tech
+  "Güncel verilerle kripto portföy stratejisi geliştir", // Analiz
+  "Mini Kedi Mavi'nin balonla yaşadığı maceraları yaz", // Yaratıcı
+  "Etkili B2B cold email sekansları oluştur", // İş
+  "Yüksek trafikli platform için DevOps mimarisi tasarla", // Tech
+  "Öğrenilmiş benlik ile gerçek benlik çatışmasını incele", // Analiz
+  "Aşık Mahzuni Şerif motiflerini modern yorumla", // Yaratıcı
+  "Yeni teknoloji markası için konumlandırma ve slogan bul", // İş
+  "Gerçek zamanlı Node.js mikroservis mimarisi oluştur", // Tech
+  "GDPR uyumlu veri gizliliği sözleşmesi hazırla", // Analiz
 ];
 
 const fontSizes = ['0.85rem', '0.95rem', '1.05rem', '1.1rem'];
-
-// 🔥 KUSURSUZ KADRAN DAĞILIMI (Sol Üst, Sağ Alt, Sol Alt, Sağ Üst) 🔥
 const slotZones = {
-  0: [ {top: '12%', left: '5%', maxWidth: '320px'} ],   
-  1: [ {top: '65%', right: '5%', maxWidth: '320px'} ],  
-  2: [ {top: '65%', left: '5%', maxWidth: '320px'} ],   
-  3: [ {top: '12%', right: '5%', maxWidth: '320px'} ]   
+  0: [ {top: '12%', left: '5%', maxWidth: '320px'} ],  
+  1: [ {top: '65%', right: '5%', maxWidth: '320px'} ], 
+  2: [ {top: '65%', left: '5%', maxWidth: '320px'} ],  
+  3: [ {top: '12%', right: '5%', maxWidth: '320px'} ]  
 };
 
 export default function Home() {
@@ -33,12 +61,43 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [copyStatus, setCopyStatus] = useState('Metni Kopyala');
-  
   const [slots, setSlots] = useState([]);
 
+  // Daktilo (Typewriter) State'leri
+  const [typewriterText, setTypewriterText] = useState('');
+  const [typewriterIndex, setTypewriterIndex] = useState(0);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  // 🔥 DAKTİLO EFEKTİ MOTORU 🔥
+  useEffect(() => {
+    const currentFullText = typewriterExamples[typewriterIndex];
+    let typingSpeed = isDeleting ? 30 : 50; // Yazma ve silme hızları
+
+    if (!isDeleting && typewriterText === currentFullText) {
+      // Kelime bittiğinde bekleme süresi
+      setTimeout(() => setIsDeleting(true), 2500);
+      return;
+    } else if (isDeleting && typewriterText === '') {
+      // Silme bittiğinde sıradaki kelimeye geç
+      setIsDeleting(false);
+      setTypewriterIndex((prev) => (prev + 1) % typewriterExamples.length);
+      return;
+    }
+
+    const timeout = setTimeout(() => {
+      setTypewriterText((prev) => 
+        isDeleting 
+          ? prev.slice(0, -1) 
+          : currentFullText.slice(0, prev.length + 1)
+      );
+    }, typingSpeed);
+
+    return () => clearTimeout(timeout);
+  }, [typewriterText, isDeleting, typewriterIndex]);
+
+  // Arka Plan Animasyonları Motoru
   useEffect(() => {
     const shuffledTexts = [...allPrompts].sort(() => 0.5 - Math.random());
-    // 24 saniyelik döngüde 6'şar saniye arayla nöbet değişimi (Asla çakışmaz)
     setSlots([
       { id: 0, text: shuffledTexts[0], pos: slotZones[0][0], size: fontSizes[2], delay: '0s' },
       { id: 1, text: shuffledTexts[1], pos: slotZones[1][0], size: fontSizes[1], delay: '6s' },
@@ -118,7 +177,6 @@ export default function Home() {
         100% { box-shadow: 0 0 8px rgba(0, 242, 254, 0.1), inset 0 0 4px rgba(0, 242, 254, 0.05); border-color: rgba(0, 242, 254, 0.15); }
       }
 
-      /* 🔥 %100 ÇAKIŞMASIZ ANİMASYON (24 Saniyede sadece 6 saniye ekranda kalır) 🔥 */
       @keyframes perfectBreathing {
         0%   { opacity: 0; filter: blur(10px); transform: translateY(10px); }
         10%  { opacity: 1; filter: blur(0px); transform: translateY(0px); }
@@ -153,18 +211,31 @@ export default function Home() {
         100% { transform: scale(1); }
       }
 
+      /* 🔥 MOBİL CSS KURTARMA OPERASYONU 🔥 */
       @media (max-width: 768px) {
-        .hero-section { margin-top: 35vh !important; }
-        .hero-title { font-size: 1.8rem !important; line-height: 1.2 !important; padding: 0 10px !important; }
-        .hero-sub { font-size: 0.9rem !important; padding: 0 15px !important; margin-top: 15px !important; }
+        .hero-section { 
+          margin-top: 25vh !important; 
+          gap: 12px !important; /* Esnek İttirme */
+        }
+        .hero-title { 
+          font-size: 1.8rem !important; 
+          line-height: 1.3 !important; 
+          padding: 0 10px !important; 
+          margin-bottom: 0 !important;
+        }
+        .hero-sub { 
+          font-size: 0.95rem !important; 
+          padding: 0 15px !important; 
+          margin-top: 0 !important; 
+          line-height: 1.5 !important;
+        }
         
-        /* 🔥 MOBİL DÜZEN: Yazılar ekrana ortalanır ve sadece 2 tanesi çalışır 🔥 */
         .cinematic-text {
           font-size: 0.85rem !important;
-          width: 90vw !important;         
+          width: 90vw !important;        
           max-width: 90vw !important;
           left: 5vw !important;              
-          right: 5vw !important;             
+          right: 5vw !important;            
           margin: 0 auto !important;
         }
         
@@ -179,6 +250,9 @@ export default function Home() {
     document.head.appendChild(styleSheet);
     return () => document.head.removeChild(styleSheet);
   }, []);
+
+  // Dinamik Placeholder (Daktilo + Sabit Metin)
+  const dynamicPlaceholder = `Ne oluşturmak istiyorsun? Örn: “${typewriterText}${typewriterText.length > 0 ? '”' : ''}`;
 
   return (
     <main style={container}>
@@ -205,7 +279,7 @@ export default function Home() {
                     top: slot.pos.top || 'auto',
                     bottom: slot.pos.bottom || 'auto',
                     left: slot.pos.left || 'auto',
-                    right: slot.pos.right || 'auto', // İŞTE HATAYI ÇÖZEN HAYATİ KOD BURASI
+                    right: slot.pos.right || 'auto', 
                     maxWidth: slot.pos.maxWidth,
                     fontSize: slot.size,
                     animationDelay: slot.delay,
@@ -216,11 +290,12 @@ export default function Home() {
               ))}
             </div>
 
+            {/* 🔥 YENİ VİZYONER BAŞLIK VE ESNEK (FLEX) YAPI 🔥 */}
             <div style={heroSection} className="hero-section">
               <div style={logoFrame}>
                  <img src="/logo.png" alt="Logo" style={centerLogo} />
               </div>
-              <h2 style={heroTitle} className="hero-title">Doğru promptu oluştur.</h2>
+              <h2 style={heroTitle} className="hero-title">Fikirlerini Güçlü Promptlara Dönüştür.</h2>
               <p style={heroSub} className="hero-sub">Metni yaz. Optimize edilmiş promptu al. Kopyala ve diğer AI araçlarında kullan.</p>
             </div>
           </>
@@ -243,7 +318,7 @@ export default function Home() {
           <div style={inputBoxInner} className="input-box-inner">
             <textarea 
               style={inputField} 
-              placeholder="Mesajınızı buraya yazın..." 
+              placeholder={dynamicPlaceholder} 
               rows={1}
               value={input}
               onChange={(e) => setInput(e.target.value)}
@@ -287,11 +362,12 @@ const contentArea = { flex: 1, display: 'flex', flexDirection: 'column', alignIt
 
 const floatingContainer = { position: 'absolute', top: '70px', left: 0, right: 0, height: '70vh', pointerEvents: 'auto', zIndex: 5, overflow: 'hidden' };
 
-const heroSection = { display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', zIndex: 10, marginTop: '30vh', width: '100%' };
-const logoFrame = { marginBottom: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center' };
+// 🔥 ESNEK MİMARİ: h-auto ve gap ile örtüşme engellendi 🔥
+const heroSection = { display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', zIndex: 10, marginTop: '25vh', width: '100%', gap: '15px', height: 'auto', minHeight: 'min-content' };
+const logoFrame = { display: 'flex', alignItems: 'center', justifyContent: 'center' };
 const centerLogo = { width: '100%', maxWidth: '180px', height: 'auto', display: 'block', objectFit: 'contain' };
-const heroTitle = { fontSize: '2.2rem', fontWeight: '600', marginBottom: '10px', color: '#fff', letterSpacing: '-0.5px' };
-const heroSub = { color: '#888', fontSize: '1rem', maxWidth: '550px', padding: '0 20px', lineHeight: '1.5' };
+const heroTitle = { fontSize: '2.2rem', fontWeight: '600', color: '#fff', letterSpacing: '-0.5px', margin: 0 };
+const heroSub = { color: '#888', fontSize: '1rem', maxWidth: '550px', padding: '0 20px', lineHeight: '1.5', margin: 0 };
 
 const resultContainer = { maxWidth: '850px', width: '100%', marginTop: '80px', marginBottom: '160px', zIndex: 10, padding: '0 20px' };
 const aiResponseWrapper = { width: '100%', backgroundColor: '#0a0a0a', padding: '25px', borderRadius: '16px', border: '1px solid rgba(0, 242, 254, 0.2)', boxShadow: '0 0 20px rgba(10, 100, 255, 0.15)' };
