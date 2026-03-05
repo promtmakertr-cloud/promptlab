@@ -1,49 +1,49 @@
 'use client';
 import { useState, useEffect } from 'react';
 
-// 🔥 25'Lİ SÜPERZEKA PROMPT HAVUZU 🔥
+// 🔥 KISALTILMIŞ VİZYONER PROMPT HAVUZU 🔥
 const allPrompts = [
-  "[Sinema] Wong Kar-wai estetiğinde, neon ışıkların yağmurlu sokaklara yansıdığı melankolik bir şehir sahnesi kurgula.",
-  "[Ürün Tasarımı] Yapay zekâ destekli bir mental sağlık uygulaması için kullanıcı odaklı UX akışı ve ölçeklenebilir backend mimarisi tasarla.",
-  "[Reklam] Premium bir su markası için 'buz gibi ferahlık' hissini yansıtan 8K sinematik reklam konsepti oluştur.",
-  "[Kripto Analizi] Güncel piyasa verilerini kullanarak death cross formasyonunu analiz et ve risk odaklı bir kripto portföy stratejisi geliştir.",
-  "[Çocuk Hikâyesi] 2. sınıf öğrencileri için pedagojik olarak uygun, Mini Kedi Mavi'nin balonla yaşadığı maceraları anlatan bir hikâye yaz.",
-  "[Felsefe] Öğrenilmiş benlik ile gerçek benlik arasındaki çatışmayı inceleyen derin bir felsefi makale yaz.",
-  "[Müzik] Aşık Mahzuni Şerif geleneğinden ilham alarak Türk halk müziği motiflerini modern bir düzenlemeyle yorumla.",
-  "[DevOps] Yüksek trafikli bir platform için mikroservis tabanlı ve zero-downtime hedefleyen bir DevOps mimarisi tasarla.",
-  "[Pazarlama] Karar vericileri hedefleyen ve dönüşüm oranını artıran etkili B2B cold email sekansları oluştur.",
-  "[Hukuk] GDPR standartlarına tam uyumlu, şirketi hukuki risklerden koruyan kapsamlı bir veri gizliliği sözleşmesi hazırla.",
-  "[Senaryo] Rick and Morty tarzında, varoluşsal bir krizi mizahi bir bilimkurgu hikâyesiyle anlatan kısa bir senaryo yaz.",
-  "[Prompt Engineering] Karmaşık bir fikri analiz edip yüksek performanslı bir master prompta dönüştür.",
-  "[Startup] Yapay zekâ tabanlı bir SaaS ürünü için yatırımcıları etkileyecek pitch deck taslağı oluştur.",
-  "[UX Yazımı] Bir mobil uygulama için kullanıcıyı yönlendiren net ve sade onboarding metinleri yaz.",
-  "[Marka Stratejisi] Yeni bir teknoloji markası için konumlandırma, slogan ve marka hikâyesi oluştur.",
-  "[İçerik Üretimi] Bir YouTube kanalı için dikkat çekici video başlıkları ve açıklamaları üret.",
-  "[Kod] Gerçek zamanlı veri işleyen ölçeklenebilir bir Node.js mikroservis mimarisi oluştur.",
-  "[Veri Analizi] Satış verilerini analiz ederek büyüme fırsatlarını ortaya çıkaran bir rapor hazırla.",
-  "[UI Tasarımı] Minimal ve modern bir AI dashboard arayüzü için tasarım prensipleri oluştur.",
-  "[Yazarlık] Distopik bir gelecekte geçen kısa ama etkileyici bir bilimkurgu hikâyesi yaz.",
-  "[SEO] Bir teknoloji blogu için yüksek trafik potansiyeline sahip SEO odaklı içerik planı oluştur.",
-  "[Sunum] Karmaşık bir konuyu yöneticilere anlatan ikna edici bir sunum yapısı hazırla.",
-  "[Eğitim] Yeni başlayanlar için yapay zekâ kavramlarını basit örneklerle anlatan bir ders planı hazırla.",
-  "[Finans] Bir startup için sürdürülebilir gelir modeli ve finansal projeksiyon planı oluştur.",
-  "[Strateji] Yeni bir dijital ürünün pazara giriş stratejisini adım adım planla."
+  "Sinema | Wong Kar-wai estetiğinde neon sokaklar ve melankolik bir sahne.",
+  "Ürün Tasarımı | Mental sağlık uygulaması için UX akışı ve backend mimarisi.",
+  "Reklam | Premium su markası için buz gibi ferahlık hissini yansıtan sinematik konsept.",
+  "Kripto | Death cross formasyonunu analiz ederek risk odaklı portföy stratejisi.",
+  "Çocuk Hikâyesi | Mini Kedi Mavi'nin balonla yaşadığı pedagojik olarak uygun maceraları.",
+  "Felsefe | Öğrenilmiş benlik ile gerçek benlik arasındaki çatışmayı inceleyen makale.",
+  "Müzik | Aşık Mahzuni Şerif ekolünden ilham alan modern Türk halk müziği.",
+  "DevOps | Yüksek trafikli bir platform için mikroservis tabanlı DevOps altyapısı.",
+  "Pazarlama | Karar vericileri hedefleyen etkili B2B cold email sekansları.",
+  "Hukuk | GDPR standartlarına tam uyumlu kapsamlı veri gizliliği sözleşmesi.",
+  "Senaryo | Rick and Morty tarında varoluşsal krizi anlatan mizahi bir hikâye.",
+  "Prompt Engineering | Karmaşık bir fikri analiz edip master prompta dönüştür.",
+  "Startup | SaaS ürünü için yatırımcıları etkileyecek pitch deck taslağı.",
+  "UX Yazımı | Mobil uygulama için net ve sade onboarding metinleri.",
+  "Marka Stratejisi | Teknoloji markası için konumlandırma, slogan ve marka hikâyesi.",
+  "İçerik Üretimi | YouTube kanalı için dikkat çekici video başlıkları.",
+  "Kod | Gerçek zamanlı veri işleyen ölçeklenebilir Node.js mikroservisi.",
+  "Veri Analizi | Satış verilerini analiz ederek büyüme fırsatlarını raporla.",
+  "UI Tasarımı | Minimal ve modern bir AI dashboard arayüzü.",
+  "Yazarlık | Distopik bir gelecekte geçen etkileyici bilimkurgu hikâyesi.",
+  "SEO | Teknoloji blogu için yüksek trafik potansiyeline sahip içerik planı.",
+  "Sunum | Karmaşık bir konuyu yöneticilere anlatan sunum yapısı.",
+  "Eğitim | Yeni başlayanlar için yapay zekâ kavramlarını basitçe anlat.",
+  "Finans | Startup için sürdürülebilir gelir modeli ve finansal projeksiyon.",
+  "Strateji | Yeni bir dijital ürünün pazara giriş stratejisini planla."
 ];
 
-// 🔥 %25 DENGELİ DAKTİLO (TYPEWRITER) ROTASYONU 🔥
+// 🔥 KISALTILMIŞ DAKTİLO (TYPEWRITER) HAVUZU 🔥
 const typewriterExamples = [
-  "Wong Kar-wai estetiğinde melankolik bir sahne kurgula",
-  "Premium bir su markası için reklam konsepti oluştur",
-  "Mental sağlık uygulaması için UX ve backend tasarla",
-  "Güncel verilerle kripto portföy stratejisi geliştir",
-  "Mini Kedi Mavi'nin balonla yaşadığı maceraları yaz",
-  "Etkili B2B cold email sekansları oluştur",
-  "Yüksek trafikli platform için DevOps mimarisi tasarla",
-  "Öğrenilmiş benlik ile gerçek benlik çatışmasını incele",
-  "Aşık Mahzuni Şerif motiflerini modern yorumla",
-  "Yeni teknoloji markası için konumlandırma ve slogan bul",
-  "Gerçek zamanlı Node.js mikroservis mimarisi oluştur",
-  "GDPR uyumlu veri gizliliği sözleşmesi hazırla",
+  "Wong Kar-wai estetiğinde sahne kurgula", 
+  "Premium su markası için reklam konsepti", 
+  "Mental sağlık uygulaması için UX tasarla", 
+  "Kripto portföy stratejisi geliştir", 
+  "Mini Kedi Mavi'nin maceralarını yaz", 
+  "Etkili B2B cold email sekansları", 
+  "Mikroservis tabanlı DevOps mimarisi", 
+  "Öğrenilmiş benlik çatışmasını incele", 
+  "Aşık Mahzuni motiflerini modern yorumla", 
+  "Teknoloji markası için slogan bul", 
+  "Node.js mikroservisi oluştur", 
+  "GDPR uyumlu veri sözleşmesi hazırla", 
 ];
 
 const fontSizes = ['0.85rem', '0.95rem', '1.05rem', '1.1rem'];
@@ -55,12 +55,13 @@ const slotZones = {
 };
 
 // 🔥 METİN AYRIŞTIRICI (PARSER) 🔥
-// "[Kategori] Prompt" formatını ayırır.
+// "Kategori | Prompt" formatını ayırır.
 const parsePromptData = (fullText) => {
   if (!fullText) return { category: '', promptText: '' };
-  const match = fullText.match(/^\[(.*?)\]\s*(.*)$/);
+  // Yeni Regex: | işaretine kadar kategori, sonrasını prompt alır.
+  const match = fullText.match(/^([^|]*)\|\s*(.*)$/); 
   if (match) {
-    return { category: match[1], promptText: match[2] };
+    return { category: match[1].trim(), promptText: match[2].trim() };
   }
   return { category: '', promptText: fullText };
 };
@@ -73,10 +74,12 @@ export default function Home() {
   const [copyStatus, setCopyStatus] = useState('Metni Kopyala');
   const [slots, setSlots] = useState([]);
 
+  // Daktilo (Typewriter) State'leri
   const [typewriterText, setTypewriterText] = useState('');
   const [typewriterIndex, setTypewriterIndex] = useState(0);
   const [isDeleting, setIsDeleting] = useState(false);
 
+  // Daktilo Efekti Motoru
   useEffect(() => {
     const currentFullText = typewriterExamples[typewriterIndex];
     let typingSpeed = isDeleting ? 30 : 50; 
@@ -101,6 +104,7 @@ export default function Home() {
     return () => clearTimeout(timeout);
   }, [typewriterText, isDeleting, typewriterIndex]);
 
+  // Arka Plan Animasyonları Motoru
   useEffect(() => {
     const shuffledTexts = [...allPrompts].sort(() => 0.5 - Math.random());
     setSlots([
@@ -207,7 +211,7 @@ export default function Home() {
       }
       
       .cinematic-text:hover .prompt-category {
-        color: #00f2fe; /* Üzerine gelince kategori neon mavi parlar */
+        color: #00f2fe; /* Üzerine gelince neon mavi parlar */
         text-shadow: 0 0 10px rgba(0, 242, 254, 0.5);
       }
 
@@ -243,6 +247,7 @@ export default function Home() {
         100% { transform: scale(1); }
       }
 
+      /* 🔥 MOBİL CSS KURTARMA OPERASYONU 🔥 */
       @media (max-width: 768px) {
         .hero-section { margin-top: 25vh !important; gap: 12px !important; }
         .hero-title { font-size: 1.8rem !important; line-height: 1.3 !important; padding: 0 10px !important; margin-bottom: 0 !important; }
@@ -287,6 +292,7 @@ export default function Home() {
           <>
             <div style={floatingContainer}>
               {slots.map((slot) => {
+                // Ayrıştırıcı ile kategori ve prompt metnini ayırıyoruz
                 const { category, promptText } = parsePromptData(slot.text);
                 return (
                   <div 
@@ -304,10 +310,11 @@ export default function Home() {
                       animationDelay: slot.delay,
                     }}
                   >
-                    {/* 🔥 YENİ ESTETİK KATEGORİ BAŞLIĞI 🔥 */}
+                    {/* 🔥 TIMES NEW ROMAN KATEGORİ BAŞLIĞI 🔥 */}
+                    {/* (/ İşareti kaldırıldı) */}
                     {category && (
                       <div className="prompt-category">
-                        / {category}
+                        {category}
                       </div>
                     )}
                     <div className="prompt-body">
