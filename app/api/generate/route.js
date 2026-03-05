@@ -45,17 +45,36 @@ export async function POST(req) {
       KRİTİK UYARI: Kendi kendine yeni başlık uydurma. Gevezelik yapma, isteğin TÜRÜNE UYGUN (Görsel veya Metin) doğrudan formata geç.
     `;
 
+    // 1. ADIM: stream: true parametresi eklendi!
     const response = await openai.chat.completions.create({
       model: "gpt-4o", 
       messages: [
         { role: "system", content: systemPrompt },
-        // KULLANICI MESAJINI DA GÜNCELLEDİK! Artık her defasında İngilizce kod bloğu emretmiyoruz.
         { role: "user", content: `Kullanıcı İsteği: "${userInput}" \n\nFORMATI ASLA BOZMADAN, İSTEĞİN TÜRÜNE UYGUN (Görselse İngilizce kodlu, değilse sadece 5 başlık) MASTER PROMPT ÜRET.` }
       ],
-      temperature: 0.2, // Sıcaklığı 0.2'de tutuyoruz, disiplinden taviz yok.
+      temperature: 0.2,
+      stream: true, // İŞTE SİHRİN BAŞLADIĞI YER
     });
 
-    return NextResponse.json({ result: response.choices[0].message.content });
+    // 2. ADIM: Gelen kelimeleri "Şelale" (Stream) şeklinde ön yüze akıtıyoruz
+    const stream = new ReadableStream({
+      async start(controller) {
+        for await (const chunk of response) {
+          const content = chunk.choices[0]?.delta?.content || "";
+          if (content) {
+            controller.enqueue(new TextEncoder().encode(content));
+          }
+        }
+        controller.close();
+      }
+    });
+
+    return new Response(stream, {
+      headers: {
+        'Content-Type': 'text/plain; charset=utf-8',
+        'Cache-Control': 'no-cache',
+      },
+    });
 
   } catch (error) {
     return NextResponse.json({ error: "Hata oluştu." }, { status: 500 });
