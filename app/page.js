@@ -198,14 +198,19 @@ export default function Home() {
     finally { setLoading(false); }
   };
 
-  // 🔥 ÇALIŞAN KUSURSUZ YÖNLENDİRME MOTURU 🔥
-  const handleQuickLaunch = (url) => {
-    navigator.clipboard.writeText(result); // Önce panoya kopyala
-    setCopyStatus('Yönlendiriliyor...');
-    setTimeout(() => { 
-        window.open(url, '_blank'); // Güvenli bir şekilde yeni sekmede aç
-        setCopyStatus('Metni Kopyala'); 
-    }, 800);
+  // 🔥 YENİ: BEKLEMESİZ (SENKRONİZE) AÇILIŞ - 404 KESİN ÇÖZÜM 🔥
+  const handleQuickLaunch = (url, name) => {
+    // 1. ASLA BEKLEME YOK! Tarayıcı engellemesin diye tıklandığı an yeni sekmeyi açıyoruz.
+    window.open(url, '_blank', 'noopener,noreferrer');
+    
+    // 2. Arka planda güvenli kopyalama (Safari bazen bunu reddedebilir, o yüzden try-catch içinde)
+    try {
+      navigator.clipboard.writeText(result);
+      setCopyStatus(name + ' Açıldı!');
+      setTimeout(() => setCopyStatus('Metni Kopyala'), 2000);
+    } catch (err) {
+      console.log('Panoya kopyalama izni reddedildi');
+    }
   };
 
   const handleVoiceTyping = () => {
@@ -364,7 +369,7 @@ export default function Home() {
                     {loading && <span className="cursor-blink"></span>}
                   </div>
                   
-                  {/* 🔥 KUSURSUZ YÖNETİM PANELİ (Doğrudan Buton Mantığı) 🔥 */}
+                  {/* 🔥 KUSURSUZ YÖNETİM PANELİ (SENKRONİZE BUTONLAR) 🔥 */}
                   {!loading && result && (
                     <div style={{ marginTop: '35px', paddingTop: '20px', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
                       
@@ -378,37 +383,37 @@ export default function Home() {
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
                         {!isVisual ? (
                           <>
-                            <button className="ai-brand-btn" onClick={() => handleQuickLaunch('[https://chatgpt.com](https://chatgpt.com)')}>
+                            <button className="ai-brand-btn" onClick={() => handleQuickLaunch('[https://chatgpt.com](https://chatgpt.com)', 'ChatGPT')}>
                               {IconChatGPT} <span>ChatGPT</span>
                             </button>
-                            <button className="ai-brand-btn" onClick={() => handleQuickLaunch('[https://gemini.google.com](https://gemini.google.com)')}>
+                            <button className="ai-brand-btn" onClick={() => handleQuickLaunch('[https://gemini.google.com](https://gemini.google.com)', 'Gemini')}>
                               {IconGemini} <span>Gemini</span>
                             </button>
-                            <button className="ai-brand-btn" onClick={() => handleQuickLaunch('[https://claude.ai](https://claude.ai)')}>
+                            <button className="ai-brand-btn" onClick={() => handleQuickLaunch('[https://claude.ai](https://claude.ai)', 'Claude')}>
                               {IconClaude} <span>Claude</span>
                             </button>
-                            <button className="ai-brand-btn" onClick={() => handleQuickLaunch('[https://www.perplexity.ai](https://www.perplexity.ai)')}>
+                            <button className="ai-brand-btn" onClick={() => handleQuickLaunch('[https://www.perplexity.ai](https://www.perplexity.ai)', 'Perplexity')}>
                               {IconPerplexity} <span>Perplexity</span>
                             </button>
-                            <button className="ai-brand-btn" onClick={() => handleQuickLaunch('[https://copilot.microsoft.com](https://copilot.microsoft.com)')}>
+                            <button className="ai-brand-btn" onClick={() => handleQuickLaunch('[https://copilot.microsoft.com](https://copilot.microsoft.com)', 'Copilot')}>
                               {IconCopilot} <span>Copilot</span>
                             </button>
                           </>
                         ) : (
                           <>
-                            <button className="ai-brand-btn" onClick={() => handleQuickLaunch('[https://discord.com/channels/@me](https://discord.com/channels/@me)')}>
+                            <button className="ai-brand-btn" onClick={() => handleQuickLaunch('[https://discord.com/channels/@me](https://discord.com/channels/@me)', 'Midjourney')}>
                               {IconMidjourney} <span>Midjourney</span>
                             </button>
-                            <button className="ai-brand-btn" onClick={() => handleQuickLaunch('[https://chatgpt.com](https://chatgpt.com)')}>
+                            <button className="ai-brand-btn" onClick={() => handleQuickLaunch('[https://chatgpt.com](https://chatgpt.com)', 'DALL-E 3')}>
                               {IconChatGPT} <span>DALL-E 3</span>
                             </button>
-                            <button className="ai-brand-btn" onClick={() => handleQuickLaunch('[https://leonardo.ai](https://leonardo.ai)')}>
+                            <button className="ai-brand-btn" onClick={() => handleQuickLaunch('[https://leonardo.ai](https://leonardo.ai)', 'Leonardo')}>
                               {IconLeonardo} <span>Leonardo</span>
                             </button>
-                            <button className="ai-brand-btn" onClick={() => handleQuickLaunch('[https://firefly.adobe.com](https://firefly.adobe.com)')}>
+                            <button className="ai-brand-btn" onClick={() => handleQuickLaunch('[https://firefly.adobe.com](https://firefly.adobe.com)', 'Adobe Firefly')}>
                               {IconAdobe} <span>Adobe Firefly</span>
                             </button>
-                            <button className="ai-brand-btn" onClick={() => handleQuickLaunch('[https://www.canva.com](https://www.canva.com)')}>
+                            <button className="ai-brand-btn" onClick={() => handleQuickLaunch('[https://www.canva.com](https://www.canva.com)', 'Canva')}>
                               {IconCanva} <span>Canva</span>
                             </button>
                           </>
