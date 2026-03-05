@@ -80,37 +80,37 @@ export default function Home() {
   const [typewriterIndex, setTypewriterIndex] = useState(0);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  // 🔥 %100 ÇARPIŞMA KORUMALI DİNAMİK KOORDİNAT MOTORU 🔥
   const getRandomPos = (slotId) => {
     const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
     const r1 = Math.random();
     const r2 = Math.random();
 
     if (isMobile) {
-      // Mobilde 2 güvenli şerit (Asla çakışmazlar)
-      if (slotId === 0) return { top: `${6 + (r1 * 8)}%`, left: '0', right: '0', margin: '0 auto', maxWidth: '85vw' };
-      if (slotId === 1) return { top: `${42 + (r1 * 8)}%`, left: '0', right: '0', margin: '0 auto', maxWidth: '85vw' };
+      // 🔥 MOBİL İÇİN YENİ GÜVENLİ BÖLGE (Sadece üst kısımda uçuşurlar) 🔥
+      // Logo 42vh'de olduğu için yazılar %8 ile %36 arasında kalacak.
+      if (slotId === 0) return { top: `${8 + (r1 * 10)}%`, left: '0', right: '0', margin: '0 auto', maxWidth: '85vw' };
+      if (slotId === 1) return { top: `${26 + (r1 * 10)}%`, left: '0', right: '0', margin: '0 auto', maxWidth: '85vw' };
       return { top: '-100%', left: '-100%', display: 'none' }; 
     }
 
-    // Masaüstü için 4 KESİN şerit (Dikeyde asla birbirine değmezler)
+    // Masaüstü (Hiç bozulmadı)
     let top, left, right;
     const maxWidth = '340px'; 
 
-    if (slotId === 0) { // Sol Üst 
-      top = `${6 + (r1 * 6)}%`; // 6% - 12% arası
+    if (slotId === 0) { 
+      top = `${6 + (r1 * 6)}%`; 
       left = `${2 + (r2 * 12)}%`;
       right = 'auto';
-    } else if (slotId === 1) { // Sağ Üst (Asimetrik)
-      top = `${10 + (r1 * 6)}%`; // 10% - 16% arası
+    } else if (slotId === 1) { 
+      top = `${10 + (r1 * 6)}%`; 
       left = 'auto';
       right = `${2 + (r2 * 12)}%`;
-    } else if (slotId === 2) { // Sol Alt 
-      top = `${38 + (r1 * 5)}%`; // 38% - 43% arası (Üsttekiyle devasa boşluk)
+    } else if (slotId === 2) {  
+      top = `${38 + (r1 * 5)}%`; 
       left = `${2 + (r2 * 12)}%`;
       right = 'auto';
-    } else { // Sağ Alt 
-      top = `${42 + (r1 * 5)}%`; // 42% - 47% arası
+    } else { 
+      top = `${42 + (r1 * 5)}%`; 
       left = 'auto';
       right = `${2 + (r2 * 12)}%`;
     }
@@ -293,15 +293,27 @@ export default function Home() {
       @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
       .edit-btn:hover { background: rgba(0, 242, 254, 0.2) !important; color: #fff !important; }
 
+      /* 🔥 MOBİL DÜZELTMELERİ (BURAYA ODAKLANDIK) 🔥 */
       @media (max-width: 768px) {
-        .hero-section { margin-top: 75vh !important; gap: 12px !important; }
-        .hero-title { font-size: 1.8rem !important; line-height: 1.3 !important; padding: 0 10px !important; margin-bottom: 0 !important; }
-        .hero-sub { font-size: 0.95rem !important; padding: 0 15px !important; margin-top: 0 !important; line-height: 1.5 !important; }
+        /* Logo ve başlık tam ortaya-aşağıya alındı (75vh'den 42vh'ye çekildi) */
+        .hero-section { margin-top: 42vh !important; gap: 10px !important; }
+        .hero-title { font-size: 1.55rem !important; line-height: 1.2 !important; padding: 0 10px !important; margin-bottom: 0 !important; }
+        .hero-sub { font-size: 0.85rem !important; padding: 0 15px !important; margin-top: 0 !important; line-height: 1.5 !important; }
         
         .cinematic-text { font-size: 0.85rem !important; margin: 0 auto !important; }
         .slot-2 { display: none !important; }
         .slot-3 { display: none !important; } 
         .floor-glow { opacity: 0.2 !important; height: 50px !important; bottom: -5px !important;}
+
+        /* Arama kutusu içindeki metnin kırılmasını ve 2. satıra inmesini engelledik */
+        .main-input {
+          font-size: 0.85rem !important;
+          white-space: nowrap !important;
+          overflow: hidden !important;
+        }
+        .main-input::placeholder {
+          font-size: 0.8rem !important;
+        }
       }
     `;
     document.head.appendChild(styleSheet);
@@ -427,6 +439,7 @@ export default function Home() {
         <div style={glowWrapper}>
           <div style={inputBoxInner} className="input-box-inner">
             <textarea 
+              className="main-input" 
               style={inputField} 
               placeholder={dynamicPlaceholder} 
               rows={1}
