@@ -86,14 +86,11 @@ export default function Home() {
     const r2 = Math.random();
 
     if (isMobile) {
-      // 🔥 MOBİL İÇİN YENİ GÜVENLİ BÖLGE (Sadece üst kısımda uçuşurlar) 🔥
-      // Logo 42vh'de olduğu için yazılar %8 ile %36 arasında kalacak.
       if (slotId === 0) return { top: `${8 + (r1 * 10)}%`, left: '0', right: '0', margin: '0 auto', maxWidth: '85vw' };
       if (slotId === 1) return { top: `${26 + (r1 * 10)}%`, left: '0', right: '0', margin: '0 auto', maxWidth: '85vw' };
       return { top: '-100%', left: '-100%', display: 'none' }; 
     }
 
-    // Masaüstü (Hiç bozulmadı)
     let top, left, right;
     const maxWidth = '340px'; 
 
@@ -288,14 +285,12 @@ export default function Home() {
       .cinematic-text:hover .prompt-category { color: #00f2fe; text-shadow: 0 0 10px rgba(0, 242, 254, 0.5); }
       .cinematic-text:hover .prompt-body { color: #ffffff; opacity: 1; text-shadow: 0 0 10px rgba(255, 255, 255, 0.4); }
       .prompt-category { font-family: "Times New Roman", Times, serif; font-size: 1.35em; font-style: italic; color: #ffffff; margin-bottom: 6px; letter-spacing: 0.5px; opacity: 0.95; transition: color 0.3s ease, text-shadow 0.3s ease; }
-      .prompt-body { font-family: inherit; font-size: 0.95em; opacity: 0.75; transition: color 0.3s ease, opacity 0.3s ease, text-shadow 0.3s ease; }
+      .prompt-body { font-family: inherit; font-size: 0.95em; opacity: 0.75; transition: color: color 0.3s ease, opacity 0.3s ease, text-shadow 0.3s ease; }
       .pulse-mic { animation: pulse 1.5s infinite; color: #00f2fe !important; }
       @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
       .edit-btn:hover { background: rgba(0, 242, 254, 0.2) !important; color: #fff !important; }
 
-      /* 🔥 MOBİL DÜZELTMELERİ (BURAYA ODAKLANDIK) 🔥 */
       @media (max-width: 768px) {
-        /* Logo ve başlık tam ortaya-aşağıya alındı (75vh'den 42vh'ye çekildi) */
         .hero-section { margin-top: 42vh !important; gap: 10px !important; }
         .hero-title { font-size: 1.55rem !important; line-height: 1.2 !important; padding: 0 10px !important; margin-bottom: 0 !important; }
         .hero-sub { font-size: 0.85rem !important; padding: 0 15px !important; margin-top: 0 !important; line-height: 1.5 !important; }
@@ -305,14 +300,19 @@ export default function Home() {
         .slot-3 { display: none !important; } 
         .floor-glow { opacity: 0.2 !important; height: 50px !important; bottom: -5px !important;}
 
-        /* Arama kutusu içindeki metnin kırılmasını ve 2. satıra inmesini engelledik */
+        /* 🔥 MOBİL ARAMA KUTUSU: ZOOM HATASI DÜZELTİLDİ VE 2 SATIR İZNİ VERİLDİ 🔥 */
         .main-input {
-          font-size: 0.85rem !important;
-          white-space: nowrap !important;
-          overflow: hidden !important;
+          font-size: 16px !important; /* iOS Zoom sorununu %100 engeller */
+          white-space: pre-wrap !important; /* Metnin aşağıya inmesine izin verdik */
+          overflow-y: auto !important; /* Taşarsa kaydırılabilir olsun */
+          line-height: 1.4 !important;
         }
         .main-input::placeholder {
-          font-size: 0.8rem !important;
+          font-size: 14px !important; /* Placeholder yazısı daha kibar dursun */
+        }
+        .input-box-inner {
+          padding: 12px 14px 12px 18px !important; /* Kutuyu biraz daha dolgun ve uzun yaptık */
+          border-radius: 28px !important; /* Çok genişleyince kapsül formu bozulmasın diye yuvarlağı kıstık */
         }
       }
     `;
@@ -320,7 +320,7 @@ export default function Home() {
     return () => document.head.removeChild(styleSheet);
   }, []);
 
-  const dynamicPlaceholder = `Ne oluşturmak istiyorsun? Örn: “${typewriterText}${typewriterText.length > 0 ? '”' : ''}`;
+  const dynamicPlaceholder = `Ne oluşturmak istiyorsun?\nÖrn: “${typewriterText}${typewriterText.length > 0 ? '”' : ''}`;
 
   return (
     <main style={container}>
@@ -442,7 +442,7 @@ export default function Home() {
               className="main-input" 
               style={inputField} 
               placeholder={dynamicPlaceholder} 
-              rows={1}
+              rows={2} /* Satır sayısını 2'ye çıkardık */
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => { if(e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleGenerate(); }}}
@@ -505,7 +505,7 @@ const cyberGradient = 'linear-gradient(90deg, #00f2fe, #0a64ff, #00f2fe, #0a64ff
 const floorGlow = { position: 'absolute', bottom: '-10px', left: '50%', transform: 'translateX(-50%)', width: '50vw', maxWidth: '600px', height: '60px', background: cyberGradient, backgroundSize: '200% 100%', filter: 'blur(45px)', opacity: 0.35, zIndex: 1, pointerEvents: 'none', animation: 'glowingBorder 15s linear infinite' };
 
 const glowWrapper = { position: 'relative', width: '100%', maxWidth: '680px', zIndex: 2, pointerEvents: 'auto' };
-const inputBoxInner = { backgroundColor: '#0a0a0a', borderRadius: '40px', border: '1px solid rgba(0, 242, 254, 0.2)', animation: 'elegantGlow 8s infinite alternate', display: 'flex', alignItems: 'center', padding: '6px 10px 6px 18px', width: '100%', height: '100%' };
+const inputBoxInner = { backgroundColor: '#0a0a0a', border: '1px solid rgba(0, 242, 254, 0.2)', animation: 'elegantGlow 8s infinite alternate', display: 'flex', alignItems: 'center', padding: '6px 10px 6px 18px', width: '100%', height: '100%', borderRadius: '40px' };
 const inputField = { flex: 1, background: 'transparent', border: 'none', color: '#fff', fontSize: '1rem', outline: 'none', resize: 'none', padding: '8px 0', maxHeight: '150px', fontFamily: 'inherit' };
 const actionButtons = { display: 'flex', alignItems: 'center', gap: '6px' };
 const iconButton = { background: 'none', border: 'none', cursor: 'pointer', padding: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center' };
