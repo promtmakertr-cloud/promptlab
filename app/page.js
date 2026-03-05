@@ -80,21 +80,21 @@ export default function Home() {
   const [typewriterIndex, setTypewriterIndex] = useState(0);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  // 🔥 YENİ: DİNAMİK VE RASTGELE KOORDİNAT MOTORU 🔥
+  // 🔥 YENİ: LOGONUN ÜSTÜNDEKİ RASTGELE KOORDİNAT MOTORU 🔥
   const getRandomPos = (slotId) => {
-    // Mobil kontrolü (SSR hatası vermemesi için window kontrolü)
+    // Mobil kontrolü
     const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
     const r1 = Math.random();
     const r2 = Math.random();
 
     if (isMobile) {
-      // Mobilde sadece slot 0 ve 1 çalışır, 2 ve 3 ekrandan silinir
-      if (slotId === 0) return { top: `${6 + (r1 * 4)}%`, left: '0', right: '0', margin: '0 auto', maxWidth: '90vw' };
-      if (slotId === 1) return { top: `${72 + (r1 * 6)}%`, left: '0', right: '0', margin: '0 auto', maxWidth: '90vw' };
-      return { top: '-100%', left: '-100%', display: 'none' };
+      // Mobilde sadece slot 0 ve 1 çalışır. Logo ~75vh'de, yazılar 5vh-70vh arasında.
+      if (slotId === 0) return { top: `${6 + (r1 * 24)}%`, left: '0', right: '0', margin: '0 auto', maxWidth: '90vw' }; // Üst Bölge
+      if (slotId === 1) return { top: `${40 + (r1 * 30)}%`, left: '0', right: '0', margin: '0 auto', maxWidth: '90vw' }; // Orta-Alt Bölge
+      return { top: '-100%', left: '-100%', display: 'none' }; // 2 ve 3 ekrandan silinir
     }
 
-    // Masaüstü için 4 ayrı güvenli bölge (Ortadaki logoyu ve arama kutusunu ezer geçmez)
+    // Masaüstü için 4 ayrı güvenli bölge (Logo ~60vh'de, yazılar 5vh-55vh arasında)
     let top, left, right;
     const maxWidth = '340px'; 
 
@@ -106,12 +106,12 @@ export default function Home() {
       top = `${8 + (r1 * 22)}%`;
       left = 'auto';
       right = `${2 + (r2 * 18)}%`;
-    } else if (slotId === 2) { // Sol Alt Kadran
-      top = `${55 + (r1 * 20)}%`;
+    } else if (slotId === 2) { // Sol Orta-Alt Kadran
+      top = `${35 + (r1 * 20)}%`; // Logonun biraz daha üstü
       left = `${2 + (r2 * 18)}%`;
       right = 'auto';
-    } else { // Sağ Alt Kadran
-      top = `${55 + (r1 * 20)}%`;
+    } else { // Sağ Orta-Alt Kadran
+      top = `${35 + (r1 * 20)}%`; // Logonun biraz daha üstü
       left = 'auto';
       right = `${2 + (r2 * 18)}%`;
     }
@@ -154,7 +154,6 @@ export default function Home() {
     return () => clearTimeout(timeout);
   }, [typewriterText, isDeleting, typewriterIndex]);
 
-  // İlk yüklemede rastgele konumları ayarla
   useEffect(() => {
     const shuffledTexts = [...allPrompts].sort(() => 0.5 - Math.random());
     setSlots([
@@ -165,7 +164,6 @@ export default function Home() {
     ]);
   }, []);
 
-  // Animasyon bitince konumları YENİDEN rastgele oluştur
   const handleAnimationIteration = (slotId) => {
     setSlots(prevSlots => {
       const currentTexts = prevSlots.map(s => s.text);
@@ -298,7 +296,8 @@ export default function Home() {
       .edit-btn:hover { background: rgba(0, 242, 254, 0.2) !important; color: #fff !important; }
 
       @media (max-width: 768px) {
-        .hero-section { margin-top: 25vh !important; gap: 12px !important; }
+        /* Mobilde heroSection daha da aşağıya */
+        .hero-section { margin-top: 75vh !important; gap: 12px !important; }
         .hero-title { font-size: 1.8rem !important; line-height: 1.3 !important; padding: 0 10px !important; margin-bottom: 0 !important; }
         .hero-sub { font-size: 0.95rem !important; padding: 0 15px !important; margin-top: 0 !important; line-height: 1.5 !important; }
         
@@ -355,6 +354,7 @@ export default function Home() {
               })}
             </div>
 
+            {/* 🔥 YENİ: LOGO VE ANA BAŞLIK ARTIK DAHA AŞAĞIDA VE GÜVENLİ 🔥 */}
             <div style={heroSection} className="hero-section">
               <div style={logoFrame}>
                  <img src="/logo.png" alt="Logo" style={centerLogo} />
@@ -464,7 +464,7 @@ export default function Home() {
   );
 }
 
-// 🔥 STİLLER (Görünmez Kalkanlar Kırıldı!) 🔥
+// 🔥 STİLLER (Görünmez Kalkanlar Kırıldı, Logo Güvende!) 🔥
 const container = { backgroundColor: '#050505', minHeight: '100vh', color: '#ECECEC', fontFamily: 'Inter, sans-serif', display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden' };
 const topBar = { padding: '20px 25px', position: 'absolute', top: 0, left: 0, right: 0, zIndex: 100, display: 'flex', justifyContent: 'space-between', alignItems: 'center' };
 const logoWrapper = { display: 'flex', alignItems: 'center', gap: '10px', opacity: 0.8, cursor: 'pointer' };
@@ -472,11 +472,10 @@ const miniLogo = { height: '20px', width: 'auto', objectFit: 'contain' };
 const backButton = { backgroundColor: 'transparent', color: '#fff', border: '1px solid #333', padding: '8px 16px', borderRadius: '20px', cursor: 'pointer', fontSize: '0.85rem' };
 const contentArea = { flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', position: 'relative', paddingBottom: '100px' };
 
-// Kalkan 1: Uçuşan yazılar serbest bırakıldı, arkaplanı tıklama engellemesi kaldırıldı.
 const floatingContainer = { position: 'absolute', top: '70px', left: 0, right: 0, height: '70vh', pointerEvents: 'none', zIndex: 5, overflow: 'hidden' };
 
-// Kalkan 2: Başlık alanı artık tıklamaları yutmayacak.
-const heroSection = { display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', zIndex: 10, marginTop: '25vh', width: '100%', gap: '15px', height: 'auto', minHeight: 'min-content', pointerEvents: 'none' };
+// Masaüstü heroSection daha aşağıya (60vh)
+const heroSection = { display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', zIndex: 10, marginTop: '60vh', width: '100%', gap: '15px', height: 'auto', minHeight: 'min-content', pointerEvents: 'none' };
 const logoFrame = { display: 'flex', alignItems: 'center', justifyContent: 'center' };
 const centerLogo = { width: '100%', maxWidth: '180px', height: 'auto', display: 'block', objectFit: 'contain' };
 const heroTitle = { fontSize: '2.2rem', fontWeight: '600', color: '#fff', letterSpacing: '-0.5px', margin: 0 };
@@ -493,12 +492,10 @@ const aiLabel = { fontSize: '0.75rem', fontWeight: '700', color: '#00f2fe', marg
 const aiText = { fontSize: '1rem', lineHeight: '1.6', color: '#E0E0E0', whiteSpace: 'pre-wrap', fontFamily: 'monospace', opacity: 0.9 };
 const copyBtn = { marginTop: '25px', background: '#fff', color: '#000', border: 'none', padding: '10px 20px', borderRadius: '8px', cursor: 'pointer', fontSize: '0.9rem', fontWeight: 'bold' };
 
-// Kalkan 3: Alt şeffaf alan tıklamaları geçirecek, arama kutusu ise tıklamaları yakalayacak.
 const bottomArea = { position: 'fixed', bottom: 0, left: 0, right: 0, padding: '30px 20px 40px 20px', background: 'transparent', display: 'flex', flexDirection: 'column', alignItems: 'center', zIndex: 20, pointerEvents: 'none' };
 const cyberGradient = 'linear-gradient(90deg, #00f2fe, #0a64ff, #00f2fe, #0a64ff)';
 const floorGlow = { position: 'absolute', bottom: '-10px', left: '50%', transform: 'translateX(-50%)', width: '50vw', maxWidth: '600px', height: '60px', background: cyberGradient, backgroundSize: '200% 100%', filter: 'blur(45px)', opacity: 0.35, zIndex: 1, pointerEvents: 'none', animation: 'glowingBorder 15s linear infinite' };
 
-// Arama kutusu güvenli bir şekilde tıklanabilir bırakıldı
 const glowWrapper = { position: 'relative', width: '100%', maxWidth: '680px', zIndex: 2, pointerEvents: 'auto' };
 const inputBoxInner = { backgroundColor: '#0a0a0a', borderRadius: '40px', border: '1px solid rgba(0, 242, 254, 0.2)', animation: 'elegantGlow 8s infinite alternate', display: 'flex', alignItems: 'center', padding: '6px 10px 6px 18px', width: '100%', height: '100%' };
 const inputField = { flex: 1, background: 'transparent', border: 'none', color: '#fff', fontSize: '1rem', outline: 'none', resize: 'none', padding: '8px 0', maxHeight: '150px', fontFamily: 'inherit' };
