@@ -54,7 +54,6 @@ const slotZones = {
   3: [ {top: '12%', right: '5%', maxWidth: '320px'} ]  
 };
 
-// 🔥 METİN AYRIŞTIRICI (PARSER) 🔥
 const parsePromptData = (fullText) => {
   if (!fullText) return { category: '', promptText: '' };
   const match = fullText.match(/^([^|]*)\|\s*(.*)$/); 
@@ -64,24 +63,42 @@ const parsePromptData = (fullText) => {
   return { category: '', promptText: fullText };
 };
 
+// 🔥 YÜKLEME MESAJLARI 🔥
+const loadingMessages = [
+  "🧠 Fikriniz yapay zeka tarafından analiz ediliyor...",
+  "📚 Master Kütüphane standartlarına uyarlanıyor...",
+  "⚙️ Sektörel jargon ve teknik detaylar ekleniyor...",
+  "✨ Son rötuşlar yapılıyor, promptunuz hazır olmak üzere..."
+];
+
 export default function Home() {
   const [input, setInput] = useState('');
   const [result, setResult] = useState('');
   const [loading, setLoading] = useState(false);
+  const [loadingStep, setLoadingStep] = useState(0); // Yükleme animasyonu için State
   const [isListening, setIsListening] = useState(false);
   const [copyStatus, setCopyStatus] = useState('Metni Kopyala');
   const [slots, setSlots] = useState([]);
 
-  // 🔥 YENİ: Kullanıcının Gönderdiği Promptun Hafızası ve Akordeon Durumu 🔥
   const [submittedPrompt, setSubmittedPrompt] = useState('');
   const [isPromptExpanded, setIsPromptExpanded] = useState(false);
 
-  // Daktilo (Typewriter) State'leri
   const [typewriterText, setTypewriterText] = useState('');
   const [typewriterIndex, setTypewriterIndex] = useState(0);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  // Daktilo Efekti Motoru
+  // Yükleme Animasyonu Döngüsü
+  useEffect(() => {
+    let interval;
+    if (loading) {
+      setLoadingStep(0);
+      interval = setInterval(() => {
+        setLoadingStep((prev) => (prev + 1) % loadingMessages.length);
+      }, 1800); // Her 1.8 saniyede bir mesaj değişir
+    }
+    return () => clearInterval(interval);
+  }, [loading]);
+
   useEffect(() => {
     const currentFullText = typewriterExamples[typewriterIndex];
     let typingSpeed = isDeleting ? 30 : 50; 
@@ -106,7 +123,6 @@ export default function Home() {
     return () => clearTimeout(timeout);
   }, [typewriterText, isDeleting, typewriterIndex]);
 
-  // Arka Plan Animasyonları Motoru
   useEffect(() => {
     const shuffledTexts = [...allPrompts].sort(() => 0.5 - Math.random());
     setSlots([
@@ -140,8 +156,6 @@ export default function Home() {
   const handleGenerate = async () => {
     if (!input.trim() || loading) return;
     setLoading(true);
-    
-    // İşlem başlarken kullanıcının promptunu hafızaya al ve akordeonu kapat
     setSubmittedPrompt(input);
     setIsPromptExpanded(false);
     
@@ -202,80 +216,52 @@ export default function Home() {
         100% { opacity: 0; filter: blur(10px); transform: translateY(-10px); }
       }
 
-      .cinematic-text {
-        position: absolute;
-        color: #888888;
-        cursor: pointer;
-        animation: perfectBreathing 24s infinite linear; 
-        text-align: left; 
-        line-height: 1.5;
-        font-weight: 300;
-        transition: transform 0.3s ease, filter 0.3s ease;
+      /* Yükleme Animasyonu (Nefes Alma) */
+      @keyframes loadingPulse {
+        0% { opacity: 0.6; transform: scale(0.98); }
+        50% { opacity: 1; transform: scale(1); }
+        100% { opacity: 0.6; transform: scale(0.98); }
       }
 
-      .cinematic-text:hover {
-        animation-play-state: paused;
-        z-index: 50;
+      .loading-box {
+        width: 100%;
+        max-width: 600px;
+        background: rgba(10, 10, 10, 0.8);
+        border: 1px solid rgba(0, 242, 254, 0.3);
+        border-radius: 16px;
+        padding: 40px 20px;
+        text-align: center;
+        box-shadow: 0 0 30px rgba(0, 242, 254, 0.1);
+        animation: loadingPulse 2s infinite ease-in-out;
       }
-      
-      .cinematic-text:hover .prompt-category {
+
+      .loading-text {
+        font-size: 1.1rem;
         color: #00f2fe;
-        text-shadow: 0 0 10px rgba(0, 242, 254, 0.5);
-      }
-
-      .cinematic-text:hover .prompt-body {
-        color: #ffffff;
-        opacity: 1;
-        text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
-      }
-
-      .prompt-category {
-        font-family: "Times New Roman", Times, serif;
-        font-size: 1.35em;
-        font-style: italic;
-        color: #ffffff;
-        margin-bottom: 6px;
+        font-weight: 500;
+        margin-top: 15px;
         letter-spacing: 0.5px;
-        opacity: 0.95;
-        transition: color 0.3s ease, text-shadow 0.3s ease;
       }
 
-      .prompt-body {
-        font-family: inherit;
-        font-size: 0.95em;
-        opacity: 0.75;
-        transition: color 0.3s ease, opacity 0.3s ease, text-shadow 0.3s ease;
-      }
-
+      .cinematic-text { position: absolute; color: #888888; cursor: pointer; animation: perfectBreathing 24s infinite linear; text-align: left; line-height: 1.5; font-weight: 300; transition: transform 0.3s ease, filter 0.3s ease; }
+      .cinematic-text:hover { animation-play-state: paused; z-index: 50; }
+      .cinematic-text:hover .prompt-category { color: #00f2fe; text-shadow: 0 0 10px rgba(0, 242, 254, 0.5); }
+      .cinematic-text:hover .prompt-body { color: #ffffff; opacity: 1; text-shadow: 0 0 10px rgba(255, 255, 255, 0.4); }
+      .prompt-category { font-family: "Times New Roman", Times, serif; font-size: 1.35em; font-style: italic; color: #ffffff; margin-bottom: 6px; letter-spacing: 0.5px; opacity: 0.95; transition: color 0.3s ease, text-shadow 0.3s ease; }
+      .prompt-body { font-family: inherit; font-size: 0.95em; opacity: 0.75; transition: color 0.3s ease, opacity 0.3s ease, text-shadow 0.3s ease; }
       .pulse-mic { animation: pulse 1.5s infinite; color: #00f2fe !important; }
-      @keyframes pulse {
-        0%   { transform: scale(1); }
-        50%  { transform: scale(1.1); }
-        100% { transform: scale(1); }
-      }
-      
-      /* Düzenle Butonu Hover Efekti */
+      @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
       .edit-btn:hover { background: rgba(0, 242, 254, 0.2) !important; color: #fff !important; }
 
       @media (max-width: 768px) {
         .hero-section { margin-top: 25vh !important; gap: 12px !important; }
         .hero-title { font-size: 1.8rem !important; line-height: 1.3 !important; padding: 0 10px !important; margin-bottom: 0 !important; }
         .hero-sub { font-size: 0.95rem !important; padding: 0 15px !important; margin-top: 0 !important; line-height: 1.5 !important; }
-        
-        .cinematic-text {
-          font-size: 0.85rem !important;
-          width: 90vw !important;        
-          max-width: 90vw !important;
-          left: 5vw !important;              
-          right: 5vw !important;            
-          margin: 0 auto !important;
-        }
-        
+        .cinematic-text { font-size: 0.85rem !important; width: 90vw !important; max-width: 90vw !important; left: 5vw !important; right: 5vw !important; margin: 0 auto !important; }
         .slot-0 { top: 8% !important; bottom: auto !important; } 
         .slot-1 { top: 78% !important; bottom: auto !important; } 
         .slot-2 { display: none !important; }
         .slot-3 { display: none !important; } 
-        
         .floor-glow { opacity: 0.2 !important; height: 50px !important; bottom: -5px !important;}
       }
     `;
@@ -291,13 +277,13 @@ export default function Home() {
         <div style={logoWrapper} onClick={handleReset}>
           <img src="/logo.png" alt="Logo" style={miniLogo} />
         </div>
-        {result && (
-          <button onClick={handleReset} style={backButton}>← Yeni Prompt</button>
+        {(result || loading) && (
+          <button onClick={handleReset} style={backButton}>← Ana Sayfa</button>
         )}
       </div>
       
       <div style={contentArea}>
-        {!result ? (
+        {!result && !loading ? (
           <>
             <div style={floatingContainer}>
               {slots.map((slot) => {
@@ -318,14 +304,8 @@ export default function Home() {
                       animationDelay: slot.delay,
                     }}
                   >
-                    {category && (
-                      <div className="prompt-category">
-                        {category}
-                      </div>
-                    )}
-                    <div className="prompt-body">
-                      {promptText}
-                    </div>
+                    {category && <div className="prompt-category">{category}</div>}
+                    <div className="prompt-body">{promptText}</div>
                   </div>
                 );
               })}
@@ -339,15 +319,29 @@ export default function Home() {
               <p style={heroSub} className="hero-sub">Metni yaz. Optimize edilmiş promptu al. Kopyala ve diğer AI araçlarında kullan.</p>
             </div>
           </>
+        ) : loading ? (
+          
+          /* 🔥 YENİ: DİNAMİK YÜKLEME EKRANI 🔥 */
+          <div style={resultContainer} className="flex flex-col items-center justify-center">
+            <div className="loading-box">
+              {/* Spinner İkonu */}
+              <svg className="animate-spin" style={{ margin: '0 auto', width: '40px', height: '40px', color: '#00f2fe' }} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              {/* Değişen Yazılar */}
+              <div className="loading-text">
+                {loadingMessages[loadingStep]}
+              </div>
+            </div>
+          </div>
+
         ) : (
           <div style={resultContainer}>
              
-             {/* 🔥 1. KULLANICININ KENDİ PROMPTU (AKORDEON YAPI) 🔥 */}
+             {/* Akordeon Kullanıcı Promptu */}
              <div style={userPromptWrapper}>
-               <div 
-                 style={userPromptHeader} 
-                 onClick={() => setIsPromptExpanded(!isPromptExpanded)}
-               >
+               <div style={userPromptHeader} onClick={() => setIsPromptExpanded(!isPromptExpanded)}>
                  <div style={userPromptTitle}>
                     <span style={{ color: '#00f2fe', marginRight: '8px' }}>✦</span>
                     {isPromptExpanded 
@@ -360,9 +354,9 @@ export default function Home() {
                      className="edit-btn"
                      style={editBtn}
                      onClick={(e) => {
-                       e.stopPropagation(); // Akordeonun açılmasını/kapanmasını engeller
-                       setInput(submittedPrompt); // Metni aşağıdaki kutuya çeker
-                       window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }); // Ekranı kutuya kaydırır
+                       e.stopPropagation(); 
+                       setInput(submittedPrompt); 
+                       window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }); 
                      }}
                    >
                      Düzenle
@@ -373,7 +367,6 @@ export default function Home() {
                  </div>
                </div>
                
-               {/* Akordeon Açıldığında Görünen Tam Metin */}
                {isPromptExpanded && (
                  <div style={userPromptBody}>
                    {submittedPrompt}
@@ -381,7 +374,7 @@ export default function Home() {
                )}
              </div>
 
-             {/* 🔥 2. YAPAY ZEKA MASTER PROMPT ÇIKTISI 🔥 */}
+             {/* Yapay Zeka Çıktısı */}
              <div style={aiResponseWrapper}>
                 <div style={aiLabel}>ÜRETİLEN MASTER PROMPT</div>
                 <div style={aiText}>{result}</div>
@@ -443,14 +436,11 @@ const centerLogo = { width: '100%', maxWidth: '180px', height: 'auto', display: 
 const heroTitle = { fontSize: '2.2rem', fontWeight: '600', color: '#fff', letterSpacing: '-0.5px', margin: 0 };
 const heroSub = { color: '#888', fontSize: '1rem', maxWidth: '550px', padding: '0 20px', lineHeight: '1.5', margin: 0 };
 const resultContainer = { maxWidth: '850px', width: '100%', marginTop: '80px', marginBottom: '160px', zIndex: 10, padding: '0 20px' };
-
-// Yeni Akordeon Stilleri
 const userPromptWrapper = { width: '100%', backgroundColor: '#0f0f0f', borderRadius: '12px', border: '1px solid #222', marginBottom: '20px', overflow: 'hidden', transition: 'all 0.3s ease' };
 const userPromptHeader = { padding: '16px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', backgroundColor: '#141414' };
 const userPromptTitle = { fontSize: '0.9rem', color: '#ccc', fontWeight: '500', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '75%' };
 const editBtn = { background: 'rgba(0, 242, 254, 0.08)', color: '#00f2fe', border: '1px solid rgba(0, 242, 254, 0.25)', padding: '6px 14px', borderRadius: '6px', fontSize: '0.8rem', cursor: 'pointer', fontWeight: '600', transition: 'all 0.2s ease' };
 const userPromptBody = { padding: '20px', borderTop: '1px solid #222', fontSize: '0.95rem', color: '#aaa', lineHeight: '1.6', whiteSpace: 'pre-wrap' };
-
 const aiResponseWrapper = { width: '100%', backgroundColor: '#0a0a0a', padding: '25px', borderRadius: '16px', border: '1px solid rgba(0, 242, 254, 0.2)', boxShadow: '0 0 20px rgba(10, 100, 255, 0.15)' };
 const aiLabel = { fontSize: '0.75rem', fontWeight: '700', color: '#00f2fe', marginBottom: '20px', letterSpacing: '2px' };
 const aiText = { fontSize: '1rem', lineHeight: '1.6', color: '#E0E0E0', whiteSpace: 'pre-wrap', fontFamily: 'monospace', opacity: 0.9 };
