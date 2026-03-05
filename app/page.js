@@ -55,10 +55,8 @@ const slotZones = {
 };
 
 // 🔥 METİN AYRIŞTIRICI (PARSER) 🔥
-// "Kategori | Prompt" formatını ayırır.
 const parsePromptData = (fullText) => {
   if (!fullText) return { category: '', promptText: '' };
-  // Yeni Regex: | işaretine kadar kategori, sonrasını prompt alır.
   const match = fullText.match(/^([^|]*)\|\s*(.*)$/); 
   if (match) {
     return { category: match[1].trim(), promptText: match[2].trim() };
@@ -73,6 +71,10 @@ export default function Home() {
   const [isListening, setIsListening] = useState(false);
   const [copyStatus, setCopyStatus] = useState('Metni Kopyala');
   const [slots, setSlots] = useState([]);
+
+  // 🔥 YENİ: Kullanıcının Gönderdiği Promptun Hafızası ve Akordeon Durumu 🔥
+  const [submittedPrompt, setSubmittedPrompt] = useState('');
+  const [isPromptExpanded, setIsPromptExpanded] = useState(false);
 
   // Daktilo (Typewriter) State'leri
   const [typewriterText, setTypewriterText] = useState('');
@@ -131,11 +133,17 @@ export default function Home() {
   const handleReset = () => {
     setResult('');
     setInput('');
+    setSubmittedPrompt('');
+    setIsPromptExpanded(false);
   };
 
   const handleGenerate = async () => {
     if (!input.trim() || loading) return;
     setLoading(true);
+    
+    // İşlem başlarken kullanıcının promptunu hafızaya al ve akordeonu kapat
+    setSubmittedPrompt(input);
+    setIsPromptExpanded(false);
     
     try {
       const res = await fetch('/api/generate', {
@@ -199,7 +207,7 @@ export default function Home() {
         color: #888888;
         cursor: pointer;
         animation: perfectBreathing 24s infinite linear; 
-        text-align: left; /* Metin sola hizalı daha şık durur */
+        text-align: left; 
         line-height: 1.5;
         font-weight: 300;
         transition: transform 0.3s ease, filter 0.3s ease;
@@ -211,7 +219,7 @@ export default function Home() {
       }
       
       .cinematic-text:hover .prompt-category {
-        color: #00f2fe; /* Üzerine gelince neon mavi parlar */
+        color: #00f2fe;
         text-shadow: 0 0 10px rgba(0, 242, 254, 0.5);
       }
 
@@ -221,7 +229,6 @@ export default function Home() {
         text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
       }
 
-      /* 🔥 TIMES NEW ROMAN KATEGORİ STİLİ 🔥 */
       .prompt-category {
         font-family: "Times New Roman", Times, serif;
         font-size: 1.35em;
@@ -246,8 +253,10 @@ export default function Home() {
         50%  { transform: scale(1.1); }
         100% { transform: scale(1); }
       }
+      
+      /* Düzenle Butonu Hover Efekti */
+      .edit-btn:hover { background: rgba(0, 242, 254, 0.2) !important; color: #fff !important; }
 
-      /* 🔥 MOBİL CSS KURTARMA OPERASYONU 🔥 */
       @media (max-width: 768px) {
         .hero-section { margin-top: 25vh !important; gap: 12px !important; }
         .hero-title { font-size: 1.8rem !important; line-height: 1.3 !important; padding: 0 10px !important; margin-bottom: 0 !important; }
@@ -292,13 +301,12 @@ export default function Home() {
           <>
             <div style={floatingContainer}>
               {slots.map((slot) => {
-                // Ayrıştırıcı ile kategori ve prompt metnini ayırıyoruz
                 const { category, promptText } = parsePromptData(slot.text);
                 return (
                   <div 
                     key={slot.id} 
                     className={`cinematic-text slot-${slot.id}`}
-                    onClick={() => setInput(promptText)} // Tıklanınca sadece saf prompt inputa gider!
+                    onClick={() => setInput(promptText)} 
                     onAnimationIteration={() => handleAnimationIteration(slot.id)}
                     style={{
                       top: slot.pos.top || 'auto',
@@ -310,8 +318,6 @@ export default function Home() {
                       animationDelay: slot.delay,
                     }}
                   >
-                    {/* 🔥 TIMES NEW ROMAN KATEGORİ BAŞLIĞI 🔥 */}
-                    {/* (/ İşareti kaldırıldı) */}
                     {category && (
                       <div className="prompt-category">
                         {category}
@@ -335,6 +341,47 @@ export default function Home() {
           </>
         ) : (
           <div style={resultContainer}>
+             
+             {/* 🔥 1. KULLANICININ KENDİ PROMPTU (AKORDEON YAPI) 🔥 */}
+             <div style={userPromptWrapper}>
+               <div 
+                 style={userPromptHeader} 
+                 onClick={() => setIsPromptExpanded(!isPromptExpanded)}
+               >
+                 <div style={userPromptTitle}>
+                    <span style={{ color: '#00f2fe', marginRight: '8px' }}>✦</span>
+                    {isPromptExpanded 
+                      ? "Senin Promptun" 
+                      : `Senin Promptun: "${submittedPrompt.length > 45 ? submittedPrompt.slice(0, 45) + '...' : submittedPrompt}"`}
+                 </div>
+                 
+                 <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
+                   <button 
+                     className="edit-btn"
+                     style={editBtn}
+                     onClick={(e) => {
+                       e.stopPropagation(); // Akordeonun açılmasını/kapanmasını engeller
+                       setInput(submittedPrompt); // Metni aşağıdaki kutuya çeker
+                       window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }); // Ekranı kutuya kaydırır
+                     }}
+                   >
+                     Düzenle
+                   </button>
+                   <span style={{ transform: isPromptExpanded ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease', color: '#888', fontSize: '0.8rem' }}>
+                     ▼
+                   </span>
+                 </div>
+               </div>
+               
+               {/* Akordeon Açıldığında Görünen Tam Metin */}
+               {isPromptExpanded && (
+                 <div style={userPromptBody}>
+                   {submittedPrompt}
+                 </div>
+               )}
+             </div>
+
+             {/* 🔥 2. YAPAY ZEKA MASTER PROMPT ÇIKTISI 🔥 */}
              <div style={aiResponseWrapper}>
                 <div style={aiLabel}>ÜRETİLEN MASTER PROMPT</div>
                 <div style={aiText}>{result}</div>
@@ -396,6 +443,14 @@ const centerLogo = { width: '100%', maxWidth: '180px', height: 'auto', display: 
 const heroTitle = { fontSize: '2.2rem', fontWeight: '600', color: '#fff', letterSpacing: '-0.5px', margin: 0 };
 const heroSub = { color: '#888', fontSize: '1rem', maxWidth: '550px', padding: '0 20px', lineHeight: '1.5', margin: 0 };
 const resultContainer = { maxWidth: '850px', width: '100%', marginTop: '80px', marginBottom: '160px', zIndex: 10, padding: '0 20px' };
+
+// Yeni Akordeon Stilleri
+const userPromptWrapper = { width: '100%', backgroundColor: '#0f0f0f', borderRadius: '12px', border: '1px solid #222', marginBottom: '20px', overflow: 'hidden', transition: 'all 0.3s ease' };
+const userPromptHeader = { padding: '16px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', backgroundColor: '#141414' };
+const userPromptTitle = { fontSize: '0.9rem', color: '#ccc', fontWeight: '500', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '75%' };
+const editBtn = { background: 'rgba(0, 242, 254, 0.08)', color: '#00f2fe', border: '1px solid rgba(0, 242, 254, 0.25)', padding: '6px 14px', borderRadius: '6px', fontSize: '0.8rem', cursor: 'pointer', fontWeight: '600', transition: 'all 0.2s ease' };
+const userPromptBody = { padding: '20px', borderTop: '1px solid #222', fontSize: '0.95rem', color: '#aaa', lineHeight: '1.6', whiteSpace: 'pre-wrap' };
+
 const aiResponseWrapper = { width: '100%', backgroundColor: '#0a0a0a', padding: '25px', borderRadius: '16px', border: '1px solid rgba(0, 242, 254, 0.2)', boxShadow: '0 0 20px rgba(10, 100, 255, 0.15)' };
 const aiLabel = { fontSize: '0.75rem', fontWeight: '700', color: '#00f2fe', marginBottom: '20px', letterSpacing: '2px' };
 const aiText = { fontSize: '1rem', lineHeight: '1.6', color: '#E0E0E0', whiteSpace: 'pre-wrap', fontFamily: 'monospace', opacity: 0.9 };
