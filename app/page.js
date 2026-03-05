@@ -198,6 +198,16 @@ export default function Home() {
     finally { setLoading(false); }
   };
 
+  // 🔥 ÇALIŞAN KUSURSUZ YÖNLENDİRME MOTURU 🔥
+  const handleQuickLaunch = (url) => {
+    navigator.clipboard.writeText(result); // Önce panoya kopyala
+    setCopyStatus('Yönlendiriliyor...');
+    setTimeout(() => { 
+        window.open(url, '_blank'); // Güvenli bir şekilde yeni sekmede aç
+        setCopyStatus('Metni Kopyala'); 
+    }, 800);
+  };
+
   const handleVoiceTyping = () => {
     if (!('webkitSpeechRecognition' in window)) { alert("Tarayıcınız sesli yazmayı desteklemiyor. Lütfen Chrome veya Safari kullanın."); return; }
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -215,25 +225,6 @@ export default function Home() {
     setCopyStatus('Kopyalandı! ✓');
     setTimeout(() => setCopyStatus('Metni Kopyala'), 2000);
   };
-
-  // 🔥 YENİ: 404 KESİN ÇÖZÜMÜ - GERÇEK LİNKLİ (ANCHOR) BUTONLAR 🔥
-  const AILinkButton = ({ icon, name, url }) => (
-    <a 
-      href={url} 
-      target="_blank" 
-      rel="noopener noreferrer" 
-      className="ai-brand-btn"
-      onClick={() => {
-        // Link zaten yeni sekmede doğal olarak açılır, biz sadece arkaplanda yazıyı panoya kopyalıyoruz!
-        navigator.clipboard.writeText(result);
-        setCopyStatus(name + ' Açılıyor...');
-        setTimeout(() => setCopyStatus('Metni Kopyala'), 2000);
-      }}
-    >
-      {icon}
-      <span>{name}</span>
-    </a>
-  );
 
   useEffect(() => {
     const styleSheet = document.createElement("style");
@@ -260,7 +251,7 @@ export default function Home() {
       @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
       .edit-btn:hover { background: rgba(0, 242, 254, 0.2) !important; color: #fff !important; }
 
-      /* 🔥 YENİ NESİL ŞIK AI LİNKLERİ (BUTON GÖRÜNÜMLÜ) 🔥 */
+      /* 🔥 YENİ NESİL ŞIK AI BUTONLARI 🔥 */
       .ai-brand-btn {
         display: inline-flex;
         align-items: center;
@@ -276,7 +267,7 @@ export default function Home() {
         transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
         font-family: inherit;
         backdrop-filter: blur(10px);
-        text-decoration: none; /* Link alt çizgisini kaldırır */
+        outline: none;
       }
       .ai-brand-btn:hover {
         background: rgba(0, 242, 254, 0.1);
@@ -373,7 +364,7 @@ export default function Home() {
                     {loading && <span className="cursor-blink"></span>}
                   </div>
                   
-                  {/* 🔥 DOĞAL (KIRILMAZ) YÖNETİM PANELİ 🔥 */}
+                  {/* 🔥 KUSURSUZ YÖNETİM PANELİ (Doğrudan Buton Mantığı) 🔥 */}
                   {!loading && result && (
                     <div style={{ marginTop: '35px', paddingTop: '20px', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
                       
@@ -387,19 +378,39 @@ export default function Home() {
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
                         {!isVisual ? (
                           <>
-                            <AILinkButton icon={IconChatGPT} name="ChatGPT" url="[https://chatgpt.com](https://chatgpt.com)" />
-                            <AILinkButton icon={IconGemini} name="Gemini" url="[https://gemini.google.com](https://gemini.google.com)" />
-                            <AILinkButton icon={IconClaude} name="Claude" url="[https://claude.ai](https://claude.ai)" />
-                            <AILinkButton icon={IconPerplexity} name="Perplexity" url="[https://www.perplexity.ai](https://www.perplexity.ai)" />
-                            <AILinkButton icon={IconCopilot} name="Copilot" url="[https://copilot.microsoft.com](https://copilot.microsoft.com)" />
+                            <button className="ai-brand-btn" onClick={() => handleQuickLaunch('[https://chatgpt.com](https://chatgpt.com)')}>
+                              {IconChatGPT} <span>ChatGPT</span>
+                            </button>
+                            <button className="ai-brand-btn" onClick={() => handleQuickLaunch('[https://gemini.google.com](https://gemini.google.com)')}>
+                              {IconGemini} <span>Gemini</span>
+                            </button>
+                            <button className="ai-brand-btn" onClick={() => handleQuickLaunch('[https://claude.ai](https://claude.ai)')}>
+                              {IconClaude} <span>Claude</span>
+                            </button>
+                            <button className="ai-brand-btn" onClick={() => handleQuickLaunch('[https://www.perplexity.ai](https://www.perplexity.ai)')}>
+                              {IconPerplexity} <span>Perplexity</span>
+                            </button>
+                            <button className="ai-brand-btn" onClick={() => handleQuickLaunch('[https://copilot.microsoft.com](https://copilot.microsoft.com)')}>
+                              {IconCopilot} <span>Copilot</span>
+                            </button>
                           </>
                         ) : (
                           <>
-                            <AILinkButton icon={IconMidjourney} name="Midjourney" url="[https://discord.com/channels/@me](https://discord.com/channels/@me)" />
-                            <AILinkButton icon={IconChatGPT} name="DALL-E 3" url="[https://chatgpt.com](https://chatgpt.com)" />
-                            <AILinkButton icon={IconLeonardo} name="Leonardo" url="[https://leonardo.ai](https://leonardo.ai)" />
-                            <AILinkButton icon={IconAdobe} name="Adobe Firefly" url="[https://firefly.adobe.com](https://firefly.adobe.com)" />
-                            <AILinkButton icon={IconCanva} name="Canva" url="[https://www.canva.com](https://www.canva.com)" />
+                            <button className="ai-brand-btn" onClick={() => handleQuickLaunch('[https://discord.com/channels/@me](https://discord.com/channels/@me)')}>
+                              {IconMidjourney} <span>Midjourney</span>
+                            </button>
+                            <button className="ai-brand-btn" onClick={() => handleQuickLaunch('[https://chatgpt.com](https://chatgpt.com)')}>
+                              {IconChatGPT} <span>DALL-E 3</span>
+                            </button>
+                            <button className="ai-brand-btn" onClick={() => handleQuickLaunch('[https://leonardo.ai](https://leonardo.ai)')}>
+                              {IconLeonardo} <span>Leonardo</span>
+                            </button>
+                            <button className="ai-brand-btn" onClick={() => handleQuickLaunch('[https://firefly.adobe.com](https://firefly.adobe.com)')}>
+                              {IconAdobe} <span>Adobe Firefly</span>
+                            </button>
+                            <button className="ai-brand-btn" onClick={() => handleQuickLaunch('[https://www.canva.com](https://www.canva.com)')}>
+                              {IconCanva} <span>Canva</span>
+                            </button>
                           </>
                         )}
                       </div>
