@@ -198,12 +198,6 @@ export default function Home() {
     finally { setLoading(false); }
   };
 
-  const handleQuickLaunch = (url) => {
-    navigator.clipboard.writeText(result);
-    setCopyStatus('Yönlendiriliyor...');
-    setTimeout(() => { window.open(url, '_blank'); setCopyStatus('Metni Kopyala'); }, 1000);
-  };
-
   const handleVoiceTyping = () => {
     if (!('webkitSpeechRecognition' in window)) { alert("Tarayıcınız sesli yazmayı desteklemiyor. Lütfen Chrome veya Safari kullanın."); return; }
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -222,12 +216,23 @@ export default function Home() {
     setTimeout(() => setCopyStatus('Metni Kopyala'), 2000);
   };
 
-  // 🔥 Estetik App Butonu Komponenti 🔥
+  // 🔥 YENİ: 404 KESİN ÇÖZÜMÜ - GERÇEK LİNKLİ (ANCHOR) BUTONLAR 🔥
   const AILinkButton = ({ icon, name, url }) => (
-    <button className="ai-brand-btn" onClick={() => handleQuickLaunch(url)}>
+    <a 
+      href={url} 
+      target="_blank" 
+      rel="noopener noreferrer" 
+      className="ai-brand-btn"
+      onClick={() => {
+        // Link zaten yeni sekmede doğal olarak açılır, biz sadece arkaplanda yazıyı panoya kopyalıyoruz!
+        navigator.clipboard.writeText(result);
+        setCopyStatus(name + ' Açılıyor...');
+        setTimeout(() => setCopyStatus('Metni Kopyala'), 2000);
+      }}
+    >
       {icon}
       <span>{name}</span>
-    </button>
+    </a>
   );
 
   useEffect(() => {
@@ -255,7 +260,7 @@ export default function Home() {
       @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
       .edit-btn:hover { background: rgba(0, 242, 254, 0.2) !important; color: #fff !important; }
 
-      /* 🔥 YENİ NESİL ŞIK AI BUTONLARI 🔥 */
+      /* 🔥 YENİ NESİL ŞIK AI LİNKLERİ (BUTON GÖRÜNÜMLÜ) 🔥 */
       .ai-brand-btn {
         display: inline-flex;
         align-items: center;
@@ -271,6 +276,7 @@ export default function Home() {
         transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
         font-family: inherit;
         backdrop-filter: blur(10px);
+        text-decoration: none; /* Link alt çizgisini kaldırır */
       }
       .ai-brand-btn:hover {
         background: rgba(0, 242, 254, 0.1);
@@ -292,7 +298,7 @@ export default function Home() {
         .main-input::placeholder { font-size: 14px !important; }
         .input-box-inner { padding: 12px 14px 12px 18px !important; border-radius: 28px !important; }
         
-        .ai-brand-btn { font-size: 0.8rem; padding: 8px 12px; } /* Mobilde butonlar biraz daha kibar olsun */
+        .ai-brand-btn { font-size: 0.8rem; padding: 8px 12px; }
       }
     `;
     document.head.appendChild(styleSheet);
@@ -367,7 +373,7 @@ export default function Home() {
                     {loading && <span className="cursor-blink"></span>}
                   </div>
                   
-                  {/* 🔥 KUSURSUZ YÖNETİM PANELİ (İkonlu Butonlar) 🔥 */}
+                  {/* 🔥 DOĞAL (KIRILMAZ) YÖNETİM PANELİ 🔥 */}
                   {!loading && result && (
                     <div style={{ marginTop: '35px', paddingTop: '20px', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
                       
@@ -454,7 +460,6 @@ const aiResponseWrapper = { width: '100%', backgroundColor: '#0a0a0a', padding: 
 const aiLabel = { fontSize: '0.75rem', fontWeight: '700', color: '#00f2fe', marginBottom: '20px', letterSpacing: '2px' };
 const aiText = { fontSize: '1rem', lineHeight: '1.6', color: '#E0E0E0', whiteSpace: 'pre-wrap', fontFamily: 'monospace', opacity: 0.9 };
 
-// Ana Kopyalama Butonu çok daha şık bir hale getirildi
 const copyBtn = { display: 'flex', alignItems: 'center', gap: '6px', background: '#fff', color: '#000', border: 'none', padding: '8px 16px', borderRadius: '8px', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 'bold', transition: 'all 0.2s ease' };
 
 const bottomArea = { position: 'fixed', bottom: 0, left: 0, right: 0, padding: '30px 20px 40px 20px', background: 'transparent', display: 'flex', flexDirection: 'column', alignItems: 'center', zIndex: 20, pointerEvents: 'none' };
