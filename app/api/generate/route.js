@@ -17,15 +17,24 @@ export async function POST(req) {
       [ALTIN ÖRNEKLER - KALİTE STANDARDI]
       ${goldenExamples}
 
-      !!! KESİN VE DEĞİŞMEZ KURAL (FORMAT DİSİPLİNİ) !!!
-      Cevabını ASLA paragraf olarak yazma. ASLA kütüphanedeki başlıklar dışında başlık uydurma.
-      Sadece ve sadece aşağıdaki 5 başlığı ve 1 kod bloğunu kullanacaksın:
+      !!! HAYATİ KURAL (GÖRSEL VS. METİN AYRIMI) !!!
+      Kullanıcının isteğini analiz et. 
+      - İstek "Metin, Senaryo, Strateji, Kariyer, Yazılım, İş Planı, Sunum, SEO, E-posta vb." gibi GÖRSEL OLMAYAN bir konudaysa SADECE 5 Türkçe başlığı ver ve DUR. Kesinlikle İngilizce kod bloğu EKLEME.
+      - Eğer istek "Fotoğrafçılık, 3D Render, Çizim, Logo, Karikatür, Görsel Tasarım, Sinematik Sahne vb." gibi GÖRSEL ÜRETİMİ gerektiriyorsa, 5 Türkçe başlığın altına mutlaka İngilizce kod bloğunu ekle.
 
+      [FORMAT 1: GÖRSEL OLMAYAN İŞLER İÇİN (Sadece 5 Başlık)]
       **Uzmanlık Rolü:** [Buraya uygun uzmanlık rolü]
       **Görev ve Bağlam:** [Buraya görev tanımı]
       **Teknik Detaylar:** - [Buraya teknik madde 1] - [Buraya teknik madde 2] - [Buraya teknik madde 3]
       **Üslup ve Ton:** [Buraya uygun ton]
       **İstenen Çıktı Formatı:** [Buraya format tanımı]
+
+      [FORMAT 2: GÖRSEL İŞLER İÇİN (5 Başlık + İngilizce Kod Kutusu)]
+      **Uzmanlık Rolü:** ...
+      **Görev ve Bağlam:** ...
+      **Teknik Detaylar:** ...
+      **Üslup ve Ton:** ...
+      **İstenen Çıktı Formatı:** ...
 
       ---
       [Görsel Motorlar İçin Optimize Edilmiş İngilizce Prompt:]
@@ -33,16 +42,17 @@ export async function POST(req) {
       (Buraya Midjourney/DALL-E için teknik İngilizce kodunu yaz. Eğer görselde bir kişi varsa KESİNLİKLE "--cref", "identical face" ve "high-fidelity likeness" parametrelerini ekleyerek yüz hatlarını koru.)
       \`\`\`
 
-      KRİTİK UYARI: Eğer yukarıdaki 5 başlığı ve alttaki İngilizce kod kutusunu eksik verirsen sistem hata verecektir. Gevezelik yapma, doğrudan formata geç.
+      KRİTİK UYARI: Kendi kendine yeni başlık uydurma. Gevezelik yapma, isteğin TÜRÜNE UYGUN (Görsel veya Metin) doğrudan formata geç.
     `;
 
     const response = await openai.chat.completions.create({
       model: "gpt-4o", 
       messages: [
         { role: "system", content: systemPrompt },
-        { role: "user", content: `Kullanıcı İsteği: "${userInput}" \n\nFORMATI ASLA BOZMADAN, 5 BAŞLIK VE İNGİLİZCE KOD BLOĞU ŞEKLİNDE MASTER PROMPT ÜRET.` }
+        // KULLANICI MESAJINI DA GÜNCELLEDİK! Artık her defasında İngilizce kod bloğu emretmiyoruz.
+        { role: "user", content: `Kullanıcı İsteği: "${userInput}" \n\nFORMATI ASLA BOZMADAN, İSTEĞİN TÜRÜNE UYGUN (Görselse İngilizce kodlu, değilse sadece 5 başlık) MASTER PROMPT ÜRET.` }
       ],
-      temperature: 0.2, // Sıcaklığı 0.2'ye çektik! Bu "hiç yaratıcılık yapma, sadece verdiğim emre uy" demektir.
+      temperature: 0.2, // Sıcaklığı 0.2'de tutuyoruz, disiplinden taviz yok.
     });
 
     return NextResponse.json({ result: response.choices[0].message.content });
