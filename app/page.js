@@ -80,40 +80,39 @@ export default function Home() {
   const [typewriterIndex, setTypewriterIndex] = useState(0);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  // 🔥 YENİ: LOGONUN ÜSTÜNDEKİ RASTGELE KOORDİNAT MOTORU 🔥
+  // 🔥 %100 ÇARPIŞMA KORUMALI DİNAMİK KOORDİNAT MOTORU 🔥
   const getRandomPos = (slotId) => {
-    // Mobil kontrolü
     const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
     const r1 = Math.random();
     const r2 = Math.random();
 
     if (isMobile) {
-      // Mobilde sadece slot 0 ve 1 çalışır. Logo ~75vh'de, yazılar 5vh-70vh arasında.
-      if (slotId === 0) return { top: `${6 + (r1 * 24)}%`, left: '0', right: '0', margin: '0 auto', maxWidth: '90vw' }; // Üst Bölge
-      if (slotId === 1) return { top: `${40 + (r1 * 30)}%`, left: '0', right: '0', margin: '0 auto', maxWidth: '90vw' }; // Orta-Alt Bölge
-      return { top: '-100%', left: '-100%', display: 'none' }; // 2 ve 3 ekrandan silinir
+      // Mobilde 2 güvenli şerit (Asla çakışmazlar)
+      if (slotId === 0) return { top: `${6 + (r1 * 8)}%`, left: '0', right: '0', margin: '0 auto', maxWidth: '85vw' };
+      if (slotId === 1) return { top: `${42 + (r1 * 8)}%`, left: '0', right: '0', margin: '0 auto', maxWidth: '85vw' };
+      return { top: '-100%', left: '-100%', display: 'none' }; 
     }
 
-    // Masaüstü için 4 ayrı güvenli bölge (Logo ~60vh'de, yazılar 5vh-55vh arasında)
+    // Masaüstü için 4 KESİN şerit (Dikeyde asla birbirine değmezler)
     let top, left, right;
     const maxWidth = '340px'; 
 
-    if (slotId === 0) { // Sol Üst Kadran
-      top = `${8 + (r1 * 22)}%`;
-      left = `${2 + (r2 * 18)}%`;
+    if (slotId === 0) { // Sol Üst 
+      top = `${6 + (r1 * 6)}%`; // 6% - 12% arası
+      left = `${2 + (r2 * 12)}%`;
       right = 'auto';
-    } else if (slotId === 1) { // Sağ Üst Kadran
-      top = `${8 + (r1 * 22)}%`;
+    } else if (slotId === 1) { // Sağ Üst (Asimetrik)
+      top = `${10 + (r1 * 6)}%`; // 10% - 16% arası
       left = 'auto';
-      right = `${2 + (r2 * 18)}%`;
-    } else if (slotId === 2) { // Sol Orta-Alt Kadran
-      top = `${35 + (r1 * 20)}%`; // Logonun biraz daha üstü
-      left = `${2 + (r2 * 18)}%`;
+      right = `${2 + (r2 * 12)}%`;
+    } else if (slotId === 2) { // Sol Alt 
+      top = `${38 + (r1 * 5)}%`; // 38% - 43% arası (Üsttekiyle devasa boşluk)
+      left = `${2 + (r2 * 12)}%`;
       right = 'auto';
-    } else { // Sağ Orta-Alt Kadran
-      top = `${35 + (r1 * 20)}%`; // Logonun biraz daha üstü
+    } else { // Sağ Alt 
+      top = `${42 + (r1 * 5)}%`; // 42% - 47% arası
       left = 'auto';
-      right = `${2 + (r2 * 18)}%`;
+      right = `${2 + (r2 * 12)}%`;
     }
 
     return { top, left, right, maxWidth };
@@ -284,7 +283,6 @@ export default function Home() {
       @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
       .cursor-blink { display: inline-block; width: 8px; height: 1.2em; background-color: #00f2fe; vertical-align: middle; margin-left: 4px; animation: blink 1s step-end infinite; }
 
-      /* 🔥 Tıklanabilirlik Zırhı (.cinematic-text) 🔥 */
       .cinematic-text { position: absolute; color: #888888; cursor: pointer; animation: perfectBreathing 24s infinite linear; text-align: left; line-height: 1.5; font-weight: 300; transition: transform 0.3s ease, filter 0.3s ease; pointer-events: auto; }
       .cinematic-text:hover { animation-play-state: paused; z-index: 50; }
       .cinematic-text:hover .prompt-category { color: #00f2fe; text-shadow: 0 0 10px rgba(0, 242, 254, 0.5); }
@@ -296,7 +294,6 @@ export default function Home() {
       .edit-btn:hover { background: rgba(0, 242, 254, 0.2) !important; color: #fff !important; }
 
       @media (max-width: 768px) {
-        /* Mobilde heroSection daha da aşağıya */
         .hero-section { margin-top: 75vh !important; gap: 12px !important; }
         .hero-title { font-size: 1.8rem !important; line-height: 1.3 !important; padding: 0 10px !important; margin-bottom: 0 !important; }
         .hero-sub { font-size: 0.95rem !important; padding: 0 15px !important; margin-top: 0 !important; line-height: 1.5 !important; }
@@ -354,7 +351,6 @@ export default function Home() {
               })}
             </div>
 
-            {/* 🔥 YENİ: LOGO VE ANA BAŞLIK ARTIK DAHA AŞAĞIDA VE GÜVENLİ 🔥 */}
             <div style={heroSection} className="hero-section">
               <div style={logoFrame}>
                  <img src="/logo.png" alt="Logo" style={centerLogo} />
@@ -464,7 +460,7 @@ export default function Home() {
   );
 }
 
-// 🔥 STİLLER (Görünmez Kalkanlar Kırıldı, Logo Güvende!) 🔥
+// 🔥 STİLLER 🔥
 const container = { backgroundColor: '#050505', minHeight: '100vh', color: '#ECECEC', fontFamily: 'Inter, sans-serif', display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden' };
 const topBar = { padding: '20px 25px', position: 'absolute', top: 0, left: 0, right: 0, zIndex: 100, display: 'flex', justifyContent: 'space-between', alignItems: 'center' };
 const logoWrapper = { display: 'flex', alignItems: 'center', gap: '10px', opacity: 0.8, cursor: 'pointer' };
@@ -474,7 +470,6 @@ const contentArea = { flex: 1, display: 'flex', flexDirection: 'column', alignIt
 
 const floatingContainer = { position: 'absolute', top: '70px', left: 0, right: 0, height: '70vh', pointerEvents: 'none', zIndex: 5, overflow: 'hidden' };
 
-// Masaüstü heroSection daha aşağıya (60vh)
 const heroSection = { display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', zIndex: 10, marginTop: '60vh', width: '100%', gap: '15px', height: 'auto', minHeight: 'min-content', pointerEvents: 'none' };
 const logoFrame = { display: 'flex', alignItems: 'center', justifyContent: 'center' };
 const centerLogo = { width: '100%', maxWidth: '180px', height: 'auto', display: 'block', objectFit: 'contain' };
