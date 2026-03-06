@@ -198,23 +198,6 @@ export default function Home() {
     finally { setLoading(false); }
   };
 
-  // 🔥 NÜKLEER ÇÖZÜM: LİNK VE BUTONLARI DEVREDEN ÇIKARAN SAF JS YÖNLENDİRMESİ 🔥
-  const handleQuickLaunch = (e, url, name) => {
-    e.stopPropagation(); // Diğer tıklama olaylarını tamamen durdur
-    
-    // 1. Kopyalama işlemi
-    try {
-      navigator.clipboard.writeText(result);
-      setCopyStatus(name + ' Açıldı!');
-      setTimeout(() => setCopyStatus('Metni Kopyala'), 2000);
-    } catch(err) {
-      console.log('Kopyalama yapılamadı');
-    }
-
-    // 2. Doğrudan yeni sekme (Next.js'in araya girmesi %100 imkansızdır)
-    window.open(url, '_blank', 'noopener,noreferrer');
-  };
-
   const handleVoiceTyping = () => {
     if (!('webkitSpeechRecognition' in window)) { alert("Tarayıcınız sesli yazmayı desteklemiyor. Lütfen Chrome veya Safari kullanın."); return; }
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -227,8 +210,7 @@ export default function Home() {
     recognition.start();
   };
 
-  const handleCopy = (e) => {
-    e.stopPropagation();
+  const handleCopy = () => {
     navigator.clipboard.writeText(result);
     setCopyStatus('Kopyalandı! ✓');
     setTimeout(() => setCopyStatus('Metni Kopyala'), 2000);
@@ -259,7 +241,7 @@ export default function Home() {
       @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
       .edit-btn:hover { background: rgba(0, 242, 254, 0.2) !important; color: #fff !important; }
 
-      /* 🔥 YENİ NESİL ŞIK AI KUTULARI (DIV KULLANILDI) 🔥 */
+      /* 🔥 SAF HTML LİNKLERİ İÇİN STİL 🔥 */
       .ai-brand-btn {
         display: inline-flex;
         align-items: center;
@@ -275,7 +257,7 @@ export default function Home() {
         transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
         font-family: inherit;
         backdrop-filter: blur(10px);
-        user-select: none; /* Metin seçimini engeller */
+        text-decoration: none; /* Alt çizgiyi siler */
       }
       .ai-brand-btn:hover {
         background: rgba(0, 242, 254, 0.1);
@@ -283,12 +265,6 @@ export default function Home() {
         color: #fff;
         transform: translateY(-2px);
         box-shadow: 0 4px 15px rgba(0, 242, 254, 0.2);
-      }
-
-      /* Kopyala kutusu hover efekti */
-      .copy-box:hover {
-        background: #e0e0e0 !important;
-        transform: translateY(-1px);
       }
 
       @media (max-width: 768px) {
@@ -378,55 +354,55 @@ export default function Home() {
                     {loading && <span className="cursor-blink"></span>}
                   </div>
                   
-                  {/* 🔥 KUSURSUZ YÖNETİM PANELİ (Tamamen DIV Etiketleri) 🔥 */}
+                  {/* 🔥 SIFIR JAVASCRIPT, SAF HTML LİNKLERİ 🔥 */}
                   {!loading && result && (
                     <div style={{ marginTop: '35px', paddingTop: '20px', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
                       
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
-                        <span style={{ fontSize: '0.85rem', color: '#888', letterSpacing: '0.5px' }}>✨ ÜRETİMİ BAŞLAT:</span>
-                        {/* Kopyalama kutusu da artık bir div */}
-                        <div onClick={handleCopy} className="copy-box" style={copyBtn}>
-                          {IconCopy} <span>{copyStatus}</span>
-                        </div>
+                        <span style={{ fontSize: '0.85rem', color: '#888', letterSpacing: '0.5px' }}>✨ 1. ADIM: PROMPTU KOPYALA:</span>
+                        <button onClick={handleCopy} style={copyBtn}>
+                          {IconCopy} {copyStatus}
+                        </button>
                       </div>
-
+                      
+                      <span style={{ fontSize: '0.85rem', color: '#888', letterSpacing: '0.5px', display: 'block', marginBottom: '10px' }}>🚀 2. ADIM: UYGULAMAYI AÇ:</span>
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
                         {!isVisual ? (
                           <>
-                            {/* BUNLAR KESİNLİKLE BUTON VEYA LİNK DEĞİLDİR. SAF DIV'DİR. */}
-                            <div className="ai-brand-btn" onClick={(e) => handleQuickLaunch(e, '[https://chatgpt.com](https://chatgpt.com)', 'ChatGPT')}>
+                            {/* DÜMDÜZ LİNKLER - ASLA 404 VEREMEZ */}
+                            <a href="[https://chatgpt.com](https://chatgpt.com)" target="_blank" rel="noopener noreferrer" className="ai-brand-btn">
                               {IconChatGPT} <span>ChatGPT</span>
-                            </div>
-                            <div className="ai-brand-btn" onClick={(e) => handleQuickLaunch(e, '[https://gemini.google.com](https://gemini.google.com)', 'Gemini')}>
+                            </a>
+                            <a href="[https://gemini.google.com](https://gemini.google.com)" target="_blank" rel="noopener noreferrer" className="ai-brand-btn">
                               {IconGemini} <span>Gemini</span>
-                            </div>
-                            <div className="ai-brand-btn" onClick={(e) => handleQuickLaunch(e, '[https://claude.ai](https://claude.ai)', 'Claude')}>
+                            </a>
+                            <a href="[https://claude.ai](https://claude.ai)" target="_blank" rel="noopener noreferrer" className="ai-brand-btn">
                               {IconClaude} <span>Claude</span>
-                            </div>
-                            <div className="ai-brand-btn" onClick={(e) => handleQuickLaunch(e, '[https://www.perplexity.ai](https://www.perplexity.ai)', 'Perplexity')}>
+                            </a>
+                            <a href="[https://www.perplexity.ai](https://www.perplexity.ai)" target="_blank" rel="noopener noreferrer" className="ai-brand-btn">
                               {IconPerplexity} <span>Perplexity</span>
-                            </div>
-                            <div className="ai-brand-btn" onClick={(e) => handleQuickLaunch(e, '[https://copilot.microsoft.com](https://copilot.microsoft.com)', 'Copilot')}>
+                            </a>
+                            <a href="[https://copilot.microsoft.com](https://copilot.microsoft.com)" target="_blank" rel="noopener noreferrer" className="ai-brand-btn">
                               {IconCopilot} <span>Copilot</span>
-                            </div>
+                            </a>
                           </>
                         ) : (
                           <>
-                            <div className="ai-brand-btn" onClick={(e) => handleQuickLaunch(e, '[https://discord.com/channels/@me](https://discord.com/channels/@me)', 'Midjourney')}>
+                            <a href="[https://discord.com/channels/@me](https://discord.com/channels/@me)" target="_blank" rel="noopener noreferrer" className="ai-brand-btn">
                               {IconMidjourney} <span>Midjourney</span>
-                            </div>
-                            <div className="ai-brand-btn" onClick={(e) => handleQuickLaunch(e, '[https://chatgpt.com](https://chatgpt.com)', 'DALL-E 3')}>
+                            </a>
+                            <a href="[https://chatgpt.com](https://chatgpt.com)" target="_blank" rel="noopener noreferrer" className="ai-brand-btn">
                               {IconChatGPT} <span>DALL-E 3</span>
-                            </div>
-                            <div className="ai-brand-btn" onClick={(e) => handleQuickLaunch(e, '[https://leonardo.ai](https://leonardo.ai)', 'Leonardo')}>
+                            </a>
+                            <a href="[https://leonardo.ai](https://leonardo.ai)" target="_blank" rel="noopener noreferrer" className="ai-brand-btn">
                               {IconLeonardo} <span>Leonardo</span>
-                            </div>
-                            <div className="ai-brand-btn" onClick={(e) => handleQuickLaunch(e, '[https://firefly.adobe.com](https://firefly.adobe.com)', 'Adobe Firefly')}>
+                            </a>
+                            <a href="[https://firefly.adobe.com](https://firefly.adobe.com)" target="_blank" rel="noopener noreferrer" className="ai-brand-btn">
                               {IconAdobe} <span>Adobe Firefly</span>
-                            </div>
-                            <div className="ai-brand-btn" onClick={(e) => handleQuickLaunch(e, '[https://www.canva.com](https://www.canva.com)', 'Canva')}>
+                            </a>
+                            <a href="[https://www.canva.com](https://www.canva.com)" target="_blank" rel="noopener noreferrer" className="ai-brand-btn">
                               {IconCanva} <span>Canva</span>
-                            </div>
+                            </a>
                           </>
                         )}
                       </div>
