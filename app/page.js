@@ -198,9 +198,10 @@ export default function Home() {
     finally { setLoading(false); }
   };
 
-  // 🔥 NÜKLEER ÇÖZÜM: LİNK VE BUTONLARI DEVREDEN ÇIKARAN SAF JS YÖNLENDİRMESİ 🔥
+  // 🔥 NÜKLEER ÇÖZÜM v2: NEXT.JS'İ TAMAMEN DEVREDEN ÇIKARAN SAF DOM MANİPÜLASYONU 🔥
   const handleQuickLaunch = (e, url, name) => {
-    e.stopPropagation(); // Diğer tıklama olaylarını tamamen durdur
+    e.preventDefault(); // Next.js'in linki ele geçirmesini kesinlikle engeller
+    e.stopPropagation(); // Olayın dış bileşenlere yayılmasını durdurur
     
     // 1. Kopyalama işlemi
     try {
@@ -211,8 +212,14 @@ export default function Home() {
       console.log('Kopyalama yapılamadı');
     }
 
-    // 2. Doğrudan yeni sekme (Next.js'in araya girmesi %100 imkansızdır)
-    window.open(url, '_blank', 'noopener,noreferrer');
+    // 2. Yönlendirme İşlemi: Tarayıcıya saf bir a etiketi oluşturup zorla tıklatıyoruz.
+    const link = document.createElement('a');
+    link.href = url;
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   const handleVoiceTyping = () => {
@@ -259,7 +266,6 @@ export default function Home() {
       @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
       .edit-btn:hover { background: rgba(0, 242, 254, 0.2) !important; color: #fff !important; }
 
-      /* 🔥 YENİ NESİL ŞIK AI KUTULARI (DIV KULLANILDI) 🔥 */
       .ai-brand-btn {
         display: inline-flex;
         align-items: center;
@@ -275,7 +281,7 @@ export default function Home() {
         transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
         font-family: inherit;
         backdrop-filter: blur(10px);
-        user-select: none; /* Metin seçimini engeller */
+        user-select: none;
       }
       .ai-brand-btn:hover {
         background: rgba(0, 242, 254, 0.1);
@@ -285,7 +291,6 @@ export default function Home() {
         box-shadow: 0 4px 15px rgba(0, 242, 254, 0.2);
       }
 
-      /* Kopyala kutusu hover efekti */
       .copy-box:hover {
         background: #e0e0e0 !important;
         transform: translateY(-1px);
@@ -302,7 +307,6 @@ export default function Home() {
         .main-input { font-size: 16px !important; white-space: pre-wrap !important; overflow-y: auto !important; line-height: 1.4 !important; }
         .main-input::placeholder { font-size: 14px !important; }
         .input-box-inner { padding: 12px 14px 12px 18px !important; border-radius: 28px !important; }
-        
         .ai-brand-btn { font-size: 0.8rem; padding: 8px 12px; }
       }
     `;
@@ -378,13 +382,11 @@ export default function Home() {
                     {loading && <span className="cursor-blink"></span>}
                   </div>
                   
-                  {/* 🔥 KUSURSUZ YÖNETİM PANELİ (Tamamen DIV Etiketleri) 🔥 */}
                   {!loading && result && (
                     <div style={{ marginTop: '35px', paddingTop: '20px', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
                       
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
                         <span style={{ fontSize: '0.85rem', color: '#888', letterSpacing: '0.5px' }}>✨ ÜRETİMİ BAŞLAT:</span>
-                        {/* Kopyalama kutusu da artık bir div */}
                         <div onClick={handleCopy} className="copy-box" style={copyBtn}>
                           {IconCopy} <span>{copyStatus}</span>
                         </div>
@@ -393,7 +395,6 @@ export default function Home() {
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
                         {!isVisual ? (
                           <>
-                            {/* BUNLAR KESİNLİKLE BUTON VEYA LİNK DEĞİLDİR. SAF DIV'DİR VE DÜZ URL İÇERİRLER */}
                             <div className="ai-brand-btn" onClick={(e) => handleQuickLaunch(e, '[https://chatgpt.com](https://chatgpt.com)', 'ChatGPT')}>
                               {IconChatGPT} <span>ChatGPT</span>
                             </div>
