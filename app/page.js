@@ -241,10 +241,26 @@ export default function Home() {
       @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
       .edit-btn:hover { background: rgba(0, 242, 254, 0.2) !important; color: #fff !important; }
 
+      /* YENİ EKLENEN/GÜNCELLENEN STİLLER */
+      .input-glow {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(ellipse at center, rgba(0, 150, 255, 0.4) 0%, transparent 70%);
+        filter: blur(20px);
+        z-index: -1;
+        pointer-events: none;
+      }
+
       .ai-brand-btn {
         display: inline-flex;
         align-items: center;
+        justify-content: center;
         gap: 8px;
+        height: 40px; /* Logoların ezilmesini engellemek için sabit yükseklik */
         background: rgba(20, 20, 20, 0.8);
         border: 1px solid rgba(255, 255, 255, 0.1);
         color: #d1d1d1;
@@ -265,6 +281,13 @@ export default function Home() {
         transform: translateY(-2px);
         box-shadow: 0 4px 15px rgba(0, 242, 254, 0.2);
       }
+      
+      /* SVG ikonların boyutlarını eşitleyen ve koruyan kural */
+      .ai-brand-btn svg {
+        width: 18px !important;
+        height: 18px !important;
+        flex-shrink: 0;
+      }
 
       .copy-box:hover {
         background: #e0e0e0 !important;
@@ -282,7 +305,8 @@ export default function Home() {
         .main-input { font-size: 16px !important; white-space: pre-wrap !important; overflow-y: auto !important; line-height: 1.4 !important; }
         .main-input::placeholder { font-size: 14px !important; }
         .input-box-inner { padding: 12px 14px 12px 18px !important; border-radius: 28px !important; }
-        .ai-brand-btn { font-size: 0.8rem; padding: 8px 12px; }
+        .ai-brand-btn { font-size: 0.8rem; padding: 8px 12px; height: 36px; }
+        .ai-brand-btn svg { width: 16px !important; height: 16px !important; }
       }
     `;
     document.head.appendChild(styleSheet);
@@ -343,7 +367,7 @@ export default function Home() {
              {(!result && loading) ? (
                <div className="flex flex-col items-center justify-center mt-10">
                  <div className="loading-box">
-                   <svg className="animate-spin" style={{ margin: '0 auto', width: '40px', height: '40px', color: '#00f2fe' }} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                   <svg className="animate-spin" style={{ margin: '0 auto', width: '40px', height: '40px', color: '#00f2fe' }} xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)" fill="none" viewBox="0 0 24 24">
                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                    </svg>
@@ -352,45 +376,45 @@ export default function Home() {
                </div>
              ) : (
                <div style={aiResponseWrapper}>
-                  <div style={aiLabel}>ÜRETİLEN MASTER PROMPT</div>
-                  <div style={aiText}>
-                    {result}
-                    {loading && <span className="cursor-blink"></span>}
-                  </div>
-                  
-                  {!loading && result && (
-                    <div style={{ marginTop: '35px', paddingTop: '20px', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
-                      
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
-                        <span style={{ fontSize: '0.85rem', color: '#888', letterSpacing: '0.5px' }}>✨ ÜRETİMİ BAŞLAT:</span>
-                        <div onClick={handleCopy} className="copy-box" style={copyBtn}>
-                          {IconCopy} <span>{copyStatus}</span>
-                        </div>
-                      </div>
+                 <div style={aiLabel}>ÜRETİLEN MASTER PROMPT</div>
+                 <div style={aiText}>
+                   {result}
+                   {loading && <span className="cursor-blink"></span>}
+                 </div>
+                 
+                 {!loading && result && (
+                   <div style={{ marginTop: '35px', paddingTop: '20px', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+                     
+                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
+                       <span style={{ fontSize: '0.85rem', color: '#888', letterSpacing: '0.5px' }}>✨ ÜRETİMİ BAŞLAT:</span>
+                       <div onClick={handleCopy} className="copy-box" style={copyBtn}>
+                         {IconCopy} <span>{copyStatus}</span>
+                       </div>
+                     </div>
 
-                      {/* ✅ DÜZELTILMIŞ PROMPT BUTTON BİLEŞENLERİ */}
-                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
-                        {!isVisual ? (
-                          <>
-                            <PromptButton result={result} url="https://chatgpt.com" name="ChatGPT" icon={IconChatGPT} />
-                            <PromptButton result={result} url="https://gemini.google.com/app" name="Gemini" icon={IconGemini} />
-                            <PromptButton result={result} url="https://claude.ai" name="Claude" icon={IconClaude} />
-                            <PromptButton result={result} url="https://www.perplexity.ai" name="Perplexity" icon={IconPerplexity} />
-                            <PromptButton result={result} url="https://copilot.microsoft.com" name="Copilot" icon={IconCopilot} />
-                          </>
-                        ) : (
-                          <>
-                            <PromptButton result={result} url="https://discord.com/channels/@me" name="Midjourney" icon={IconMidjourney} />
-                            <PromptButton result={result} url="https://chatgpt.com" name="DALL-E 3" icon={IconChatGPT} />
-                            <PromptButton result={result} url="https://leonardo.ai" name="Leonardo" icon={IconLeonardo} />
-                            <PromptButton result={result} url="https://firefly.adobe.com" name="Adobe Firefly" icon={IconAdobe} />
-                            <PromptButton result={result} url="https://www.canva.com" name="Canva" icon={IconCanva} />
-                          </>
-                        )}
-                      </div>
+                     {/* ✅ DÜZELTILMIŞ PROMPT BUTTON BİLEŞENLERİ */}
+                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+                       {!isVisual ? (
+                         <>
+                           <PromptButton result={result} url="[https://chatgpt.com](https://chatgpt.com)" name="ChatGPT" icon={IconChatGPT} />
+                           <PromptButton result={result} url="[https://gemini.google.com/app](https://gemini.google.com/app)" name="Gemini" icon={IconGemini} />
+                           <PromptButton result={result} url="[https://claude.ai](https://claude.ai)" name="Claude" icon={IconClaude} />
+                           <PromptButton result={result} url="[https://www.perplexity.ai](https://www.perplexity.ai)" name="Perplexity" icon={IconPerplexity} />
+                           <PromptButton result={result} url="[https://copilot.microsoft.com](https://copilot.microsoft.com)" name="Copilot" icon={IconCopilot} />
+                         </>
+                       ) : (
+                         <>
+                           <PromptButton result={result} url="[https://discord.com/channels/@me](https://discord.com/channels/@me)" name="Midjourney" icon={IconMidjourney} />
+                           <PromptButton result={result} url="[https://chatgpt.com](https://chatgpt.com)" name="DALL-E 3" icon={IconChatGPT} />
+                           <PromptButton result={result} url="[https://leonardo.ai](https://leonardo.ai)" name="Leonardo" icon={IconLeonardo} />
+                           <PromptButton result={result} url="[https://firefly.adobe.com](https://firefly.adobe.com)" name="Adobe Firefly" icon={IconAdobe} />
+                           <PromptButton result={result} url="[https://www.canva.com](https://www.canva.com)" name="Canva" icon={IconCanva} />
+                         </>
+                       )}
+                     </div>
 
-                    </div>
-                  )}
+                   </div>
+                 )}
 
                </div>
              )}
@@ -401,6 +425,9 @@ export default function Home() {
       <div style={bottomArea}>
         <div className="floor-glow" style={floorGlow}></div>
         <div style={glowWrapper}>
+          {/* ✅ PARLAMA MERKEZE EKLENDİ */}
+          <div className="input-glow"></div>
+          
           <div style={inputBoxInner} className="input-box-inner">
             <textarea 
               className="main-input" style={inputField} placeholder={dynamicPlaceholder} rows={2} 
