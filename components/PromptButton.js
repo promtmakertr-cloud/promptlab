@@ -1,33 +1,26 @@
 'use client';
 
-import { useCallback } from 'react';
-
 export default function PromptButton({ result, url, name, icon }) {
-  const handleClick = useCallback((e) => {
+  const handleQuickLaunch = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    
-    // Metni kopyala
-    navigator.clipboard.writeText(result).catch((err) => {
-      console.error('Kopyalama hatası:', err);
-    });
 
-    // URL'yi aç (Next.js Router'ı atlıyor)
-    const newWindow = window.open(url, '_blank', 'noopener,noreferrer');
-    
-    if (newWindow) {
-      newWindow.opener = null;
+    // 1. Üretilen promptu sessizce kopyala
+    try {
+      if (result) navigator.clipboard.writeText(result);
+    } catch (err) {
+      console.log('Kopyalama hatası', err);
     }
-  }, [result, url]);
+
+    // 2. 404 KESİN ÇÖZÜM: Next.js router'ını atlayıp saf tarayıcı yönlendirmesi yapıyoruz
+    if (typeof window !== "undefined") {
+      window.open(url, '_blank', 'noopener,noreferrer');
+    }
+  };
 
   return (
-    <button
-      className="ai-brand-btn"
-      onClick={handleClick}
-      type="button"
-      aria-label={`${name} ile aç`}
-    >
+    <div className="ai-brand-btn" onClick={handleQuickLaunch} title={`${name} Aç`}>
       {icon} <span>{name}</span>
-    </button>
+    </div>
   );
 }
