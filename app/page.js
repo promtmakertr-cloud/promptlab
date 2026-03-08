@@ -216,51 +216,62 @@ export default function Home() {
     setTimeout(() => setCopyStatus('Metni Kopyala'), 2000);
   };
 
-  // 🔥 NÜKLEER ÇÖZÜM: FORM BUTONU BİLEŞENİ 🔥
-  // Bu bileşen, tıklamayı bir form gönderimine dönüştürerek Next.js'i tamamen devre dışı bırakır.
-  const AIFormButton = ({ url, icon, name }) => (
-    <form action={url} target="_blank" method="get" style={{ display: 'inline-block', margin: 0, padding: 0 }}>
-      <button 
-        type="submit" 
-        className="ai-brand-btn" 
-        onClick={() => {
-          // Arka planda sessizce kopyala, yönlendirme işini Forma bırak!
-          try { navigator.clipboard.writeText(result); } catch(e) {}
-          setCopyStatus(name + ' Açılıyor!');
-          setTimeout(() => setCopyStatus('Metni Kopyala'), 2000);
-        }}
-      >
+  // 🔥 KESİN ÇÖZÜM: DOM INJECTION YÖNLENDİRME BİLEŞENİ 🔥
+  // Next.js router'ını tamamen bypass eden sanal DOM dışı (Hard Navigation) yönlendirme.
+  const AIPlatformButton = ({ url, icon, name }) => {
+    const handleRedirect = (e) => {
+      e.preventDefault();
+      try {
+        navigator.clipboard.writeText(result);
+        setCopyStatus(name + ' Açılıyor!');
+        setTimeout(() => setCopyStatus('Metni Kopyala'), 2000);
+      } catch (err) {
+        console.error("Kopyalama hatası:", err);
+      }
+
+      // DOM Injection Bypass
+      const link = document.createElement('a');
+      link.href = url;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    };
+
+    return (
+      <button className="ai-brand-btn" onClick={handleRedirect}>
         {icon} <span>{name}</span>
       </button>
-    </form>
-  );
+    );
+  };
 
   useEffect(() => {
     const styleSheet = document.createElement("style");
     styleSheet.innerText = `
       @keyframes elegantGlow {
-        0%   { box-shadow: 0 0 8px rgba(0, 242, 254, 0.1), inset 0 0 4px rgba(0, 242, 254, 0.05); border-color: rgba(0, 242, 254, 0.15); }
-        50%  { box-shadow: 0 0 20px rgba(10, 100, 255, 0.25), inset 0 0 8px rgba(10, 100, 255, 0.1); border-color: rgba(10, 100, 255, 0.35); }
-        100% { box-shadow: 0 0 8px rgba(0, 242, 254, 0.1), inset 0 0 4px rgba(0, 242, 254, 0.05); border-color: rgba(0, 242, 254, 0.15); }
+        0%   { box-shadow: 0 0 8px rgba(255, 191, 0, 0.1), inset 0 0 4px rgba(255, 191, 0, 0.05); border-color: rgba(255, 191, 0, 0.15); }
+        50%  { box-shadow: 0 0 20px rgba(255, 126, 0, 0.25), inset 0 0 8px rgba(255, 126, 0, 0.1); border-color: rgba(255, 126, 0, 0.35); }
+        100% { box-shadow: 0 0 8px rgba(255, 191, 0, 0.1), inset 0 0 4px rgba(255, 191, 0, 0.05); border-color: rgba(255, 191, 0, 0.15); }
       }
       @keyframes perfectBreathing { 0% { opacity: 0; filter: blur(10px); transform: translateY(10px); } 10% { opacity: 1; filter: blur(0px); transform: translateY(0px); } 25% { opacity: 1; filter: blur(0px); transform: translateY(0px); } 35% { opacity: 0; filter: blur(10px); transform: translateY(-10px); } 100% { opacity: 0; filter: blur(10px); transform: translateY(-10px); } }
       @keyframes loadingPulse { 0% { opacity: 0.6; transform: scale(0.98); } 50% { opacity: 1; transform: scale(1); } 100% { opacity: 0.6; transform: scale(0.98); } }
       @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 
-      .loading-box { width: 100%; max-width: 600px; background: rgba(10, 10, 10, 0.8); border: 1px solid rgba(0, 242, 254, 0.3); border-radius: 16px; padding: 40px 20px; text-align: center; box-shadow: 0 0 30px rgba(0, 242, 254, 0.1); animation: loadingPulse 2s infinite ease-in-out; }
-      .loading-text { font-size: 1.1rem; color: #00f2fe; font-weight: 500; margin-top: 15px; letter-spacing: 0.5px; }
-      .cursor-blink { display: inline-block; width: 8px; height: 1.2em; background-color: #00f2fe; vertical-align: middle; margin-left: 4px; animation: blink 1s step-end infinite; }
+      .loading-box { width: 100%; max-width: 600px; background: rgba(10, 10, 10, 0.8); border: 1px solid rgba(255, 191, 0, 0.3); border-radius: 16px; padding: 40px 20px; text-align: center; box-shadow: 0 0 30px rgba(255, 191, 0, 0.1); animation: loadingPulse 2s infinite ease-in-out; }
+      .loading-text { font-size: 1.1rem; color: #ffbf00; font-weight: 500; margin-top: 15px; letter-spacing: 0.5px; }
+      .cursor-blink { display: inline-block; width: 8px; height: 1.2em; background-color: #ffbf00; vertical-align: middle; margin-left: 4px; animation: blink 1s step-end infinite; }
       .cinematic-text { position: absolute; color: #888888; cursor: pointer; animation: perfectBreathing 24s infinite linear; text-align: left; line-height: 1.5; font-weight: 300; transition: transform 0.3s ease, filter 0.3s ease; pointer-events: auto; }
       .cinematic-text:hover { animation-play-state: paused; z-index: 50; }
-      .cinematic-text:hover .prompt-category { color: #00f2fe; text-shadow: 0 0 10px rgba(0, 242, 254, 0.5); }
+      .cinematic-text:hover .prompt-category { color: #ffbf00; text-shadow: 0 0 10px rgba(255, 191, 0, 0.5); }
       .cinematic-text:hover .prompt-body { color: #ffffff; opacity: 1; text-shadow: 0 0 10px rgba(255, 255, 255, 0.4); }
       .prompt-category { font-family: "Times New Roman", Times, serif; font-size: 1.35em; font-style: italic; color: #ffffff; margin-bottom: 6px; letter-spacing: 0.5px; opacity: 0.95; transition: color 0.3s ease, text-shadow 0.3s ease; }
       .prompt-body { font-family: inherit; font-size: 0.95em; opacity: 0.75; transition: color 0.3s ease, opacity 0.3s ease, text-shadow 0.3s ease; }
-      .pulse-mic { animation: pulse 1.5s infinite; color: #00f2fe !important; }
+      .pulse-mic { animation: pulse 1.5s infinite; color: #ffbf00 !important; }
       @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
-      .edit-btn:hover { background: rgba(0, 242, 254, 0.2) !important; color: #fff !important; }
+      .edit-btn:hover { background: rgba(255, 191, 0, 0.2) !important; color: #fff !important; }
 
-      /* 🔥 YENİ NESİL ŞIK AI BUTONLARI (Form Butonları İçin Uyarlandı) 🔥 */
+      /* 🔥 YENİ NESİL ŞIK AI BUTONLARI 🔥 */
       .ai-brand-btn {
         display: inline-flex;
         align-items: center;
@@ -279,11 +290,11 @@ export default function Home() {
         outline: none;
       }
       .ai-brand-btn:hover {
-        background: rgba(0, 242, 254, 0.1);
-        border-color: rgba(0, 242, 254, 0.5);
+        background: rgba(255, 191, 0, 0.1);
+        border-color: rgba(255, 191, 0, 0.5);
         color: #fff;
         transform: translateY(-2px);
-        box-shadow: 0 4px 15px rgba(0, 242, 254, 0.2);
+        box-shadow: 0 4px 15px rgba(255, 191, 0, 0.2);
       }
 
       @media (max-width: 768px) {
@@ -340,11 +351,11 @@ export default function Home() {
           </>
         ) : (
           <div style={resultContainer}>
-             
+              
              <div style={userPromptWrapper}>
                <div style={userPromptHeader} onClick={() => setIsPromptExpanded(!isPromptExpanded)}>
                  <div style={userPromptTitle}>
-                    <span style={{ color: '#00f2fe', marginRight: '8px' }}>✦</span>
+                    <span style={{ color: '#ffbf00', marginRight: '8px' }}>✦</span>
                     {isPromptExpanded ? "Senin Promptun" : `Senin Promptun: "${submittedPrompt.length > 45 ? submittedPrompt.slice(0, 45) + '...' : submittedPrompt}"`}
                  </div>
                  <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
@@ -358,7 +369,7 @@ export default function Home() {
              {(!result && loading) ? (
                <div className="flex flex-col items-center justify-center mt-10">
                  <div className="loading-box">
-                   <svg className="animate-spin" style={{ margin: '0 auto', width: '40px', height: '40px', color: '#00f2fe' }} xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)" fill="none" viewBox="0 0 24 24">
+                   <svg className="animate-spin" style={{ margin: '0 auto', width: '40px', height: '40px', color: '#ffbf00' }} xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)" fill="none" viewBox="0 0 24 24">
                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                    </svg>
@@ -373,7 +384,7 @@ export default function Home() {
                     {loading && <span className="cursor-blink"></span>}
                   </div>
                   
-                  {/* 🔥 İŞTE O KUSURSUZ FORM YÖNLENDİRME PANELİ 🔥 */}
+                  {/* 🔥 İŞTE O KUSURSUZ YÖNLENDİRME PANELİ 🔥 */}
                   {!loading && result && (
                     <div style={{ marginTop: '35px', paddingTop: '20px', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
                       
@@ -387,20 +398,19 @@ export default function Home() {
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
                         {!isVisual ? (
                           <>
-                            {/* BUNLAR ARTIK BAĞLANTI DEĞİL, GÖRÜNMEZ FORMLARDIR */}
-                            <AIFormButton url="[https://chatgpt.com](https://chatgpt.com)" icon={IconChatGPT} name="ChatGPT" />
-                            <AIFormButton url="[https://gemini.google.com](https://gemini.google.com)" icon={IconGemini} name="Gemini" />
-                            <AIFormButton url="[https://claude.ai](https://claude.ai)" icon={IconClaude} name="Claude" />
-                            <AIFormButton url="[https://www.perplexity.ai](https://www.perplexity.ai)" icon={IconPerplexity} name="Perplexity" />
-                            <AIFormButton url="[https://copilot.microsoft.com](https://copilot.microsoft.com)" icon={IconCopilot} name="Copilot" />
+                            <AIPlatformButton url="[https://chatgpt.com](https://chatgpt.com)" icon={IconChatGPT} name="ChatGPT" />
+                            <AIPlatformButton url="[https://gemini.google.com](https://gemini.google.com)" icon={IconGemini} name="Gemini" />
+                            <AIPlatformButton url="[https://claude.ai](https://claude.ai)" icon={IconClaude} name="Claude" />
+                            <AIPlatformButton url="[https://www.perplexity.ai](https://www.perplexity.ai)" icon={IconPerplexity} name="Perplexity" />
+                            <AIPlatformButton url="[https://copilot.microsoft.com](https://copilot.microsoft.com)" icon={IconCopilot} name="Copilot" />
                           </>
                         ) : (
                           <>
-                            <AIFormButton url="[https://discord.com/channels/@me](https://discord.com/channels/@me)" icon={IconMidjourney} name="Midjourney" />
-                            <AIFormButton url="[https://chatgpt.com](https://chatgpt.com)" icon={IconChatGPT} name="DALL-E 3" />
-                            <AIFormButton url="[https://leonardo.ai](https://leonardo.ai)" icon={IconLeonardo} name="Leonardo" />
-                            <AIFormButton url="[https://firefly.adobe.com](https://firefly.adobe.com)" icon={IconAdobe} name="Adobe Firefly" />
-                            <AIFormButton url="[https://www.canva.com](https://www.canva.com)" icon={IconCanva} name="Canva" />
+                            <AIPlatformButton url="[https://discord.com/channels/@me](https://discord.com/channels/@me)" icon={IconMidjourney} name="Midjourney" />
+                            <AIPlatformButton url="[https://chatgpt.com](https://chatgpt.com)" icon={IconChatGPT} name="DALL-E 3" />
+                            <AIPlatformButton url="[https://leonardo.ai](https://leonardo.ai)" icon={IconLeonardo} name="Leonardo" />
+                            <AIPlatformButton url="[https://firefly.adobe.com](https://firefly.adobe.com)" icon={IconAdobe} name="Adobe Firefly" />
+                            <AIPlatformButton url="[https://www.canva.com](https://www.canva.com)" icon={IconCanva} name="Canva" />
                           </>
                         )}
                       </div>
@@ -455,20 +465,20 @@ const resultContainer = { maxWidth: '850px', width: '100%', marginTop: '80px', m
 const userPromptWrapper = { width: '100%', backgroundColor: '#0f0f0f', borderRadius: '12px', border: '1px solid #222', marginBottom: '20px', overflow: 'hidden', transition: 'all 0.3s ease' };
 const userPromptHeader = { padding: '16px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', backgroundColor: '#141414' };
 const userPromptTitle = { fontSize: '0.9rem', color: '#ccc', fontWeight: '500', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '75%' };
-const editBtn = { background: 'rgba(0, 242, 254, 0.08)', color: '#00f2fe', border: '1px solid rgba(0, 242, 254, 0.25)', padding: '6px 14px', borderRadius: '6px', fontSize: '0.8rem', cursor: 'pointer', fontWeight: '600', transition: 'all 0.2s ease' };
+const editBtn = { background: 'rgba(255, 191, 0, 0.08)', color: '#ffbf00', border: '1px solid rgba(255, 191, 0, 0.25)', padding: '6px 14px', borderRadius: '6px', fontSize: '0.8rem', cursor: 'pointer', fontWeight: '600', transition: 'all 0.2s ease' };
 const userPromptBody = { padding: '20px', borderTop: '1px solid #222', fontSize: '0.95rem', color: '#aaa', lineHeight: '1.6', whiteSpace: 'pre-wrap' };
-const aiResponseWrapper = { width: '100%', backgroundColor: '#0a0a0a', padding: '25px', borderRadius: '16px', border: '1px solid rgba(0, 242, 254, 0.2)', boxShadow: '0 0 20px rgba(10, 100, 255, 0.15)' };
-const aiLabel = { fontSize: '0.75rem', fontWeight: '700', color: '#00f2fe', marginBottom: '20px', letterSpacing: '2px' };
+const aiResponseWrapper = { width: '100%', backgroundColor: '#0a0a0a', padding: '25px', borderRadius: '16px', border: '1px solid rgba(255, 191, 0, 0.2)', boxShadow: '0 0 20px rgba(255, 126, 0, 0.15)' };
+const aiLabel = { fontSize: '0.75rem', fontWeight: '700', color: '#ffbf00', marginBottom: '20px', letterSpacing: '2px' };
 const aiText = { fontSize: '1rem', lineHeight: '1.6', color: '#E0E0E0', whiteSpace: 'pre-wrap', fontFamily: 'monospace', opacity: 0.9 };
 
 const copyBtn = { display: 'flex', alignItems: 'center', gap: '6px', background: '#fff', color: '#000', border: 'none', padding: '8px 16px', borderRadius: '8px', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 'bold', transition: 'all 0.2s ease' };
 
 const bottomArea = { position: 'fixed', bottom: 0, left: 0, right: 0, padding: '30px 20px 40px 20px', background: 'transparent', display: 'flex', flexDirection: 'column', alignItems: 'center', zIndex: 20, pointerEvents: 'none' };
-const cyberGradient = 'linear-gradient(90deg, #00f2fe, #0a64ff, #00f2fe, #0a64ff)';
+const cyberGradient = 'linear-gradient(90deg, #ffbf00, #ff7e00, #ffbf00, #ff7e00)';
 const floorGlow = { position: 'absolute', bottom: '-10px', left: '50%', transform: 'translateX(-50%)', width: '50vw', maxWidth: '600px', height: '60px', background: cyberGradient, backgroundSize: '200% 100%', filter: 'blur(45px)', opacity: 0.35, zIndex: 1, pointerEvents: 'none', animation: 'glowingBorder 15s linear infinite' };
 
 const glowWrapper = { position: 'relative', width: '100%', maxWidth: '680px', zIndex: 2, pointerEvents: 'auto' };
-const inputBoxInner = { backgroundColor: '#0a0a0a', borderRadius: '40px', border: '1px solid rgba(0, 242, 254, 0.2)', animation: 'elegantGlow 8s infinite alternate', display: 'flex', alignItems: 'center', padding: '6px 10px 6px 18px', width: '100%', height: '100%' };
+const inputBoxInner = { backgroundColor: '#0a0a0a', borderRadius: '40px', border: '1px solid rgba(255, 191, 0, 0.2)', animation: 'elegantGlow 8s infinite alternate', display: 'flex', alignItems: 'center', padding: '6px 10px 6px 18px', width: '100%', height: '100%' };
 const inputField = { flex: 1, background: 'transparent', border: 'none', color: '#fff', fontSize: '1rem', outline: 'none', resize: 'none', padding: '8px 0', maxHeight: '150px', fontFamily: 'inherit' };
 const actionButtons = { display: 'flex', alignItems: 'center', gap: '6px' };
 const iconButton = { background: 'none', border: 'none', cursor: 'pointer', padding: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center' };
