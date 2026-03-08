@@ -216,6 +216,25 @@ export default function Home() {
     setTimeout(() => setCopyStatus('Metni Kopyala'), 2000);
   };
 
+  // 🔥 NÜKLEER ÇÖZÜM: FORM BUTONU BİLEŞENİ 🔥
+  // Bu bileşen, tıklamayı bir form gönderimine dönüştürerek Next.js'i tamamen devre dışı bırakır.
+  const AIFormButton = ({ url, icon, name }) => (
+    <form action={url} target="_blank" method="get" style={{ display: 'inline-block', margin: 0, padding: 0 }}>
+      <button 
+        type="submit" 
+        className="ai-brand-btn" 
+        onClick={() => {
+          // Arka planda sessizce kopyala, yönlendirme işini Forma bırak!
+          try { navigator.clipboard.writeText(result); } catch(e) {}
+          setCopyStatus(name + ' Açılıyor!');
+          setTimeout(() => setCopyStatus('Metni Kopyala'), 2000);
+        }}
+      >
+        {icon} <span>{name}</span>
+      </button>
+    </form>
+  );
+
   useEffect(() => {
     const styleSheet = document.createElement("style");
     styleSheet.innerText = `
@@ -241,7 +260,7 @@ export default function Home() {
       @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
       .edit-btn:hover { background: rgba(0, 242, 254, 0.2) !important; color: #fff !important; }
 
-      /* 🔥 SAF HTML LİNKLERİ İÇİN STİL 🔥 */
+      /* 🔥 YENİ NESİL ŞIK AI BUTONLARI (Form Butonları İçin Uyarlandı) 🔥 */
       .ai-brand-btn {
         display: inline-flex;
         align-items: center;
@@ -257,7 +276,7 @@ export default function Home() {
         transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
         font-family: inherit;
         backdrop-filter: blur(10px);
-        text-decoration: none; /* Alt çizgiyi siler */
+        outline: none;
       }
       .ai-brand-btn:hover {
         background: rgba(0, 242, 254, 0.1);
@@ -354,55 +373,34 @@ export default function Home() {
                     {loading && <span className="cursor-blink"></span>}
                   </div>
                   
-                  {/* 🔥 SIFIR JAVASCRIPT, SAF HTML LİNKLERİ 🔥 */}
+                  {/* 🔥 İŞTE O KUSURSUZ FORM YÖNLENDİRME PANELİ 🔥 */}
                   {!loading && result && (
                     <div style={{ marginTop: '35px', paddingTop: '20px', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
                       
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
-                        <span style={{ fontSize: '0.85rem', color: '#888', letterSpacing: '0.5px' }}>✨ 1. ADIM: PROMPTU KOPYALA:</span>
+                        <span style={{ fontSize: '0.85rem', color: '#888', letterSpacing: '0.5px' }}>✨ ÜRETİMİ BAŞLAT:</span>
                         <button onClick={handleCopy} style={copyBtn}>
                           {IconCopy} {copyStatus}
                         </button>
                       </div>
-                      
-                      <span style={{ fontSize: '0.85rem', color: '#888', letterSpacing: '0.5px', display: 'block', marginBottom: '10px' }}>🚀 2. ADIM: UYGULAMAYI AÇ:</span>
+
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
                         {!isVisual ? (
                           <>
-                            {/* DÜMDÜZ LİNKLER - ASLA 404 VEREMEZ */}
-                            <a href="[https://chatgpt.com](https://chatgpt.com)" target="_blank" rel="noopener noreferrer" className="ai-brand-btn">
-                              {IconChatGPT} <span>ChatGPT</span>
-                            </a>
-                            <a href="[https://gemini.google.com](https://gemini.google.com)" target="_blank" rel="noopener noreferrer" className="ai-brand-btn">
-                              {IconGemini} <span>Gemini</span>
-                            </a>
-                            <a href="[https://claude.ai](https://claude.ai)" target="_blank" rel="noopener noreferrer" className="ai-brand-btn">
-                              {IconClaude} <span>Claude</span>
-                            </a>
-                            <a href="[https://www.perplexity.ai](https://www.perplexity.ai)" target="_blank" rel="noopener noreferrer" className="ai-brand-btn">
-                              {IconPerplexity} <span>Perplexity</span>
-                            </a>
-                            <a href="[https://copilot.microsoft.com](https://copilot.microsoft.com)" target="_blank" rel="noopener noreferrer" className="ai-brand-btn">
-                              {IconCopilot} <span>Copilot</span>
-                            </a>
+                            {/* BUNLAR ARTIK BAĞLANTI DEĞİL, GÖRÜNMEZ FORMLARDIR */}
+                            <AIFormButton url="[https://chatgpt.com](https://chatgpt.com)" icon={IconChatGPT} name="ChatGPT" />
+                            <AIFormButton url="[https://gemini.google.com](https://gemini.google.com)" icon={IconGemini} name="Gemini" />
+                            <AIFormButton url="[https://claude.ai](https://claude.ai)" icon={IconClaude} name="Claude" />
+                            <AIFormButton url="[https://www.perplexity.ai](https://www.perplexity.ai)" icon={IconPerplexity} name="Perplexity" />
+                            <AIFormButton url="[https://copilot.microsoft.com](https://copilot.microsoft.com)" icon={IconCopilot} name="Copilot" />
                           </>
                         ) : (
                           <>
-                            <a href="[https://discord.com/channels/@me](https://discord.com/channels/@me)" target="_blank" rel="noopener noreferrer" className="ai-brand-btn">
-                              {IconMidjourney} <span>Midjourney</span>
-                            </a>
-                            <a href="[https://chatgpt.com](https://chatgpt.com)" target="_blank" rel="noopener noreferrer" className="ai-brand-btn">
-                              {IconChatGPT} <span>DALL-E 3</span>
-                            </a>
-                            <a href="[https://leonardo.ai](https://leonardo.ai)" target="_blank" rel="noopener noreferrer" className="ai-brand-btn">
-                              {IconLeonardo} <span>Leonardo</span>
-                            </a>
-                            <a href="[https://firefly.adobe.com](https://firefly.adobe.com)" target="_blank" rel="noopener noreferrer" className="ai-brand-btn">
-                              {IconAdobe} <span>Adobe Firefly</span>
-                            </a>
-                            <a href="[https://www.canva.com](https://www.canva.com)" target="_blank" rel="noopener noreferrer" className="ai-brand-btn">
-                              {IconCanva} <span>Canva</span>
-                            </a>
+                            <AIFormButton url="[https://discord.com/channels/@me](https://discord.com/channels/@me)" icon={IconMidjourney} name="Midjourney" />
+                            <AIFormButton url="[https://chatgpt.com](https://chatgpt.com)" icon={IconChatGPT} name="DALL-E 3" />
+                            <AIFormButton url="[https://leonardo.ai](https://leonardo.ai)" icon={IconLeonardo} name="Leonardo" />
+                            <AIFormButton url="[https://firefly.adobe.com](https://firefly.adobe.com)" icon={IconAdobe} name="Adobe Firefly" />
+                            <AIFormButton url="[https://www.canva.com](https://www.canva.com)" icon={IconCanva} name="Canva" />
                           </>
                         )}
                       </div>
