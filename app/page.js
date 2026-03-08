@@ -61,7 +61,6 @@ const loadingMessages = [
   "✨ Son rötuşlar yapılıyor, promptunuz hazır olmak üzere..."
 ];
 
-// 🔥 YAPAY ZEKA UYGULAMA İKONLARI (SVG) 🔥
 const IconChatGPT = <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M22.2819 9.8211a5.9847 5.9847 0 0 0-.5157-4.9108 6.0462 6.0462 0 0 0-6.5098-2.9A6.0651 6.0651 0 0 0 4.9807 4.1818a5.9847 5.9847 0 0 0-3.9977 2.9 6.0462 6.0462 0 0 0 .7427 7.0966 5.98 5.98 0 0 0 .511 4.9107 6.051 6.051 0 0 0 6.5146 2.9001A5.9847 5.9847 0 0 0 13.2599 24a6.0557 6.0557 0 0 0 5.7718-4.2058 5.9894 5.9894 0 0 0 3.9977-2.9001 6.0557 6.0557 0 0 0-.7475-7.073zm-9.022 12.6081a4.4755 4.4755 0 0 1-2.8764-1.0408l.1419-.0804 4.7783-2.7582a.7948.7948 0 0 0 .3927-.6813v-6.7369l2.02 1.1686a.071.071 0 0 1 .038.052v5.5826a4.504 4.504 0 0 1-4.4945 4.4944zm-9.6607-4.1254a4.4708 4.4708 0 0 1-.5346-3.0137l.142.0852 4.783 2.7582a.7712.7712 0 0 0 .7806 0l5.8428-3.3685v2.3324a.0804.0804 0 0 1-.0332.0615L9.74 19.9502a4.4992 4.4992 0 0 1-6.1408-1.6464zM2.3408 7.8956a4.485 4.485 0 0 1 2.3655-1.9728V11.6a.7664.7664 0 0 0 .3879.6765l5.8144 3.3543-2.0201 1.1685a.0757.0757 0 0 1-.071 0l-4.8303-2.7865A4.504 4.504 0 0 1 2.3408 7.8956zm16.0993 3.8558L12.5967 8.3829a.0804.0804 0 0 1 .0332-.0615l4.8303-2.7866a4.4992 4.4992 0 0 1 6.1408 1.6464 4.4708 4.4708 0 0 1 .5346 3.0137l-.1416-.0852-4.783-2.7582a.7712.7712 0 0 0-.7806 0l-5.8428 3.3685v-2.3324zm2.0107-3.0231l-4.8-2.7677a.7664.7664 0 0 0-.3879-.6764V1.1925a.0757.0757 0 0 1 .071 0l4.8303 2.7866a4.504 4.504 0 0 1 2.28 4.6138zM8.5035 1.5165l-.1419.0804-4.7783 2.7582a.7948.7948 0 0 0-.3927.6813v6.7369l-2.02-1.1686a.071.071 0 0 1-.038-.052V4.9701a4.504 4.504 0 0 1 7.371-3.4536zM14.793 9.4042l-2.7932-1.6127-2.7932 1.6127v3.2255l2.7932 1.6127 2.7932-1.6127z"/></svg>;
 const IconGemini = <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 0C12 6.62742 6.62742 12 0 12C6.62742 12 12 17.3726 12 24C12 17.3726 17.3726 12 24 12C17.3726 12 12 6.62742 12 0Z"/></svg>;
 const IconClaude = <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><rect width="24" height="24" rx="4" fill="none" stroke="currentColor" strokeWidth="2"/><text x="50%" y="50%" textAnchor="middle" dy=".35em" fontFamily="Georgia, serif" fontSize="14" fontWeight="bold">C</text></svg>;
@@ -198,12 +197,10 @@ export default function Home() {
     finally { setLoading(false); }
   };
 
-  // 🔥 NÜKLEER ÇÖZÜM v2: NEXT.JS'İ TAMAMEN DEVREDEN ÇIKARAN SAF DOM MANİPÜLASYONU 🔥
   const handleQuickLaunch = (e, url, name) => {
-    e.preventDefault(); // Next.js'in linki ele geçirmesini kesinlikle engeller
-    e.stopPropagation(); // Olayın dış bileşenlere yayılmasını durdurur
+    e.preventDefault(); 
+    e.stopPropagation(); 
     
-    // 1. Kopyalama işlemi
     try {
       navigator.clipboard.writeText(result);
       setCopyStatus(name + ' Açıldı!');
@@ -212,7 +209,6 @@ export default function Home() {
       console.log('Kopyalama yapılamadı');
     }
 
-    // 2. Yönlendirme İşlemi: Tarayıcıya saf bir a etiketi oluşturup zorla tıklatıyoruz.
     const link = document.createElement('a');
     link.href = url;
     link.target = '_blank';
