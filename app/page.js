@@ -278,7 +278,6 @@ export default function Home() {
         .cinematic-text { font-size: 0.85rem !important; margin: 0 auto !important; }
         .slot-2 { display: none !important; }
         .slot-3 { display: none !important; } 
-        .floor-glow { opacity: 0.2 !important; height: 50px !important; bottom: -5px !important;}
         .main-input { font-size: 16px !important; white-space: pre-wrap !important; overflow-y: auto !important; line-height: 1.4 !important; }
         .main-input::placeholder { font-size: 14px !important; }
         .input-box-inner { padding: 12px 14px 12px 18px !important; border-radius: 28px !important; }
@@ -343,7 +342,7 @@ export default function Home() {
              {(!result && loading) ? (
                <div className="flex flex-col items-center justify-center mt-10">
                  <div className="loading-box">
-                   <svg className="animate-spin" style={{ margin: '0 auto', width: '40px', height: '40px', color: '#00f2fe' }} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                   <svg className="animate-spin" style={{ margin: '0 auto', width: '40px', height: '40px', color: '#00f2fe' }} xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)" fill="none" viewBox="0 0 24 24">
                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                    </svg>
@@ -372,19 +371,19 @@ export default function Home() {
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
                         {!isVisual ? (
                           <>
-                            <PromptButton result={result} url="https://chatgpt.com" name="ChatGPT" icon={IconChatGPT} />
-                            <PromptButton result={result} url="https://gemini.google.com/app" name="Gemini" icon={IconGemini} />
-                            <PromptButton result={result} url="https://claude.ai" name="Claude" icon={IconClaude} />
-                            <PromptButton result={result} url="https://www.perplexity.ai" name="Perplexity" icon={IconPerplexity} />
-                            <PromptButton result={result} url="https://copilot.microsoft.com" name="Copilot" icon={IconCopilot} />
+                            <PromptButton result={result} url="[https://chatgpt.com](https://chatgpt.com)" name="ChatGPT" icon={IconChatGPT} />
+                            <PromptButton result={result} url="[https://gemini.google.com/app](https://gemini.google.com/app)" name="Gemini" icon={IconGemini} />
+                            <PromptButton result={result} url="[https://claude.ai](https://claude.ai)" name="Claude" icon={IconClaude} />
+                            <PromptButton result={result} url="[https://www.perplexity.ai](https://www.perplexity.ai)" name="Perplexity" icon={IconPerplexity} />
+                            <PromptButton result={result} url="[https://copilot.microsoft.com](https://copilot.microsoft.com)" name="Copilot" icon={IconCopilot} />
                           </>
                         ) : (
                           <>
-                            <PromptButton result={result} url="https://discord.com/channels/@me" name="Midjourney" icon={IconMidjourney} />
-                            <PromptButton result={result} url="https://chatgpt.com" name="DALL-E 3" icon={IconChatGPT} />
-                            <PromptButton result={result} url="https://leonardo.ai" name="Leonardo" icon={IconLeonardo} />
-                            <PromptButton result={result} url="https://firefly.adobe.com" name="Adobe Firefly" icon={IconAdobe} />
-                            <PromptButton result={result} url="https://www.canva.com" name="Canva" icon={IconCanva} />
+                            <PromptButton result={result} url="[https://discord.com/channels/@me](https://discord.com/channels/@me)" name="Midjourney" icon={IconMidjourney} />
+                            <PromptButton result={result} url="[https://chatgpt.com](https://chatgpt.com)" name="DALL-E 3" icon={IconChatGPT} />
+                            <PromptButton result={result} url="[https://leonardo.ai](https://leonardo.ai)" name="Leonardo" icon={IconLeonardo} />
+                            <PromptButton result={result} url="[https://firefly.adobe.com](https://firefly.adobe.com)" name="Adobe Firefly" icon={IconAdobe} />
+                            <PromptButton result={result} url="[https://www.canva.com](https://www.canva.com)" name="Canva" icon={IconCanva} />
                           </>
                         )}
                       </div>
@@ -399,8 +398,9 @@ export default function Home() {
       </div>
 
       <div style={bottomArea}>
-        <div className="floor-glow" style={floorGlow}></div>
         <div style={glowWrapper}>
+          {/* ÇÖZÜM: floorGlow artık inputWrapper'ın tam içinde, ona bağlı hizalanıyor */}
+          <div className="floor-glow" style={floorGlow}></div>
           <div style={inputBoxInner} className="input-box-inner">
             <textarea 
               className="main-input" style={inputField} placeholder={dynamicPlaceholder} rows={2} 
@@ -449,9 +449,12 @@ const copyBtn = { display: 'flex', alignItems: 'center', gap: '6px', background:
 
 const bottomArea = { position: 'fixed', bottom: 0, left: 0, right: 0, padding: '30px 20px 40px 20px', background: 'transparent', display: 'flex', flexDirection: 'column', alignItems: 'center', zIndex: 50 };
 const cyberGradient = 'linear-gradient(90deg, #00f2fe, #0a64ff, #00f2fe, #0a64ff)';
-const floorGlow = { position: 'absolute', bottom: '-10px', left: '50%', transform: 'translateX(-50%)', width: '50vw', maxWidth: '600px', height: '60px', background: cyberGradient, backgroundSize: '200% 100%', opacity: 0.3, filter: 'blur(30px)', animation: 'pulse 4s infinite' };
 
 const glowWrapper = { position: 'relative', width: '100%', maxWidth: '680px', zIndex: 2, pointerEvents: 'auto' };
+
+// ÇÖZÜM: floorGlow CSS Objeleri. Artık glowWrapper'ın genişliğini (100%) alacak, böylece kayma yapmayacak.
+const floorGlow = { position: 'absolute', bottom: '-15px', left: 0, right: 0, width: '100%', height: '60px', background: cyberGradient, backgroundSize: '200% 100%', opacity: 0.3, filter: 'blur(30px)', animation: 'pulse 4s infinite', zIndex: -1 };
+
 const inputBoxInner = { backgroundColor: '#0a0a0a', borderRadius: '40px', border: '1px solid rgba(0, 242, 254, 0.2)', animation: 'elegantGlow 8s infinite alternate', display: 'flex', alignItems: 'center', padding: '12px 14px 12px 18px', gap: '10px' };
 const inputField = { flex: 1, background: 'transparent', border: 'none', color: '#fff', fontSize: '1rem', outline: 'none', resize: 'none', padding: '8px 0', maxHeight: '150px', fontFamily: 'inherit' };
 const actionButtons = { display: 'flex', alignItems: 'center', gap: '6px' };
