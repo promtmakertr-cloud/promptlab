@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
+import PromptButton from '../components/PromptButton';
 
 // 🔥 KULLANICI ODAKLI VE VİZYONER PROMPT HAVUZU 🔥
 const allPrompts = [
@@ -196,26 +197,6 @@ export default function Home() {
     finally { setLoading(false); }
   };
 
-  // 🔥 HATASIZ YÖNLENDİRME: NEXT.JS MÜDAHALESİNİ SIFIRLAYAN MANTIK 🔥
-  const handleFinalLaunch = (e, url, name) => {
-    e.preventDefault(); 
-    e.stopPropagation(); 
-    
-    // 1. Kopyalama işlemi
-    try {
-      navigator.clipboard.writeText(result);
-      setCopyStatus(name + ' İçin Hazır!');
-      setTimeout(() => setCopyStatus('Metni Kopyala'), 2000);
-    } catch(err) {
-      console.log('Kopyalama hatası');
-    }
-
-    // 2. Saf JavaScript ile yeni sekme (404 riskini bitirir)
-    if (typeof window !== 'undefined') {
-       window.open(url, '_blank', 'noopener,noreferrer');
-    }
-  };
-
   const handleVoiceTyping = () => {
     if (!('webkitSpeechRecognition' in window)) { alert("Tarayıcınız sesli yazmayı desteklemiyor. Lütfen Chrome veya Safari kullanın."); return; }
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -386,42 +367,23 @@ export default function Home() {
                         </div>
                       </div>
 
+                      {/* 🔥 YENİ VE TEMİZ BİLEŞEN MİMARİSİ BURADA 🔥 */}
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
                         {!isVisual ? (
                           <>
-                            <div className="ai-brand-btn" onClick={(e) => handleFinalLaunch(e, '[https://chatgpt.com](https://chatgpt.com)', 'ChatGPT')}>
-                              {IconChatGPT} <span>ChatGPT</span>
-                            </div>
-                            <div className="ai-brand-btn" onClick={(e) => handleFinalLaunch(e, '[https://gemini.google.com](https://gemini.google.com)', 'Gemini')}>
-                              {IconGemini} <span>Gemini</span>
-                            </div>
-                            <div className="ai-brand-btn" onClick={(e) => handleFinalLaunch(e, '[https://claude.ai](https://claude.ai)', 'Claude')}>
-                              {IconClaude} <span>Claude</span>
-                            </div>
-                            <div className="ai-brand-btn" onClick={(e) => handleFinalLaunch(e, '[https://www.perplexity.ai](https://www.perplexity.ai)', 'Perplexity')}>
-                              {IconPerplexity} <span>Perplexity</span>
-                            </div>
-                            <div className="ai-brand-btn" onClick={(e) => handleFinalLaunch(e, '[https://copilot.microsoft.com](https://copilot.microsoft.com)', 'Copilot')}>
-                              {IconCopilot} <span>Copilot</span>
-                            </div>
+                            <PromptButton result={result} url="[https://chatgpt.com](https://chatgpt.com)" name="ChatGPT" icon={IconChatGPT} />
+                            <PromptButton result={result} url="[https://gemini.google.com](https://gemini.google.com)" name="Gemini" icon={IconGemini} />
+                            <PromptButton result={result} url="[https://claude.ai](https://claude.ai)" name="Claude" icon={IconClaude} />
+                            <PromptButton result={result} url="[https://www.perplexity.ai](https://www.perplexity.ai)" name="Perplexity" icon={IconPerplexity} />
+                            <PromptButton result={result} url="[https://copilot.microsoft.com](https://copilot.microsoft.com)" name="Copilot" icon={IconCopilot} />
                           </>
                         ) : (
                           <>
-                            <div className="ai-brand-btn" onClick={(e) => handleFinalLaunch(e, '[https://discord.com/channels/@me](https://discord.com/channels/@me)', 'Midjourney')}>
-                              {IconMidjourney} <span>Midjourney</span>
-                            </div>
-                            <div className="ai-brand-btn" onClick={(e) => handleFinalLaunch(e, '[https://chatgpt.com](https://chatgpt.com)', 'DALL-E 3')}>
-                              {IconChatGPT} <span>DALL-E 3</span>
-                            </div>
-                            <div className="ai-brand-btn" onClick={(e) => handleFinalLaunch(e, '[https://leonardo.ai](https://leonardo.ai)', 'Leonardo')}>
-                              {IconLeonardo} <span>Leonardo</span>
-                            </div>
-                            <div className="ai-brand-btn" onClick={(e) => handleFinalLaunch(e, '[https://firefly.adobe.com](https://firefly.adobe.com)', 'Adobe Firefly')}>
-                              {IconAdobe} <span>Adobe Firefly</span>
-                            </div>
-                            <div className="ai-brand-btn" onClick={(e) => handleFinalLaunch(e, '[https://www.canva.com](https://www.canva.com)', 'Canva')}>
-                              {IconCanva} <span>Canva</span>
-                            </div>
+                            <PromptButton result={result} url="[https://discord.com/channels/@me](https://discord.com/channels/@me)" name="Midjourney" icon={IconMidjourney} />
+                            <PromptButton result={result} url="[https://chatgpt.com](https://chatgpt.com)" name="DALL-E 3" icon={IconChatGPT} />
+                            <PromptButton result={result} url="[https://leonardo.ai](https://leonardo.ai)" name="Leonardo" icon={IconLeonardo} />
+                            <PromptButton result={result} url="[https://firefly.adobe.com](https://firefly.adobe.com)" name="Adobe Firefly" icon={IconAdobe} />
+                            <PromptButton result={result} url="[https://www.canva.com](https://www.canva.com)" name="Canva" icon={IconCanva} />
                           </>
                         )}
                       </div>
