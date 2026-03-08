@@ -345,7 +345,7 @@ export default function Home() {
           </>
         ) : (
           <div style={resultContainer}>
-             
+              
              <div style={userPromptWrapper}>
                <div style={userPromptHeader} onClick={() => setIsPromptExpanded(!isPromptExpanded)}>
                  <div style={userPromptTitle}>
@@ -393,7 +393,7 @@ export default function Home() {
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
                         {!isVisual ? (
                           <>
-                            {/* BUNLAR KESİNLİKLE BUTON VEYA LİNK DEĞİLDİR. SAF DIV'DİR. */}
+                            {/* BUNLAR KESİNLİKLE BUTON VEYA LİNK DEĞİLDİR. SAF DIV'DİR VE DÜZ URL İÇERİRLER */}
                             <div className="ai-brand-btn" onClick={(e) => handleQuickLaunch(e, '[https://chatgpt.com](https://chatgpt.com)', 'ChatGPT')}>
                               {IconChatGPT} <span>ChatGPT</span>
                             </div>
