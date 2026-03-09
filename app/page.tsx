@@ -59,6 +59,7 @@ export default function Home() {
   const [refineInput, setRefineInput] = useState('');
   const [refining, setRefining] = useState(false);
   const [showRefine, setShowRefine] = useState(false);
+  const [currentFavoriteId, setCurrentFavoriteId] = useState<number | null>(null);
   const resultRef = useRef<HTMLDivElement>(null);
 
   // Load persisted data from localStorage
@@ -80,7 +81,7 @@ export default function Home() {
       const decoded = decodeFromShare(hash.slice(7));
       if (decoded) {
         setResult(decoded);
-        window.location.hash = '';
+        window.history.replaceState(null, '', window.location.pathname + window.location.search);
       }
     }
   }, []);
@@ -132,6 +133,12 @@ export default function Home() {
       fullText += decoder.decode(value, { stream: true });
       setResult(fullText);
     }
+    // Flush any remaining buffered bytes (important for multi-byte UTF-8 characters)
+    const remaining = decoder.decode();
+    if (remaining) {
+      fullText += remaining;
+      setResult(fullText);
+    }
 
     return fullText;
   }, []);
@@ -141,6 +148,7 @@ export default function Home() {
     setLoading(true);
     setResult('');
     setStarred(false);
+    setCurrentFavoriteId(null);
     setShowRefine(false);
     setActiveTab('generate');
 
@@ -168,6 +176,7 @@ export default function Home() {
         saveToHistory(`[Geliştirildi] ${refineInput}`, refined);
         setRefineInput('');
         setStarred(false);
+        setCurrentFavoriteId(null);
       }
     } catch (err: unknown) {
       setResult('Hata oluştu: ' + (err instanceof Error ? err.message : 'Bilinmeyen hata'));
@@ -181,6 +190,8 @@ export default function Home() {
     navigator.clipboard.writeText(result).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
+    }).catch(() => {
+      // Clipboard access may be denied; fail silently
     });
   };
 
@@ -191,18 +202,21 @@ export default function Home() {
     navigator.clipboard.writeText(url).then(() => {
       setShared(true);
       setTimeout(() => setShared(false), 3000);
+    }).catch(() => {
+      // Clipboard access may be denied; fail silently
     });
   };
 
   const handleToggleFavorite = () => {
     if (!result || !userInput) return;
-    if (starred) {
+    if (starred && currentFavoriteId !== null) {
       setFavorites((prev) => {
-        const updated = prev.filter((f) => f.output !== result);
+        const updated = prev.filter((f) => f.id !== currentFavoriteId);
         try { localStorage.setItem(FAVORITES_KEY, JSON.stringify(updated)); } catch { /* ignore */ }
         return updated;
       });
       setStarred(false);
+      setCurrentFavoriteId(null);
     } else {
       const entry: HistoryEntry = {
         id: Date.now(),
@@ -216,6 +230,7 @@ export default function Home() {
         return updated;
       });
       setStarred(true);
+      setCurrentFavoriteId(entry.id);
     }
   };
 
@@ -236,6 +251,7 @@ export default function Home() {
     setUserInput(input);
     setResult(output);
     setStarred(false);
+    setCurrentFavoriteId(null);
     setActiveTab('generate');
   };
 

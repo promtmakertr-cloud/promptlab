@@ -31,7 +31,7 @@ const AIToolSelector = ({ generatedText }) => {
 
   return (
     <div style={{ backgroundColor: '#050505', padding: '20px', borderRadius: '12px' }}>
-      <h1 style={{ color: '#FFFFFF' }}>AI Tool Selector</h1>
+      <h2 style={{ color: '#FFFFFF', fontSize: '1rem', fontWeight: '600', margin: '0 0 12px' }}>AI Tool Selector</h2>
       <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
         {tools.map(({ name, icon: Icon, url }) => (
           <div key={name} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>

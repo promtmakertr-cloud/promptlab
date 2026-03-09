@@ -22,6 +22,14 @@ export async function POST(req) {
       previousPrompt,
     } = await req.json();
 
+    // Input validation
+    if (!userInput || typeof userInput !== 'string' || !userInput.trim()) {
+      return NextResponse.json({ error: "Geçerli bir girdi gerekli." }, { status: 400 });
+    }
+    if (userInput.length > 4000) {
+      return NextResponse.json({ error: "Girdi çok uzun (maks. 4000 karakter)." }, { status: 400 });
+    }
+
     const toneInstruction = TONE_INSTRUCTIONS[tone] || TONE_INSTRUCTIONS.professional;
 
     const languageInstruction = language === 'en'
@@ -58,7 +66,7 @@ export async function POST(req) {
       **Görev ve Bağlam:** ...
       **Teknik Detaylar:** ...
       **Üslup ve Ton:** ...
-      **İstened Çıktı Formatı:** ...
+      **İstenen Çıktı Formatı:** ...
 
       ---
       [Görsel Motorlar İçin Optimize Edilmiş İngilizce Prompt:]
@@ -88,13 +96,17 @@ export async function POST(req) {
 
     const stream = new ReadableStream({
       async start(controller) {
-        for await (const chunk of response) {
-          const content = chunk.choices[0]?.delta?.content || "";
-          if (content) {
-            controller.enqueue(new TextEncoder().encode(content));
+        try {
+          for await (const chunk of response) {
+            const content = chunk.choices[0]?.delta?.content || "";
+            if (content) {
+              controller.enqueue(new TextEncoder().encode(content));
+            }
           }
+          controller.close();
+        } catch (streamErr) {
+          controller.error(streamErr);
         }
-        controller.close();
       }
     });
 
