@@ -4,12 +4,19 @@ import { useState, useCallback } from 'react';
 import { Bot, Sparkles, BrainCircuit, Search, Code } from 'lucide-react';
 
 const tools = [
-  { name: 'ChatGPT',    icon: Bot,          url: 'https://chatgpt.com/' },
-  { name: 'Gemini',     icon: Sparkles,     url: 'https://gemini.google.com/' },
-  { name: 'Claude',     icon: BrainCircuit, url: 'https://claude.ai/' },
-  { name: 'Perplexity', icon: Search,       url: 'https://www.perplexity.ai/' },
-  { name: 'Copilot',    icon: Code,         url: 'https://github.com/features/copilot' },
+  { name: 'ChatGPT',    icon: Bot,          url: 'https://chatgpt.com/',           promptParam: 'q' },
+  { name: 'Gemini',     icon: Sparkles,     url: 'https://gemini.google.com/app',  promptParam: 'q' },
+  { name: 'Claude',     icon: BrainCircuit, url: 'https://claude.ai/new',          promptParam: 'q' },
+  { name: 'Perplexity', icon: Search,       url: 'https://www.perplexity.ai/',     promptParam: 'q' },
+  { name: 'Copilot',    icon: Code,         url: 'https://copilot.microsoft.com/', promptParam: 'q' },
 ];
+
+function buildUrl(tool, text) {
+  if (!text || !tool.promptParam) return tool.url;
+  const url = new URL(tool.url);
+  url.searchParams.set(tool.promptParam, text);
+  return url.toString();
+}
 
 const AIToolSelector = ({ generatedText }) => {
   const [copiedTool, setCopiedTool] = useState(null);
@@ -25,20 +32,19 @@ const AIToolSelector = ({ generatedText }) => {
       .catch((err) => console.error('Clipboard hatası:', err));
   }, [generatedText]);
 
-  const handleLinkOpen = useCallback((url) => {
-    window.open(url, '_blank', 'noopener,noreferrer');
-  }, []);
-
   return (
     <div style={{ backgroundColor: '#050505', padding: '20px', borderRadius: '12px' }}>
       <h1 style={{ color: '#FFFFFF' }}>AI Tool Selector</h1>
       <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-        {tools.map(({ name, icon: Icon, url }) => (
+        {tools.map((tool) => {
+          const { name, icon: Icon } = tool;
+          const openUrl = buildUrl(tool, generatedText);
+          return (
           <div key={name} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
             <button
               onClick={() => {
-                handleCopy({ name, url });
-                handleLinkOpen(url);
+                handleCopy(tool);
+                window.open(openUrl, '_blank', 'noopener,noreferrer');
               }}
               title={`${name}: metni kopyala ve aç`}
               style={{
@@ -57,7 +63,8 @@ const AIToolSelector = ({ generatedText }) => {
               {copiedTool === name ? '✅ Kopyalandı!' : name}
             </span>
           </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
