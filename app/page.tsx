@@ -12,6 +12,28 @@ const FAVORITES_KEY = 'promptlab_favorites';
 const MAX_HISTORY = 20;
 const MAX_FAVORITES = 50;
 
+const EXAMPLE_PROMPTS = [
+  { category: 'Pazarlama', text: 'Instagram için dikkat çekici ve etkileşim odaklı ürün lansman postu.' },
+  { category: 'Görsel Tasarım', text: 'Unreal Engine 5 tarzında, neon ışıklı fütüristik bir siberpunk şehir manzarası.' },
+  { category: 'İş Dünyası', text: 'Potansiyel müşterilere gönderilecek, ikna edici ve profesyonel soğuk e-posta.' },
+  { category: 'Yazılım', text: 'React ve Tailwind kullanarak modern ve duyarlı bir landing page kodu.' },
+  { category: 'Kariyer', text: 'Yazılım mühendisliği mülakatı için en sık sorulan teknik sorular.' },
+  { category: 'İçerik', text: 'Teknoloji blogu için SEO uyumlu ve okuyucuyu içine çeken makale taslağı.' },
+  { category: 'Girişimcilik', text: 'Yeni bir e-ticaret markası için rakip analizi ve pazara giriş stratejisi.' },
+  { category: 'YouTube', text: 'Yemek tarifi kanalı için izlenme rekorları kıracak 5 video başlığı.' },
+];
+
+const TYPEWRITER_EXAMPLES = [
+  'Instagram için etkili bir post yaz',
+  'Siberpunk tarzı şehir görseli üret',
+  'İkna edici bir satış e-postası hazırla',
+  'React ile landing page kodla',
+  'Kuantum fiziğini basitçe anlat',
+  'Yeni girişimim için iş planı oluştur',
+  'YouTube videom için SEO başlıkları bul',
+  'Minimalist bir şirket logosu tasarla',
+];
+
 type HistoryEntry = {
   id: number;
   input: string;
@@ -70,6 +92,11 @@ function HomeContent() {
   const [savedNotice, setSavedNotice] = useState(false);
   const resultRef = useRef<HTMLDivElement>(null);
 
+  // Typewriter effect state
+  const [typewriterText, setTypewriterText] = useState('');
+  const [typewriterIndex, setTypewriterIndex] = useState(0);
+  const [isDeleting, setIsDeleting] = useState(false);
+
   // Load persisted data from localStorage
   useEffect(() => {
     try {
@@ -115,6 +142,29 @@ function HomeContent() {
       resultRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
   }, [result]);
+
+  // Typewriter effect for placeholder
+  useEffect(() => {
+    const currentFullText = TYPEWRITER_EXAMPLES[typewriterIndex];
+    const typingSpeed = isDeleting ? 30 : 50;
+
+    if (!isDeleting && typewriterText === currentFullText) {
+      const timer = setTimeout(() => setIsDeleting(true), 2500);
+      return () => clearTimeout(timer);
+    } else if (isDeleting && typewriterText === '') {
+      setIsDeleting(false);
+      setTypewriterIndex((prev) => (prev + 1) % TYPEWRITER_EXAMPLES.length);
+      return;
+    }
+
+    const timeout = setTimeout(() => {
+      setTypewriterText((prev) =>
+        isDeleting ? prev.slice(0, -1) : currentFullText.slice(0, prev.length + 1)
+      );
+    }, typingSpeed);
+
+    return () => clearTimeout(timeout);
+  }, [typewriterText, isDeleting, typewriterIndex]);
 
   const saveToHistory = (input: string, output: string) => {
     const entry: HistoryEntry = {
@@ -316,7 +366,8 @@ function HomeContent() {
       <div style={{ marginBottom: '2rem' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '0.75rem' }}>
           <div>
-            <h1 style={{ fontSize: '1.8rem', fontWeight: '700', margin: 0 }}>🎯 PromptLab</h1>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo.png" alt="PromptLab" style={{ height: '48px', width: 'auto', display: 'block', objectFit: 'contain' }} />
             <p style={{ color: '#666', fontSize: '0.9rem', marginTop: '0.4rem' }}>
               Fikrinizi profesyonel yapay zeka promptlarına dönüştürün
             </p>
@@ -360,6 +411,45 @@ function HomeContent() {
 
       {/* Prompt Generator */}
       <div>
+          {/* Example Prompts (shown when input is empty and no result) */}
+          {!result && !userInput && (
+            <div style={{ marginBottom: '1.25rem' }}>
+              <p style={{ color: '#555', fontSize: '0.8rem', marginBottom: '0.6rem', letterSpacing: '0.5px' }}>
+                💡 Örnek promptlar — tıkla ve dene:
+              </p>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                {EXAMPLE_PROMPTS.map((example, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setUserInput(example.text)}
+                    style={{
+                      background: '#0a0a0a',
+                      border: '1px solid #222',
+                      borderRadius: '20px',
+                      padding: '0.3rem 0.75rem',
+                      color: '#888',
+                      fontSize: '0.8rem',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s',
+                      textAlign: 'left',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.borderColor = '#444';
+                      e.currentTarget.style.color = '#fff';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.borderColor = '#222';
+                      e.currentTarget.style.color = '#888';
+                    }}
+                  >
+                    <span style={{ color: '#555', marginRight: '4px', fontSize: '0.75rem' }}>{example.category}</span>
+                    {example.text.length > 40 ? example.text.slice(0, 40) + '…' : example.text}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Textarea */}
           <div style={{ position: 'relative', marginBottom: '1rem' }}>
             <textarea
@@ -368,7 +458,7 @@ function HomeContent() {
               onKeyDown={(e) => {
                 if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) handleGenerate();
               }}
-              placeholder="Ne yapmak istediğinizi yazın... (örn: 'Sinematik bir portre fotoğrafı' veya 'B2B satış e-postası')"
+              placeholder={`Ne oluşturmak istiyorsunuz?\nÖrn: "${typewriterText}"`}
               rows={4}
               style={{
                 width: '100%',
