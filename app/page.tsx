@@ -1,785 +1,459 @@
 'use client';
+import { useState, useEffect } from 'react';
+import PromptButton from '../components/PromptButton';
 
-import { useState, useEffect, useRef, useCallback, Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
-import AIToolSelector from '@/components/AIToolSelector';
-import { Copy, Check, Star, Share2, RefreshCw, Save } from 'lucide-react';
-import type { Language, Tone } from '@/lib/types';
-import { MAX_TITLE_LENGTH } from '@/lib/types';
+// 🔥 KULLANICI ODAKLI VE VİZYONER PROMPT HAVUZU 🔥
+const allPrompts = [
+  "Pazarlama | Instagram için dikkat çekici ve etkileşim odaklı ürün lansman postu.",
+  "İçerik Üretimi | Teknoloji blogu için SEO uyumlu ve okuyucuyu içine çeken makale taslağı.",
+  "Görsel Tasarım | Unreal Engine 5 tarzında, neon ışıklı fütüristik bir siberpunk şehir manzarası.",
+  "İş Dünyası | Potansiyel müşterilere gönderilecek, ikna edici ve profesyonel soğuk e-posta (cold email).",
+  "Yazılım | React ve Tailwind kullanarak modern ve duyarlı (responsive) bir landing page kodu.",
+  "Eğitim | Kuantum bilgisayarların çalışma mantığını 10 yaşındaki bir çocuğa anlatır gibi açıkla.",
+  "Kişisel Gelişim | Zaman yönetimi ve odaklanma becerilerini artırmak için 30 günlük eylem planı.",
+  "Girişimcilik | Yeni bir e-ticaret markası için rakip analizi ve pazara giriş stratejisi.",
+  "Verimlilik | Karmaşık ve uzun bir PDF raporunu yöneticiler için 3 maddede özetle.",
+  "Metin Yazarlığı | Kullanıcıları bültene abone olmaya ikna edecek vurucu bir 'Call to Action' (CTA) metni.",
+  "Kariyer | Yazılım mühendisliği mülakatı için en sık sorulan teknik ve davranışsal sorular.",
+  "Senaryo | Bir kafede yanlışlıkla kahveleri karışan iki yabancının romantik komedi tarzında tanışma hikayesi.",
+  "Logo Tasarımı | Minimalist, modern ve güven veren bir finans teknolojisi (FinTech) girişimi logosu.",
+  "Çeviri | Akademik bir İngilizce metni, anlam bütünlüğünü bozmadan akıcı bir Türkçeye çevir.",
+  "Veri Analizi | E-ticaret satış verilerini inceleyerek müşteri sadakatini artıracak stratejiler öner.",
+  "Sunum | Yapay zekanın iş dünyasındaki geleceği hakkında yöneticilere yapılacak 10 slaytlık sunum taslağı.",
+  "Seyahat | Roma'da düşük bütçeli, yerel lezzetleri ve gizli kalmış mekanları kapsayan 3 günlük gezi planı.",
+  "Sağlık | Evde ekipmansız yapılabilecek, yeni başlayanlar için 20 dakikalık yağ yakıcı HIIT antrenmanı.",
+  "Arayüz (UI) | Koyu tema (dark mode) destekli, kullanıcı dostu ve modern bir mobil bankacılık ekranı.",
+  "Marka Stratejisi | Organik cilt bakım ürünleri satan bir marka için isim önerileri ve marka hikayesi.",
+  "Satış | Bir B2B yazılım ürünü (SaaS) için müşterinin itirazlarını çürütecek satış konuşması (pitch).",
+  "YouTube | Yemek tarifi kanalı için izlenme rekorları kıracak, merak uyandırıcı 5 video başlığı.",
+  "Oyun Tasarımı | Orta Çağ'da geçen bir RPG oyunu için derinlikli bir ana karakter arka plan hikayesi.",
+  "Finans | Küçük bir işletme için aylık gelir-gider tablosu ve nakit akışı optimizasyon önerileri."
+];
 
-const HISTORY_KEY = 'promptlab_history';
-const FAVORITES_KEY = 'promptlab_favorites';
-const MAX_HISTORY = 20;
-const MAX_FAVORITES = 50;
+// ⌨️ DAKTİLO EFEKTİ İÇİN KULLANICI DOSTU ÖRNEKLER ⌨️
+const typewriterExamples = [
+  "Instagram için etkili bir post yaz", 
+  "Siberpunk tarzı şehir görseli üret", 
+  "İkna edici bir satış e-postası hazırla", 
+  "React ile landing page kodla", 
+  "Kuantum fiziğini basitçe anlat", 
+  "Yeni girişimim için iş planı oluştur", 
+  "YouTube videom için SEO başlıkları bul", 
+  "Minimalist bir şirket logosu tasarla", 
+  "3 günlük Roma seyahati planla", 
+  "İngilizce makaleyi Türkçeye çevir",
+  "Yöneticiler için raporu özetle"
+];
 
-type HistoryEntry = {
-  id: number;
-  input: string;
-  output: string;
-  createdAt: string;
+const fontSizes = ['0.85rem', '0.95rem', '1.05rem', '1.1rem'];
+
+const parsePromptData = (fullText) => {
+  if (!fullText) return { category: '', promptText: '' };
+  const match = fullText.match(/^([^|]*)\|\s*(.*)$/); 
+  if (match) { return { category: match[1].trim(), promptText: match[2].trim() }; }
+  return { category: '', promptText: fullText };
 };
 
-const TONE_LABELS: Record<Tone, string> = {
-  professional: 'Profesyonel',
-  creative: 'Yaratıcı',
-  technical: 'Teknik',
-  concise: 'Kısa & Öz',
-};
+const loadingMessages = [
+  "🧠 Fikriniz yapay zeka tarafından analiz ediliyor...",
+  "📚 Master Kütüphane standartlarına uyarlanıyor...",
+  "⚙️ Sektörel jargon ve teknik detaylar ekleniyor...",
+  "✨ Son rötuşlar yapılıyor, promptunuz hazır olmak üzere..."
+];
 
-function encodeForShare(text: string): string {
-  const bytes = new TextEncoder().encode(text);
-  return btoa(Array.from(bytes).map((b) => String.fromCharCode(b)).join(''));
-}
-
-function decodeFromShare(encoded: string): string {
-  try {
-    const bytes = Uint8Array.from(atob(encoded), (c) => c.charCodeAt(0));
-    return new TextDecoder().decode(bytes);
-  } catch {
-    return '';
-  }
-}
+const IconChatGPT = <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M22.2819 9.8211a5.9847 5.9847 0 0 0-.5157-4.9108 6.0462 6.0462 0 0 0-6.5098-2.9A6.0651 6.0651 0 0 0 4.9" /></svg>;
+const IconGemini = <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 0C12 6.62742 6.62742 12 0 12C6.62742 12 12 17.3726 12 24C12 17.3726 17.3726 12 24 12C17.3726 12 12 6" /></svg>;
+const IconClaude = <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><rect width="24" height="24" rx="4" fill="none" stroke="currentColor" strokeWidth="2" /></svg>;
+const IconPerplexity = <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><polygon points="12 2 2 7 2 17 12 22 22 17 22 7" fill="none" stroke="currentColor" strokeWidth="2" /></svg>;
+const IconCopilot = <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M11 2H2v9h9V2zm11 0h-9v9h9V2zm-11 11H2v9h9v-9zm11 0h-9v9h9v-9z" /></svg>;
+const IconMidjourney = <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M2 20h20v2H2v-2zm10-18l8 16H4l8-16z" fill="none" stroke="currentColor" strokeWidth="2" /></svg>;
+const IconLeonardo = <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M6 2v16h12v4H2V2h4z" /><circle cx="16" cy="8" r="3" /></svg>;
+const IconAdobe = <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><polygon points="14.5 2 22 22 18 22 14.5 12 11 22 7 22" /><polygon points="9.5 2 2 22 6 22 9.5 12" /></svg>;
+const IconCanva = <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" /><path d="M15 8a4 4 0 0 0-6 0 4 4 0 0 0 0 6 4 4 0 0 0" /></svg>;
+const IconCopy = <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" /><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v1" /></svg>;
 
 export default function Home() {
-  return (
-    <Suspense>
-      <HomeContent />
-    </Suspense>
-  );
+  const [input, setInput] = useState('');
+  const [result, setResult] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [loadingStep, setLoadingStep] = useState(0); 
+  const [isListening, setIsListening] = useState(false);
+  const [copyStatus, setCopyStatus] = useState('Metni Kopyala');
+  const [slots, setSlots] = useState([]);
+
+  const [submittedPrompt, setSubmittedPrompt] = useState('');
+  const [isPromptExpanded, setIsPromptExpanded] = useState(false);
+  const [isVisual, setIsVisual] = useState(false); 
+
+  const [typewriterText, setTypewriterText] = useState('');
+  const [typewriterIndex, setTypewriterIndex] = useState(0);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const getRandomPos = (slotId) => {
+    const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
+    const r1 = Math.random();
+    const r2 = Math.random();
+
+    if (isMobile) {
+      if (slotId === 0) return { top: `${8 + (r1 * 10)}%`, left: '0', right: '0', margin: '0 auto', maxWidth: '85vw' };
+      if (slotId === 1) return { top: `${26 + (r1 * 10)}%`, left: '0', right: '0', margin: '0 auto', maxWidth: '85vw' };
+      return { top: '-100%', left: '-100%', display: 'none' }; 
+    }
+
+    let top, left, right;
+    const maxWidth = '340px'; 
+
+    if (slotId === 0) { top = `${6 + (r1 * 6)}%`; left = `${2 + (r2 * 12)}%`; right = 'auto'; } 
+    else if (slotId === 1) { top = `${10 + (r1 * 6)}%`; left = 'auto'; right = `${2 + (r2 * 12)}%`; } 
+    else if (slotId === 2) { top = `${38 + (r1 * 5)}%`; left = `${2 + (r2 * 12)}%`; right = 'auto'; } 
+    else { top = `${42 + (r1 * 5)}%`; left = 'auto'; right = `${2 + (r2 * 12)}%`; }
+
+    return { top, left, right, maxWidth };
+  };
+
+  useEffect(() => {
+    let interval;
+    if (loading && !result) {
+      setLoadingStep(0);
+      interval = setInterval(() => { setLoadingStep((prev) => (prev + 1) % loadingMessages.length); }, 1800);
+    }
+    return () => clearInterval(interval);
+  }, [loading, result]);
+
+  useEffect(() => {
+    const currentFullText = typewriterExamples[typewriterIndex];
+    let typingSpeed = isDeleting ? 30 : 50; 
+
+    if (!isDeleting && typewriterText === currentFullText) {
+      setTimeout(() => setIsDeleting(true), 2500);
+      return;
+    } else if (isDeleting && typewriterText === '') {
+      setIsDeleting(false);
+      setTypewriterIndex((prev) => (prev + 1) % typewriterExamples.length);
+      return;
+    }
+
+    const timeout = setTimeout(() => {
+      setTypewriterText((prev) => isDeleting ? prev.slice(0, -1) : currentFullText.slice(0, prev.length + 1));
+    }, typingSpeed);
+
+    return () => clearTimeout(timeout);
+  }, [typewriterText, isDeleting, typewriterIndex]);
+
+  useEffect(() => {
+    const shuffledTexts = [...allPrompts].sort(() => 0.5 - Math.random());
+    setSlots([
+      { id: 0, text: shuffledTexts[0], pos: getRandomPos(0), size: fontSizes[2], delay: '0s' },
+      { id: 1, text: shuffledTexts[1], pos: getRandomPos(1), size: fontSizes[1], delay: '6s' },
+      { id: 2, text: shuffledTexts[2], pos: getRandomPos(2), size: fontSizes[3], delay: '12s' },
+      { id: 3, text: shuffledTexts[3], pos: getRandomPos(3), size: fontSizes[0], delay: '18s' },
+    ]);
+  }, []);
+
+  const handleAnimationIteration = (slotId) => {
+    setSlots(prevSlots => {
+      const currentTexts = prevSlots.map(s => s.text);
+      const availablePrompts = allPrompts.filter(p => !currentTexts.includes(p));
+      const newText = availablePrompts[Math.floor(Math.random() * availablePrompts.length)] || allPrompts[0];
+      const newSize = fontSizes[Math.floor(Math.random() * fontSizes.length)];
+      return prevSlots.map(slot => slot.id === slotId ? { ...slot, text: newText, pos: getRandomPos(slotId), size: newSize } : slot );
+    });
+  };
+
+  const handleReset = () => {
+    setResult(''); setInput(''); setSubmittedPrompt(''); setIsPromptExpanded(false); setIsVisual(false); 
+  };
+
+  const handleGenerate = async () => {
+    if (!input.trim() || loading) return;
+    setLoading(true); setSubmittedPrompt(input); setIsPromptExpanded(false); setResult(''); setIsVisual(false); 
+    
+    const currentInput = input; setInput(''); 
+    
+    try {
+      const res = await fetch('/api/generate', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userInput: currentInput }),
+      });
+
+      if (!res.ok) { const errText = await res.text(); throw new Error(`Sunucu Hatası (${res.status}): ${errText}`); }
+      if (!res.body) throw new Error("Tarayıcınız akış (streaming) desteklemiyor.");
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder("utf-8");
+      let done = false;
+      let fullContent = "";
+
+      while (!done) {
+        const { value, done: readerDone } = await reader.read();
+        done = readerDone;
+        if (value) {
+          const chunk = decoder.decode(value, { stream: true });
+          fullContent += chunk;
+          setResult((prev) => prev + chunk); 
+          if (fullContent.includes("```text")) { setIsVisual(true); }
+        }
+      }
+    } catch (err) { alert("Hata Oluştu: " + err.message); setInput(currentInput); setSubmittedPrompt(''); } 
+    finally { setLoading(false); }
+  };
+
+  const handleVoiceTyping = () => {
+    if (!('webkitSpeechRecognition' in window)) { alert("Tarayıcınız sesli yazmayı desteklemiyor. Lütfen Chrome veya Safari kullanın."); return; }
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'tr-TR'; recognition.interimResults = false;
+    recognition.onstart = () => setIsListening(true);
+    recognition.onresult = (event) => setInput((prev) => prev + " " + event.results[0][0].transcript);
+    recognition.onerror = () => setIsListening(false);
+    recognition.onend = () => setIsListening(false);
+    recognition.start();
+  };
+
+  const handleCopy = (e) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(result);
+    setCopyStatus('Kopyalandı! ✓');
+    setTimeout(() => setCopyStatus('Metni Kopyala'), 2000);
+  };
+
+  useEffect(() => {
+    const styleSheet = document.createElement("style");
+    styleSheet.innerText = `
+      @keyframes elegantGlow {
+        0%   { box-shadow: 0 0 8px rgba(0, 242, 254, 0.1), inset 0 0 4px rgba(0, 242, 254, 0.05); border-color: rgba(0, 242, 254, 0.15); }
+        50%  { box-shadow: 0 0 20px rgba(10, 100, 255, 0.25), inset 0 0 8px rgba(10, 100, 255, 0.1); border-color: rgba(10, 100, 255, 0.35); }
+        100% { box-shadow: 0 0 8px rgba(0, 242, 254, 0.1), inset 0 0 4px rgba(0, 242, 254, 0.05); border-color: rgba(0, 242, 254, 0.15); }
+      }
+      @keyframes perfectBreathing { 0% { opacity: 0; filter: blur(10px); transform: translateY(10px); } 10% { opacity: 1; filter: blur(0px); transform: translateY(0px); } 25% { opacity: 1; filter: blur(0px); transform: translateY(0px); } 90% { opacity: 1; filter: blur(0px); transform: translateY(0px); } 100% { opacity: 0; filter: blur(10px); transform: translateY(10px); } }
+      @keyframes loadingPulse { 0% { opacity: 0.6; transform: scale(0.98); } 50% { opacity: 1; transform: scale(1); } 100% { opacity: 0.6; transform: scale(0.98); } }
+      @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+      .loading-box { width: 100%; max-width: 600px; background: rgba(10, 10, 10, 0.8); border: 1px solid rgba(0, 242, 254, 0.3); border-radius: 16px; padding: 40px 20px; text-align: center; box-shadow: 0 0 30px rgba(0, 242, 254, 0.1); }
+      .loading-text { font-size: 1.1rem; color: #00f2fe; font-weight: 500; margin-top: 15px; letter-spacing: 0.5px; }
+      .cursor-blink { display: inline-block; width: 8px; height: 1.2em; background-color: #00f2fe; vertical-align: middle; margin-left: 4px; animation: blink 1s step-end infinite; }
+      .cinematic-text { position: absolute; color: #888888; cursor: pointer; animation: perfectBreathing 24s infinite linear; text-align: left; line-height: 1.5; font-weight: 300; transition: transform 0.3s ease; pointer-events: auto; }
+      .cinematic-text:hover { animation-play-state: paused; z-index: 50; }
+      .cinematic-text:hover .prompt-category { color: #00f2fe; text-shadow: 0 0 10px rgba(0, 242, 254, 0.5); }
+      .cinematic-text:hover .prompt-body { color: #ffffff; opacity: 1; text-shadow: 0 0 10px rgba(255, 255, 255, 0.4); }
+      .prompt-category { font-family: "Times New Roman", Times, serif; font-size: 1.35em; font-style: italic; color: #ffffff; margin-bottom: 6px; letter-spacing: 0.5px; opacity: 0.95; transition: color 0.3s ease, text-shadow 0.3s ease; }
+      .prompt-body { font-family: inherit; font-size: 0.95em; opacity: 0.75; transition: color 0.3s ease, opacity 0.3s ease, text-shadow 0.3s ease; }
+      .pulse-mic { animation: pulse 1.5s infinite; color: #00f2fe !important; }
+      @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+      .edit-btn:hover { background: rgba(0, 242, 254, 0.2) !important; color: #fff !important; }
+
+      .ai-brand-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(20, 20, 20, 0.8);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: #d1d1d1;
+        padding: 8px 15px;
+        border-radius: 10px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        font-family: inherit;
+        backdrop-filter: blur(10px);
+        user-select: none;
+      }
+      .ai-brand-btn:hover {
+        background: rgba(0, 242, 254, 0.1);
+        border-color: rgba(0, 242, 254, 0.5);
+        color: #fff;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0, 242, 254, 0.2);
+      }
+
+      .copy-box:hover {
+        background: #e0e0e0 !important;
+        transform: translateY(-1px);
+      }
+
+      @media (max-width: 768px) {
+        .hero-section { margin-top: 42vh !important; gap: 10px !important; }
+        .hero-title { font-size: 1.55rem !important; line-height: 1.2 !important; padding: 0 10px !important; margin-bottom: 0 !important; }
+        .hero-sub { font-size: 0.85rem !important; padding: 0 15px !important; margin-top: 0 !important; line-height: 1.5 !important; }
+        .cinematic-text { font-size: 0.85rem !important; margin: 0 auto !important; }
+        .slot-2 { display: none !important; }
+        .slot-3 { display: none !important; } 
+        .floor-glow { opacity: 0.2 !important; height: 50px !important; bottom: -5px !important;}
+        .main-input { font-size: 16px !important; white-space: pre-wrap !important; overflow-y: auto !important; line-height: 1.4 !important; }
+        .main-input::placeholder { font-size: 14px !important; }
+        .input-box-inner { padding: 12px 14px 12px 18px !important; border-radius: 28px !important; }
+        .ai-brand-btn { font-size: 0.8rem; padding: 8px 12px; }
+      }
+    `;
+    document.head.appendChild(styleSheet);
+    return () => document.head.removeChild(styleSheet);
+  }, []);
+
+  const dynamicPlaceholder = `Ne oluşturmak istiyorsun?\nÖrn: "${typewriterText}${typewriterText.length > 0 ? '"' : ''}`;
+
+  return (
+    <main style={container}>
+      <div style={topBar}>
+        <div style={logoWrapper} onClick={handleReset}>
+          <img src="/logo.png" alt="Logo" style={miniLogo} />
+        </div>
+        {(submittedPrompt) && ( <button onClick={handleReset} style={backButton}>← Ana Sayfa</button> )}
+      </div>
+      
+      <div style={contentArea}>
+        {!submittedPrompt ? (
+          <>
+            <div style={floatingContainer}>
+              {slots.map((slot) => {
+                const { category, promptText } = parsePromptData(slot.text);
+                return (
+                  <div key={slot.id} className={`cinematic-text slot-${slot.id}`} onClick={() => setInput(promptText)} onAnimationIteration={() => handleAnimationIteration(slot.id)}
+                    style={{ top: slot.pos.top || 'auto', bottom: slot.pos.bottom || 'auto', left: slot.pos.left || 'auto', right: slot.pos.right || 'auto', maxWidth: slot.pos.maxWidth, fontSize: slot.size, animationDelay: slot.delay }}
+                  >
+                    {category && <div className="prompt-category">{category}</div>}
+                    <div className="prompt-body">{promptText}</div>
+                  </div>
+                );
+              })}
+            </div>
+
+            <div style={heroSection} className="hero-section">
+              <div style={logoFrame}> <img src="/logo.png" alt="Logo" style={centerLogo} /> </div>
+              <h2 style={heroTitle} className="hero-title">Fikirlerini Güçlü Promptlara Dönüştür.</h2>
+              <p style={heroSub} className="hero-sub">Metni yaz. Optimize edilmiş promptu al. Kopyala ve diğer AI araçlarında kullan.</p>
+            </div>
+          </>
+        ) : (
+          <div style={resultContainer}>
+              
+             <div style={userPromptWrapper}>
+               <div style={userPromptHeader} onClick={() => setIsPromptExpanded(!isPromptExpanded)}>
+                 <div style={userPromptTitle}>
+                    <span style={{ color: '#00f2fe', marginRight: '8px' }}>✦</span>
+                    {isPromptExpanded ? "Senin Promptun" : `Senin Promptun: "${submittedPrompt.length > 45 ? submittedPrompt.slice(0, 45) + '...' : submittedPrompt}"`}
+                 </div>
+                 <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
+                   <button className="edit-btn" style={editBtn} onClick={(e) => { e.stopPropagation(); setInput(submittedPrompt); window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }); }} title="Düzenle">✎</button>
+                   <span style={{ transform: isPromptExpanded ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease', color: '#888', fontSize: '0.8rem' }}>▼</span>
+                 </div>
+               </div>
+               {isPromptExpanded && ( <div style={userPromptBody}>{submittedPrompt}</div> )}
+             </div>
+
+             {(!result && loading) ? (
+               <div className="flex flex-col items-center justify-center mt-10">
+                 <div className="loading-box">
+                   <svg className="animate-spin" style={{ margin: '0 auto', width: '40px', height: '40px', color: '#00f2fe' }} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                   </svg>
+                   <div className="loading-text">{loadingMessages[loadingStep]}</div>
+                 </div>
+               </div>
+             ) : (
+               <div style={aiResponseWrapper}>
+                  <div style={aiLabel}>ÜRETİLEN MASTER PROMPT</div>
+                  <div style={aiText}>
+                    {result}
+                    {loading && <span className="cursor-blink"></span>}
+                  </div>
+                  
+                  {!loading && result && (
+                    <div style={{ marginTop: '35px', paddingTop: '20px', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+                      
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
+                        <span style={{ fontSize: '0.85rem', color: '#888', letterSpacing: '0.5px' }}>✨ ÜRETİMİ BAŞLAT:</span>
+                        <div onClick={handleCopy} className="copy-box" style={copyBtn}>
+                          {IconCopy} <span>{copyStatus}</span>
+                        </div>
+                      </div>
+
+                      {/* ✅ DÜZELTILMIŞ PROMPT BUTTON BİLEŞENLERİ */}
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+                        {!isVisual ? (
+                          <>
+                            <PromptButton result={result} url="https://chatgpt.com" name="ChatGPT" icon={IconChatGPT} />
+                            <PromptButton result={result} url="https://gemini.google.com/app" name="Gemini" icon={IconGemini} />
+                            <PromptButton result={result} url="https://claude.ai" name="Claude" icon={IconClaude} />
+                            <PromptButton result={result} url="https://www.perplexity.ai" name="Perplexity" icon={IconPerplexity} />
+                            <PromptButton result={result} url="https://copilot.microsoft.com" name="Copilot" icon={IconCopilot} />
+                          </>
+                        ) : (
+                          <>
+                            <PromptButton result={result} url="https://discord.com/channels/@me" name="Midjourney" icon={IconMidjourney} />
+                            <PromptButton result={result} url="https://chatgpt.com" name="DALL-E 3" icon={IconChatGPT} />
+                            <PromptButton result={result} url="https://leonardo.ai" name="Leonardo" icon={IconLeonardo} />
+                            <PromptButton result={result} url="https://firefly.adobe.com" name="Adobe Firefly" icon={IconAdobe} />
+                            <PromptButton result={result} url="https://www.canva.com" name="Canva" icon={IconCanva} />
+                          </>
+                        )}
+                      </div>
+
+                    </div>
+                  )}
+
+               </div>
+             )}
+          </div>
+        )}
+      </div>
+
+      <div style={bottomArea}>
+        <div className="floor-glow" style={floorGlow}></div>
+        <div style={glowWrapper}>
+          <div style={inputBoxInner} className="input-box-inner">
+            <textarea 
+              className="main-input" style={inputField} placeholder={dynamicPlaceholder} rows={2} 
+              value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => { if(e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleGenerate(); }}}
+            />
+            <div style={actionButtons}>
+              <button onClick={handleVoiceTyping} style={iconButton} className={isListening ? "pulse-mic" : ""} title="Sesle Yaz">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#888" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+              </button>
+              <button onClick={handleGenerate} disabled={loading || !input.trim()} style={sendButton}> {loading ? '⏳' : '↑'} </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  );
 }
 
-function HomeContent() {
-  const searchParams = useSearchParams();
-  const [userInput, setUserInput] = useState('');
-  const [result, setResult] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [history, setHistory] = useState<HistoryEntry[]>([]);
-  const [favorites, setFavorites] = useState<HistoryEntry[]>([]);
-  const [copied, setCopied] = useState(false);
-  const [shared, setShared] = useState(false);
-  const [starred, setStarred] = useState(false);
-  const [language, setLanguage] = useState<Language>('tr');
-  const [tone, setTone] = useState<Tone>('professional');
-  const [refineInput, setRefineInput] = useState('');
-  const [refining, setRefining] = useState(false);
-  const [showRefine, setShowRefine] = useState(false);
-  const [currentFavoriteId, setCurrentFavoriteId] = useState<number | null>(null);
-  const [saveTitle, setSaveTitle] = useState('');
-  const [showSaveInput, setShowSaveInput] = useState(false);
-  const [saving, setSaving] = useState(false);
-  const [savedNotice, setSavedNotice] = useState(false);
-  const resultRef = useRef<HTMLDivElement>(null);
+// 🔥 KUSURSUZ STİLLER 🔥
+const container = { backgroundColor: '#050505', minHeight: '100vh', color: '#ECECEC', fontFamily: 'Inter, sans-serif', display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden' };
+const topBar = { padding: '20px 25px', position: 'absolute', top: 0, left: 0, right: 0, zIndex: 100, display: 'flex', justifyContent: 'space-between', alignItems: 'center' };
+const logoWrapper = { display: 'flex', alignItems: 'center', gap: '10px', opacity: 0.8, cursor: 'pointer' };
+const miniLogo = { height: '20px', width: 'auto', objectFit: 'contain' };
+const backButton = { backgroundColor: 'transparent', color: '#fff', border: '1px solid #333', padding: '8px 16px', borderRadius: '20px', cursor: 'pointer', fontSize: '0.85rem' };
+const contentArea = { flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', position: 'relative', paddingBottom: '100px' };
 
-  // Load persisted data from localStorage
-  useEffect(() => {
-    try {
-      const savedHistory = localStorage.getItem(HISTORY_KEY);
-      if (savedHistory) setHistory(JSON.parse(savedHistory));
-      const savedFavorites = localStorage.getItem(FAVORITES_KEY);
-      if (savedFavorites) setFavorites(JSON.parse(savedFavorites));
-    } catch {
-      // localStorage may be unavailable
-    }
-  }, []);
+const floatingContainer = { position: 'absolute', top: '70px', left: 0, right: 0, height: '70vh', pointerEvents: 'none', zIndex: 5, overflow: 'hidden' };
 
-  // Pre-fill input/output from URL params (template or loaded saved prompt)
-  useEffect(() => {
-    const template = searchParams.get('template');
-    const input = searchParams.get('input');
-    const output = searchParams.get('output');
-    if (template) {
-      setUserInput(template);
-    } else if (input) {
-      setUserInput(input);
-      if (output) setResult(output);
-    } else {
-      return;
-    }
-    window.history.replaceState(null, '', window.location.pathname);
-  }, [searchParams]);
+const heroSection = { display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', zIndex: 10, marginTop: '60vh', width: '100%', gap: '15px', height: 'auto', minHeight: 'min-content' };
+const logoFrame = { display: 'flex', alignItems: 'center', justifyContent: 'center' };
+const centerLogo = { width: '100%', maxWidth: '180px', height: 'auto', display: 'block', objectFit: 'contain' };
+const heroTitle = { fontSize: '2.2rem', fontWeight: '600', color: '#fff', letterSpacing: '-0.5px', margin: 0 };
+const heroSub = { color: '#888', fontSize: '1rem', maxWidth: '550px', padding: '0 20px', lineHeight: '1.5', margin: 0 };
+const resultContainer = { maxWidth: '850px', width: '100%', marginTop: '80px', marginBottom: '160px', zIndex: 10, padding: '0 20px' };
 
-  // Decode shared prompt from URL hash on initial load
-  useEffect(() => {
-    const hash = window.location.hash;
-    if (hash.startsWith('#share=')) {
-      const decoded = decodeFromShare(hash.slice(7));
-      if (decoded) {
-        setResult(decoded);
-        window.history.replaceState(null, '', window.location.pathname + window.location.search);
-      }
-    }
-  }, []);
+const userPromptWrapper = { width: '100%', backgroundColor: '#0f0f0f', borderRadius: '12px', border: '1px solid #222', marginBottom: '20px', overflow: 'hidden', transition: 'all 0.3s ease' };
+const userPromptHeader = { padding: '16px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', backgroundColor: '#141414' };
+const userPromptTitle = { fontSize: '0.9rem', color: '#ccc', fontWeight: '500', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '75%' };
+const editBtn = { background: 'rgba(0, 242, 254, 0.08)', color: '#00f2fe', border: '1px solid rgba(0, 242, 254, 0.25)', padding: '6px 14px', borderRadius: '6px', fontSize: '0.8rem', cursor: 'pointer', fontWeight: '500' };
+const userPromptBody = { padding: '20px', borderTop: '1px solid #222', fontSize: '0.95rem', color: '#aaa', lineHeight: '1.6', whiteSpace: 'pre-wrap' };
+const aiResponseWrapper = { width: '100%', backgroundColor: '#0a0a0a', padding: '25px', borderRadius: '16px', border: '1px solid rgba(0, 242, 254, 0.2)', boxShadow: '0 0 20px rgba(10, 100, 255, 0.15)' };
+const aiLabel = { fontSize: '0.75rem', fontWeight: '700', color: '#00f2fe', marginBottom: '20px', letterSpacing: '2px' };
+const aiText = { fontSize: '1rem', lineHeight: '1.6', color: '#E0E0E0', whiteSpace: 'pre-wrap', fontFamily: 'monospace', opacity: 0.9 };
 
-  useEffect(() => {
-    if (result && resultRef.current) {
-      resultRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    }
-  }, [result]);
+const copyBtn = { display: 'flex', alignItems: 'center', gap: '6px', background: '#fff', color: '#000', border: 'none', padding: '8px 16px', borderRadius: '8px', cursor: 'pointer', fontSize: '0.85rem', fontWeight: '500', transition: 'all 0.3s ease' };
 
-  const saveToHistory = (input: string, output: string) => {
-    const entry: HistoryEntry = {
-      id: Date.now(),
-      input,
-      output,
-      createdAt: new Date().toISOString(),
-    };
-    setHistory((prev) => {
-      const updated = [entry, ...prev].slice(0, MAX_HISTORY);
-      try { localStorage.setItem(HISTORY_KEY, JSON.stringify(updated)); } catch { /* ignore */ }
-      return updated;
-    });
-  };
+const bottomArea = { position: 'fixed', bottom: 0, left: 0, right: 0, padding: '30px 20px 40px 20px', background: 'transparent', display: 'flex', flexDirection: 'column', alignItems: 'center', zIndex: 50 };
+const cyberGradient = 'linear-gradient(90deg, #00f2fe, #0a64ff, #00f2fe, #0a64ff)';
+const floorGlow = { position: 'absolute', bottom: '-10px', left: '50%', transform: 'translateX(-50%)', width: '50vw', maxWidth: '600px', height: '60px', background: cyberGradient, backgroundSize: '200% 100%', opacity: 0.3, filter: 'blur(30px)', animation: 'pulse 4s infinite' };
 
-  const streamGenerate = useCallback(async (
-    input: string,
-    options: { language: Language; tone: Tone; previousPrompt?: string }
-  ): Promise<string> => {
-    const res = await fetch('/api/generate', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        userInput: input,
-        language: options.language,
-        tone: options.tone,
-        ...(options.previousPrompt ? { previousPrompt: options.previousPrompt } : {}),
-      }),
-    });
-
-    if (!res.ok || !res.body) throw new Error('API hatası');
-
-    const reader = res.body.getReader();
-    const decoder = new TextDecoder();
-    let fullText = '';
-
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      fullText += decoder.decode(value, { stream: true });
-      setResult(fullText);
-    }
-    // Flush any remaining buffered bytes (important for multi-byte UTF-8 characters)
-    const remaining = decoder.decode();
-    if (remaining) {
-      fullText += remaining;
-      setResult(fullText);
-    }
-
-    return fullText;
-  }, []);
-
-  const handleGenerate = async () => {
-    if (!userInput.trim() || loading) return;
-    setLoading(true);
-    setResult('');
-    setStarred(false);
-    setCurrentFavoriteId(null);
-    setShowRefine(false);
-    setShowSaveInput(false);
-    setSavedNotice(false);
-
-    try {
-      const fullText = await streamGenerate(userInput, { language, tone });
-      if (fullText) saveToHistory(userInput, fullText);
-    } catch (err: unknown) {
-      setResult('Hata oluştu: ' + (err instanceof Error ? err.message : 'Bilinmeyen hata'));
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleRefine = async () => {
-    if (!refineInput.trim() || refining || !result) return;
-    setRefining(true);
-
-    try {
-      const refined = await streamGenerate(refineInput, {
-        language,
-        tone,
-        previousPrompt: result,
-      });
-      if (refined) {
-        saveToHistory(`[Geliştirildi] ${refineInput}`, refined);
-        setRefineInput('');
-        setStarred(false);
-        setCurrentFavoriteId(null);
-      }
-    } catch (err: unknown) {
-      setResult('Hata oluştu: ' + (err instanceof Error ? err.message : 'Bilinmeyen hata'));
-    } finally {
-      setRefining(false);
-    }
-  };
-
-  const handleCopyResult = () => {
-    if (!result) return;
-    navigator.clipboard.writeText(result).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    }).catch(() => {
-      // Clipboard access may be denied; fail silently
-    });
-  };
-
-  const handleShare = () => {
-    if (!result) return;
-    const encoded = encodeForShare(result);
-    const url = `${window.location.origin}${window.location.pathname}#share=${encoded}`;
-    navigator.clipboard.writeText(url).then(() => {
-      setShared(true);
-      setTimeout(() => setShared(false), 3000);
-    }).catch(() => {
-      // Clipboard access may be denied; fail silently
-    });
-  };
-
-  const handleToggleFavorite = () => {
-    if (!result || !userInput) return;
-    if (starred && currentFavoriteId !== null) {
-      setFavorites((prev) => {
-        const updated = prev.filter((f) => f.id !== currentFavoriteId);
-        try { localStorage.setItem(FAVORITES_KEY, JSON.stringify(updated)); } catch { /* ignore */ }
-        return updated;
-      });
-      setStarred(false);
-      setCurrentFavoriteId(null);
-    } else {
-      const entry: HistoryEntry = {
-        id: Date.now(),
-        input: userInput,
-        output: result,
-        createdAt: new Date().toISOString(),
-      };
-      setFavorites((prev) => {
-        const updated = [entry, ...prev].slice(0, MAX_FAVORITES);
-        try { localStorage.setItem(FAVORITES_KEY, JSON.stringify(updated)); } catch { /* ignore */ }
-        return updated;
-      });
-      setStarred(true);
-      setCurrentFavoriteId(entry.id);
-    }
-  };
-
-  const handleDeleteFavorite = (id: number) => {
-    setFavorites((prev) => {
-      const updated = prev.filter((f) => f.id !== id);
-      try { localStorage.setItem(FAVORITES_KEY, JSON.stringify(updated)); } catch { /* ignore */ }
-      return updated;
-    });
-  };
-
-  const handleOpenSaveForm = () => {
-    setSaveTitle(userInput.slice(0, MAX_TITLE_LENGTH));
-    setShowSaveInput(true);
-  };
-
-  const handleSavePrompt = async () => {
-    if (!result || !saveTitle.trim() || saving) return;
-    setSaving(true);
-    try {
-      const res = await fetch('/api/prompts', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          title: saveTitle.trim(),
-          input: userInput,
-          output: result,
-          language,
-          tone,
-        }),
-      });
-      if (res.ok) {
-        setSaveTitle('');
-        setShowSaveInput(false);
-        setSavedNotice(true);
-        setTimeout(() => setSavedNotice(false), 2500);
-      }
-    } catch { /* ignore */ } finally {
-      setSaving(false);
-    }
-  };
-
-  const charCount = userInput.length;
-
-  return (
-    <main
-      style={{
-        padding: '2rem',
-        background: '#050505',
-        color: '#fff',
-        minHeight: '100vh',
-        fontFamily: 'Arial, sans-serif',
-        maxWidth: '860px',
-        margin: '0 auto',
-      }}
-    >
-      {/* Header */}
-      <div style={{ marginBottom: '2rem' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '0.75rem' }}>
-          <div>
-            <h1 style={{ fontSize: '1.8rem', fontWeight: '700', margin: 0 }}>🎯 PromptLab</h1>
-            <p style={{ color: '#666', fontSize: '0.9rem', marginTop: '0.4rem' }}>
-              Fikrinizi profesyonel yapay zeka promptlarına dönüştürün
-            </p>
-          </div>
-          <nav style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', paddingTop: '0.25rem' }}>
-            <a
-              href="/library"
-              style={{
-                color: '#888',
-                fontSize: '0.85rem',
-                textDecoration: 'none',
-                padding: '0.35rem 0.75rem',
-                border: '1px solid #222',
-                borderRadius: '6px',
-                transition: 'color 0.2s, border-color 0.2s',
-              }}
-              onMouseEnter={(e) => { e.currentTarget.style.color = '#fff'; e.currentTarget.style.borderColor = '#444'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.color = '#888'; e.currentTarget.style.borderColor = '#222'; }}
-            >
-              ⚡ Kütüphane
-            </a>
-            <a
-              href="/saved"
-              style={{
-                color: '#888',
-                fontSize: '0.85rem',
-                textDecoration: 'none',
-                padding: '0.35rem 0.75rem',
-                border: '1px solid #222',
-                borderRadius: '6px',
-                transition: 'color 0.2s, border-color 0.2s',
-              }}
-              onMouseEnter={(e) => { e.currentTarget.style.color = '#fff'; e.currentTarget.style.borderColor = '#444'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.color = '#888'; e.currentTarget.style.borderColor = '#222'; }}
-            >
-              💾 Kaydedilenler
-            </a>
-          </nav>
-        </div>
-      </div>
-
-      {/* Prompt Generator */}
-      <div>
-          {/* Textarea */}
-          <div style={{ position: 'relative', marginBottom: '1rem' }}>
-            <textarea
-              value={userInput}
-              onChange={(e) => setUserInput(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) handleGenerate();
-              }}
-              placeholder="Ne yapmak istediğinizi yazın... (örn: 'Sinematik bir portre fotoğrafı' veya 'B2B satış e-postası')"
-              rows={4}
-              style={{
-                width: '100%',
-                background: '#0d0d0d',
-                border: '1px solid #222',
-                borderRadius: '10px',
-                color: '#fff',
-                fontSize: '0.95rem',
-                padding: '1rem',
-                resize: 'vertical',
-                outline: 'none',
-                fontFamily: 'inherit',
-                lineHeight: '1.6',
-                boxSizing: 'border-box',
-              }}
-            />
-            <div
-              style={{
-                position: 'absolute',
-                bottom: '0.6rem',
-                right: '0.75rem',
-                color: charCount > 800 ? '#ef4444' : '#444',
-                fontSize: '0.75rem',
-              }}
-            >
-              {charCount} karakter
-            </div>
-          </div>
-
-          {/* Options Row: Language + Tone */}
-          <div
-            style={{
-              display: 'flex',
-              flexWrap: 'wrap',
-              gap: '0.75rem',
-              alignItems: 'center',
-              marginBottom: '1rem',
-              padding: '0.75rem',
-              background: '#0a0a0a',
-              borderRadius: '8px',
-              border: '1px solid #1a1a1a',
-            }}
-          >
-            {/* Language Toggle */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-              <span style={{ color: '#555', fontSize: '0.8rem' }}>Dil:</span>
-              {(['tr', 'en'] as Language[]).map((lang) => (
-                <button
-                  key={lang}
-                  onClick={() => setLanguage(lang)}
-                  style={{
-                    padding: '0.25rem 0.6rem',
-                    background: language === lang ? '#0070f3' : 'none',
-                    border: `1px solid ${language === lang ? '#0070f3' : '#333'}`,
-                    borderRadius: '5px',
-                    color: language === lang ? '#fff' : '#888',
-                    fontSize: '0.8rem',
-                    cursor: 'pointer',
-                    transition: 'all 0.15s',
-                  }}
-                >
-                  {lang === 'tr' ? '🇹🇷 TR' : '🇬🇧 EN'}
-                </button>
-              ))}
-            </div>
-
-            <div style={{ width: '1px', height: '20px', background: '#222' }} />
-
-            {/* Tone Selector */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap' }}>
-              <span style={{ color: '#555', fontSize: '0.8rem' }}>Ton:</span>
-              {(Object.keys(TONE_LABELS) as Tone[]).map((t) => (
-                <button
-                  key={t}
-                  onClick={() => setTone(t)}
-                  style={{
-                    padding: '0.25rem 0.6rem',
-                    background: tone === t ? '#1a1a1a' : 'none',
-                    border: `1px solid ${tone === t ? '#0070f3' : '#2a2a2a'}`,
-                    borderRadius: '5px',
-                    color: tone === t ? '#fff' : '#888',
-                    fontSize: '0.8rem',
-                    cursor: 'pointer',
-                    transition: 'all 0.15s',
-                  }}
-                >
-                  {TONE_LABELS[t]}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Generate Button */}
-          <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', marginBottom: '2rem' }}>
-            <button
-              onClick={handleGenerate}
-              disabled={loading || !userInput.trim()}
-              style={{
-                padding: '0.65rem 1.5rem',
-                background: loading || !userInput.trim() ? '#1a3a5c' : '#0070f3',
-                color: loading || !userInput.trim() ? '#5a8ab8' : '#fff',
-                border: 'none',
-                borderRadius: '8px',
-                cursor: loading || !userInput.trim() ? 'not-allowed' : 'pointer',
-                fontSize: '0.95rem',
-                fontWeight: '600',
-                transition: 'background 0.2s',
-              }}
-            >
-              {loading ? '⏳ Oluşturuluyor...' : '✨ Prompt Oluştur'}
-            </button>
-            <span style={{ color: '#444', fontSize: '0.8rem' }}>veya Ctrl+Enter</span>
-          </div>
-
-          {/* Result Area */}
-          {result && (
-            <div ref={resultRef}>
-              {/* Result Header */}
-              <div
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  marginBottom: '0.75rem',
-                  flexWrap: 'wrap',
-                  gap: '0.5rem',
-                }}
-              >
-                <h2 style={{ margin: 0, fontSize: '1rem', color: '#aaa', fontWeight: '500' }}>
-                  Oluşturulan Prompt
-                </h2>
-                <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-                  {/* Favorite button */}
-                  <button
-                    onClick={handleToggleFavorite}
-                    title={starred ? 'Favorilerden çıkar' : 'Favorilere ekle'}
-                    style={{
-                      background: starred ? '#78350f22' : '#1a1a1a',
-                      border: `1px solid ${starred ? '#d97706' : '#333'}`,
-                      borderRadius: '6px',
-                      padding: '0.35rem 0.6rem',
-                      color: starred ? '#f59e0b' : '#888',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '4px',
-                      fontSize: '0.8rem',
-                      transition: 'all 0.2s',
-                    }}
-                  >
-                    <Star size={14} fill={starred ? '#f59e0b' : 'none'} />
-                    {starred ? 'Favorilerde' : 'Favorile'}
-                  </button>
-
-                  {/* Share button */}
-                  <button
-                    onClick={handleShare}
-                    title="Paylaşım bağlantısını kopyala"
-                    style={{
-                      background: shared ? '#1e3a5f22' : '#1a1a1a',
-                      border: `1px solid ${shared ? '#3b82f6' : '#333'}`,
-                      borderRadius: '6px',
-                      padding: '0.35rem 0.6rem',
-                      color: shared ? '#60a5fa' : '#888',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '4px',
-                      fontSize: '0.8rem',
-                      transition: 'all 0.2s',
-                    }}
-                  >
-                    <Share2 size={14} />
-                    {shared ? 'Link Kopyalandı!' : 'Paylaş'}
-                  </button>
-
-                  {/* Copy button */}
-                  <button
-                    onClick={handleCopyResult}
-                    style={{
-                      background: copied ? '#16a34a22' : '#1a1a1a',
-                      border: `1px solid ${copied ? '#16a34a' : '#333'}`,
-                      borderRadius: '6px',
-                      padding: '0.35rem 0.75rem',
-                      color: copied ? '#4ade80' : '#aaa',
-                      fontSize: '0.8rem',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '5px',
-                      transition: 'all 0.2s',
-                    }}
-                  >
-                    {copied ? <Check size={14} /> : <Copy size={14} />}
-                    {copied ? 'Kopyalandı!' : 'Kopyala'}
-                  </button>
-
-                  {/* Save button */}
-                  {!loading && !refining && (
-                    <button
-                      onClick={handleOpenSaveForm}
-                      title="Promptu kaydet"
-                      style={{
-                        background: savedNotice ? '#14532d22' : '#1a1a1a',
-                        border: `1px solid ${savedNotice ? '#16a34a' : '#333'}`,
-                        borderRadius: '6px',
-                        padding: '0.35rem 0.6rem',
-                        color: savedNotice ? '#4ade80' : '#888',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '4px',
-                        fontSize: '0.8rem',
-                        transition: 'all 0.2s',
-                      }}
-                    >
-                      <Save size={14} />
-                      {savedNotice ? 'Kaydedildi!' : 'Kaydet'}
-                    </button>
-                  )}
-                </div>
-              </div>
-
-              {/* Inline save form */}
-              {showSaveInput && !loading && !refining && (
-                <div
-                  style={{
-                    marginBottom: '0.75rem',
-                    padding: '0.75rem',
-                    background: '#0a0a0a',
-                    borderRadius: '8px',
-                    border: '1px solid #1e2a1e',
-                    display: 'flex',
-                    gap: '0.5rem',
-                    alignItems: 'center',
-                    flexWrap: 'wrap',
-                  }}
-                >
-                  <Save size={14} color="#22c55e" style={{ flexShrink: 0 }} />
-                  <input
-                    type="text"
-                    value={saveTitle}
-                    onChange={(e) => setSaveTitle(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') handleSavePrompt();
-                      if (e.key === 'Escape') setShowSaveInput(false);
-                    }}
-                    placeholder="Kayıt adı..."
-                    maxLength={MAX_TITLE_LENGTH}
-                    autoFocus
-                    style={{
-                      flex: 1,
-                      minWidth: '140px',
-                      background: '#0d0d0d',
-                      border: '1px solid #2a3a2a',
-                      borderRadius: '6px',
-                      color: '#fff',
-                      fontSize: '0.85rem',
-                      padding: '0.35rem 0.6rem',
-                      outline: 'none',
-                    }}
-                  />
-                  <button
-                    onClick={handleSavePrompt}
-                    disabled={saving || !saveTitle.trim()}
-                    style={{
-                      padding: '0.35rem 0.9rem',
-                      background:
-                        saving || !saveTitle.trim() ? '#1a3a5c' : '#16a34a',
-                      color:
-                        saving || !saveTitle.trim() ? '#5a8ab8' : '#fff',
-                      border: 'none',
-                      borderRadius: '6px',
-                      cursor:
-                        saving || !saveTitle.trim()
-                          ? 'not-allowed'
-                          : 'pointer',
-                      fontSize: '0.82rem',
-                      fontWeight: '600',
-                    }}
-                  >
-                    {saving ? '...' : 'Kaydet'}
-                  </button>
-                  <button
-                    onClick={() => setShowSaveInput(false)}
-                    style={{
-                      padding: '0.35rem 0.6rem',
-                      background: 'none',
-                      border: '1px solid #333',
-                      borderRadius: '6px',
-                      color: '#666',
-                      cursor: 'pointer',
-                      fontSize: '0.82rem',
-                    }}
-                  >
-                    İptal
-                  </button>
-                </div>
-              )}
-
-              {/* Result Text */}
-              <pre
-                style={{
-                  background: '#0d0d0d',
-                  border: '1px solid #1a1a1a',
-                  borderRadius: '10px',
-                  padding: '1.25rem',
-                  color: '#e0e0e0',
-                  fontSize: '0.88rem',
-                  lineHeight: '1.7',
-                  whiteSpace: 'pre-wrap',
-                  wordBreak: 'break-word',
-                  margin: 0,
-                  fontFamily: 'inherit',
-                }}
-              >
-                {result}
-                {(loading || refining) && <span style={{ opacity: 0.5 }}>▌</span>}
-              </pre>
-
-              {/* Iterative Refinement Section */}
-              {!loading && (
-                <div style={{ marginTop: '1rem' }}>
-                  <button
-                    onClick={() => setShowRefine(!showRefine)}
-                    style={{
-                      background: 'none',
-                      border: '1px solid #222',
-                      borderRadius: '6px',
-                      padding: '0.4rem 0.8rem',
-                      color: showRefine ? '#fff' : '#666',
-                      fontSize: '0.82rem',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '5px',
-                    }}
-                  >
-                    <RefreshCw size={13} />
-                    Promptu Geliştir
-                  </button>
-
-                  {showRefine && (
-                    <div
-                      style={{
-                        marginTop: '0.75rem',
-                        padding: '1rem',
-                        background: '#0a0a0a',
-                        borderRadius: '8px',
-                        border: '1px solid #1a1a1a',
-                      }}
-                    >
-                      <p style={{ color: '#666', fontSize: '0.82rem', margin: '0 0 0.6rem' }}>
-                        Mevcut promptu nasıl geliştirmek istersiniz?
-                      </p>
-                      <textarea
-                        value={refineInput}
-                        onChange={(e) => setRefineInput(e.target.value)}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) handleRefine();
-                        }}
-                        placeholder="Örn: Daha kısa yap, teknik detayları artır, daha yaratıcı bir ton ekle..."
-                        rows={2}
-                        style={{
-                          width: '100%',
-                          background: '#0d0d0d',
-                          border: '1px solid #222',
-                          borderRadius: '8px',
-                          color: '#fff',
-                          fontSize: '0.88rem',
-                          padding: '0.75rem',
-                          resize: 'vertical',
-                          outline: 'none',
-                          fontFamily: 'inherit',
-                          boxSizing: 'border-box',
-                          marginBottom: '0.6rem',
-                        }}
-                      />
-                      <button
-                        onClick={handleRefine}
-                        disabled={refining || !refineInput.trim()}
-                        style={{
-                          padding: '0.5rem 1.2rem',
-                          background: refining || !refineInput.trim() ? '#1a3a5c' : '#0070f3',
-                          color: refining || !refineInput.trim() ? '#5a8ab8' : '#fff',
-                          border: 'none',
-                          borderRadius: '6px',
-                          cursor: refining || !refineInput.trim() ? 'not-allowed' : 'pointer',
-                          fontSize: '0.88rem',
-                          fontWeight: '600',
-                        }}
-                      >
-                        {refining ? '⏳ Geliştiriliyor...' : '🔄 Geliştir'}
-                      </button>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* AI Tool Selector */}
-              {!loading && !refining && (
-                <div style={{ marginTop: '1.25rem' }}>
-                  <div style={{ color: '#555', fontSize: '0.8rem', marginBottom: '0.5rem' }}>
-                    Bu promptu açmak istediğiniz AI aracına gönderin:
-                  </div>
-                  <AIToolSelector generatedText={result} />
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-    </main>
-  );
-}
+const glowWrapper = { position: 'relative', width: '100%', maxWidth: '680px', zIndex: 2, pointerEvents: 'auto' };
+const inputBoxInner = { backgroundColor: '#0a0a0a', borderRadius: '40px', border: '1px solid rgba(0, 242, 254, 0.2)', animation: 'elegantGlow 8s infinite alternate', display: 'flex', alignItems: 'center', padding: '12px 14px 12px 18px', gap: '10px' };
+const inputField = { flex: 1, background: 'transparent', border: 'none', color: '#fff', fontSize: '1rem', outline: 'none', resize: 'none', padding: '8px 0', maxHeight: '150px', fontFamily: 'inherit' };
+const actionButtons = { display: 'flex', alignItems: 'center', gap: '6px' };
+const iconButton = { background: 'none', border: 'none', cursor: 'pointer', padding: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center' };
+const sendButton = { width: '32px', height: '32px', borderRadius: '50%', border: 'none', backgroundColor: '#fff', color: '#000', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', transition: 'transform 0.2s ease', fontSize: '1.2rem' };
