@@ -1,13 +1,10 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import AIToolSelector from '@/components/AIToolSelector';
-import PromptTemplates from '@/components/PromptTemplates';
-import PromptHistory from '@/components/PromptHistory';
-import FavoritesList from '@/components/FavoritesList';
-import SavedPrompts from '@/components/SavedPrompts';
 import { Copy, Check, Star, Share2, RefreshCw, Save } from 'lucide-react';
-import type { Language, Tone, SavedPrompt } from '@/lib/types';
+import type { Language, Tone } from '@/lib/types';
 import { MAX_TITLE_LENGTH } from '@/lib/types';
 
 const HISTORY_KEY = 'promptlab_history';
@@ -21,8 +18,6 @@ type HistoryEntry = {
   output: string;
   createdAt: string;
 };
-
-type Tab = 'generate' | 'templates' | 'history' | 'favorites' | 'saved';
 
 const TONE_LABELS: Record<Tone, string> = {
   professional: 'Profesyonel',
@@ -46,12 +41,20 @@ function decodeFromShare(encoded: string): string {
 }
 
 export default function Home() {
+  return (
+    <Suspense>
+      <HomeContent />
+    </Suspense>
+  );
+}
+
+function HomeContent() {
+  const searchParams = useSearchParams();
   const [userInput, setUserInput] = useState('');
   const [result, setResult] = useState('');
   const [loading, setLoading] = useState(false);
   const [history, setHistory] = useState<HistoryEntry[]>([]);
   const [favorites, setFavorites] = useState<HistoryEntry[]>([]);
-  const [activeTab, setActiveTab] = useState<Tab>('generate');
   const [copied, setCopied] = useState(false);
   const [shared, setShared] = useState(false);
   const [starred, setStarred] = useState(false);
@@ -61,7 +64,6 @@ export default function Home() {
   const [refining, setRefining] = useState(false);
   const [showRefine, setShowRefine] = useState(false);
   const [currentFavoriteId, setCurrentFavoriteId] = useState<number | null>(null);
-  const [savedPrompts, setSavedPrompts] = useState<SavedPrompt[]>([]);
   const [saveTitle, setSaveTitle] = useState('');
   const [showSaveInput, setShowSaveInput] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -80,13 +82,21 @@ export default function Home() {
     }
   }, []);
 
-  // Fetch server-saved prompts from the API
+  // Pre-fill input/output from URL params (template or loaded saved prompt)
   useEffect(() => {
-    fetch('/api/prompts')
-      .then((res) => (res.ok ? res.json() : []))
-      .then((data: SavedPrompt[]) => setSavedPrompts(data))
-      .catch(() => {});
-  }, []);
+    const template = searchParams.get('template');
+    const input = searchParams.get('input');
+    const output = searchParams.get('output');
+    if (template) {
+      setUserInput(template);
+    } else if (input) {
+      setUserInput(input);
+      if (output) setResult(output);
+    } else {
+      return;
+    }
+    window.history.replaceState(null, '', window.location.pathname);
+  }, [searchParams]);
 
   // Decode shared prompt from URL hash on initial load
   useEffect(() => {
@@ -166,7 +176,6 @@ export default function Home() {
     setShowRefine(false);
     setShowSaveInput(false);
     setSavedNotice(false);
-    setActiveTab('generate');
 
     try {
       const fullText = await streamGenerate(userInput, { language, tone });
@@ -258,24 +267,6 @@ export default function Home() {
     });
   };
 
-  const handleTemplateSelect = (value: string) => {
-    setUserInput(value);
-    setActiveTab('generate');
-  };
-
-  const handleHistorySelect = (input: string, output: string) => {
-    setUserInput(input);
-    setResult(output);
-    setStarred(false);
-    setCurrentFavoriteId(null);
-    setActiveTab('generate');
-  };
-
-  const handleHistoryClear = () => {
-    setHistory([]);
-    try { localStorage.removeItem(HISTORY_KEY); } catch { /* ignore */ }
-  };
-
   const handleOpenSaveForm = () => {
     setSaveTitle(userInput.slice(0, MAX_TITLE_LENGTH));
     setShowSaveInput(true);
@@ -297,8 +288,6 @@ export default function Home() {
         }),
       });
       if (res.ok) {
-        const saved: SavedPrompt = await res.json();
-        setSavedPrompts((prev) => [saved, ...prev]);
         setSaveTitle('');
         setShowSaveInput(false);
         setSavedNotice(true);
@@ -309,21 +298,7 @@ export default function Home() {
     }
   };
 
-  const handleDeleteSaved = async (id: string) => {
-    try {
-      await fetch(`/api/prompts/${id}`, { method: 'DELETE' });
-      setSavedPrompts((prev) => prev.filter((p) => p.id !== id));
-    } catch { /* ignore */ }
-  };
-
   const charCount = userInput.length;
-  const tabs: { id: Tab; label: string }[] = [
-    { id: 'generate', label: '✏️ Oluştur' },
-    { id: 'templates', label: '⚡ Şablonlar' },
-    { id: 'history', label: `🕒 Geçmiş${history.length ? ` (${history.length})` : ''}` },
-    { id: 'favorites', label: `⭐ Favoriler${favorites.length ? ` (${favorites.length})` : ''}` },
-    { id: 'saved', label: `💾 Kaydedilenler${savedPrompts.length ? ` (${savedPrompts.length})` : ''}` },
-  ];
 
   return (
     <main
@@ -339,47 +314,52 @@ export default function Home() {
     >
       {/* Header */}
       <div style={{ marginBottom: '2rem' }}>
-        <h1 style={{ fontSize: '1.8rem', fontWeight: '700', margin: 0 }}>🎯 PromptLab</h1>
-        <p style={{ color: '#666', fontSize: '0.9rem', marginTop: '0.4rem' }}>
-          Fikrinizi profesyonel yapay zeka promptlarına dönüştürün
-        </p>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '0.75rem' }}>
+          <div>
+            <h1 style={{ fontSize: '1.8rem', fontWeight: '700', margin: 0 }}>🎯 PromptLab</h1>
+            <p style={{ color: '#666', fontSize: '0.9rem', marginTop: '0.4rem' }}>
+              Fikrinizi profesyonel yapay zeka promptlarına dönüştürün
+            </p>
+          </div>
+          <nav style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', paddingTop: '0.25rem' }}>
+            <a
+              href="/library"
+              style={{
+                color: '#888',
+                fontSize: '0.85rem',
+                textDecoration: 'none',
+                padding: '0.35rem 0.75rem',
+                border: '1px solid #222',
+                borderRadius: '6px',
+                transition: 'color 0.2s, border-color 0.2s',
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.color = '#fff'; e.currentTarget.style.borderColor = '#444'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.color = '#888'; e.currentTarget.style.borderColor = '#222'; }}
+            >
+              ⚡ Kütüphane
+            </a>
+            <a
+              href="/saved"
+              style={{
+                color: '#888',
+                fontSize: '0.85rem',
+                textDecoration: 'none',
+                padding: '0.35rem 0.75rem',
+                border: '1px solid #222',
+                borderRadius: '6px',
+                transition: 'color 0.2s, border-color 0.2s',
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.color = '#fff'; e.currentTarget.style.borderColor = '#444'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.color = '#888'; e.currentTarget.style.borderColor = '#222'; }}
+            >
+              💾 Kaydedilenler
+            </a>
+          </nav>
+        </div>
       </div>
 
-      {/* Tab Bar */}
-      <div
-        style={{
-          display: 'flex',
-          gap: '4px',
-          marginBottom: '1.5rem',
-          borderBottom: '1px solid #1a1a1a',
-          flexWrap: 'wrap',
-        }}
-      >
-        {tabs.map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            style={{
-              background: 'none',
-              border: 'none',
-              borderBottom: activeTab === tab.id ? '2px solid #0070f3' : '2px solid transparent',
-              color: activeTab === tab.id ? '#fff' : '#666',
-              padding: '0.5rem 1rem',
-              cursor: 'pointer',
-              fontSize: '0.9rem',
-              fontWeight: activeTab === tab.id ? '600' : '400',
-              transition: 'color 0.2s',
-              marginBottom: '-1px',
-            }}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </div>
-
-      {/* Generate Tab */}
-      {activeTab === 'generate' && (
-        <div>
+      {/* Prompt Generator */}
+      <div>
           {/* Textarea */}
           <div style={{ position: 'relative', marginBottom: '1rem' }}>
             <textarea
@@ -800,39 +780,6 @@ export default function Home() {
             </div>
           )}
         </div>
-      )}
-
-      {/* Templates Tab */}
-      {activeTab === 'templates' && (
-        <PromptTemplates onSelect={handleTemplateSelect} />
-      )}
-
-      {/* History Tab */}
-      {activeTab === 'history' && (
-        <PromptHistory
-          history={history}
-          onSelect={handleHistorySelect}
-          onClear={handleHistoryClear}
-        />
-      )}
-
-      {/* Favorites Tab */}
-      {activeTab === 'favorites' && (
-        <FavoritesList
-          favorites={favorites}
-          onSelect={handleHistorySelect}
-          onDelete={handleDeleteFavorite}
-        />
-      )}
-
-      {/* Saved Prompts Tab */}
-      {activeTab === 'saved' && (
-        <SavedPrompts
-          prompts={savedPrompts}
-          onLoad={handleHistorySelect}
-          onDelete={handleDeleteSaved}
-        />
-      )}
     </main>
   );
 }
