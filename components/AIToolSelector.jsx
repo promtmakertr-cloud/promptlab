@@ -1,51 +1,63 @@
-import React from 'react';
-import { ChatGPT, Gemini, Claude, Perplexity, Copilot } from 'lucide-react';
+'use client';
+
+import { useState, useCallback } from 'react';
+import { Bot, Sparkles, BrainCircuit, Search, Code } from 'lucide-react';
+
+const tools = [
+  { name: 'ChatGPT',    icon: Bot,          url: 'https://chatgpt.com/' },
+  { name: 'Gemini',     icon: Sparkles,     url: 'https://gemini.google.com/' },
+  { name: 'Claude',     icon: BrainCircuit, url: 'https://claude.ai/' },
+  { name: 'Perplexity', icon: Search,       url: 'https://www.perplexity.ai/' },
+  { name: 'Copilot',    icon: Code,         url: 'https://github.com/features/copilot' },
+];
 
 const AIToolSelector = () => {
-    const handleCopy = (tool) => {
-        const toolLinks = {
-            ChatGPT: 'https://chat.openai.com/',
-            Gemini: 'https://gemini.com/',
-            Claude: 'https://claude.ai/',
-            Perplexity: 'https://www.perplexity.ai/',
-            Copilot: 'https://github.com/features/copilot',
-        };
-        navigator.clipboard.writeText(toolLinks[tool]).then(() => {
-            alert(`${tool} link copied to clipboard!`);
-        });
-    };
+  const [copiedTool, setCopiedTool] = useState(null);
 
-    const handleLinkOpen = (url) => {
-        window.open(url, '_blank');
-    };
+  const handleCopy = useCallback((tool) => {
+    navigator.clipboard
+      .writeText(tool.url)
+      .then(() => {
+        setCopiedTool(tool.name);
+        setTimeout(() => setCopiedTool(null), 2000);
+      })
+      .catch((err) => console.error('Clipboard hatası:', err));
+  }, []);
 
-    return (
-        <div style={{ backgroundColor: '#050505', padding: '20px' }}>
-            <h1 style={{ color: '#FFFFFF' }}>AI Tool Selector</h1>
-            <div style={{ display: 'flex', gap: '10px' }}>
-                <button onClick={() => handleCopy('ChatGPT')}
-                        style={{ border: 'none', background: 'none', cursor: 'pointer', color: '#FFFFFF', transition: '0.3s' }}>
-                    <ChatGPT />
-                </button>
-                <button onClick={() => handleCopy('Gemini')}
-                        style={{ border: 'none', background: 'none', cursor: 'pointer', color: '#FFFFFF', transition: '0.3s' }}>
-                    <Gemini />
-                </button>
-                <button onClick={() => handleCopy('Claude')}
-                        style={{ border: 'none', background: 'none', cursor: 'pointer', color: '#FFFFFF', transition: '0.3s' }}>
-                    <Claude />
-                </button>
-                <button onClick={() => handleCopy('Perplexity')}
-                        style={{ border: 'none', background: 'none', cursor: 'pointer', color: '#FFFFFF', transition: '0.3s' }}>
-                    <Perplexity />
-                </button>
-                <button onClick={() => handleCopy('Copilot')}
-                        style={{ border: 'none', background: 'none', cursor: 'pointer', color: '#FFFFFF', transition: '0.3s' }}>
-                    <Copilot />
-                </button>
-            </div>
-        </div>
-    );
+  const handleLinkOpen = useCallback((url) => {
+    window.open(url, '_blank', 'noopener,noreferrer');
+  }, []);
+
+  return (
+    <div style={{ backgroundColor: '#050505', padding: '20px', borderRadius: '12px' }}>
+      <h1 style={{ color: '#FFFFFF' }}>AI Tool Selector</h1>
+      <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+        {tools.map(({ name, icon: Icon, url }) => (
+          <div key={name} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
+            <button
+              onClick={() => handleCopy({ name, url })}
+              onDoubleClick={() => handleLinkOpen(url)}
+              title={`Tıkla: ${name} linkini kopyala | Çift tıkla: aç`}
+              style={{
+                border: '1px solid #333',
+                background: 'none',
+                cursor: 'pointer',
+                color: copiedTool === name ? '#4ade80' : '#FFFFFF',
+                transition: 'color 0.3s',
+                padding: '10px',
+                borderRadius: '8px',
+              }}
+            >
+              <Icon size={28} />
+            </button>
+            <span style={{ color: '#aaa', fontSize: '12px' }}>
+              {copiedTool === name ? 'Kopyalandı!' : name}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 };
 
 export default AIToolSelector;
