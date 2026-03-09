@@ -2,11 +2,16 @@ import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { goldenExamples } from './examples';
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY, 
-});
+let openaiClient = null;
+function getOpenAIClient() {
+  if (!openaiClient) {
+    openaiClient = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+  }
+  return openaiClient;
+}
 
 export async function POST(req) {
+  const openai = getOpenAIClient();
   try {
     const { userInput } = await req.json();
 
