@@ -2,12 +2,12 @@ import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { goldenExamples } from './examples';
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY, 
-});
-
 export async function POST(req) {
   try {
+    const openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+    });
+
     const { userInput } = await req.json();
 
     const systemPrompt = `
