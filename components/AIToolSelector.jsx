@@ -11,18 +11,19 @@ const tools = [
   { name: 'Copilot',    icon: Code,         url: 'https://github.com/features/copilot' },
 ];
 
-const AIToolSelector = () => {
+const AIToolSelector = ({ generatedText }) => {
   const [copiedTool, setCopiedTool] = useState(null);
 
   const handleCopy = useCallback((tool) => {
+    const textToCopy = generatedText || tool.url;
     navigator.clipboard
-      .writeText(tool.url)
+      .writeText(textToCopy)
       .then(() => {
         setCopiedTool(tool.name);
         setTimeout(() => setCopiedTool(null), 2000);
       })
       .catch((err) => console.error('Clipboard hatası:', err));
-  }, []);
+  }, [generatedText]);
 
   const handleLinkOpen = useCallback((url) => {
     window.open(url, '_blank', 'noopener,noreferrer');
@@ -35,9 +36,11 @@ const AIToolSelector = () => {
         {tools.map(({ name, icon: Icon, url }) => (
           <div key={name} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
             <button
-              onClick={() => handleCopy({ name, url })}
-              onDoubleClick={() => handleLinkOpen(url)}
-              title={`Tıkla: ${name} linkini kopyala | Çift tıkla: aç`}
+              onClick={() => {
+                handleCopy({ name, url });
+                handleLinkOpen(url);
+              }}
+              title={`${name}: metni kopyala ve aç`}
               style={{
                 border: '1px solid #333',
                 background: 'none',
@@ -51,7 +54,7 @@ const AIToolSelector = () => {
               <Icon size={28} />
             </button>
             <span style={{ color: '#aaa', fontSize: '12px' }}>
-              {copiedTool === name ? 'Kopyalandı!' : name}
+              {copiedTool === name ? '✅ Kopyalandı!' : name}
             </span>
           </div>
         ))}
