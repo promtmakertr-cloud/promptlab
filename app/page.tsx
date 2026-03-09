@@ -5,7 +5,10 @@ import AIToolSelector from '@/components/AIToolSelector';
 import PromptTemplates from '@/components/PromptTemplates';
 import PromptHistory from '@/components/PromptHistory';
 import FavoritesList from '@/components/FavoritesList';
-import { Copy, Check, Star, Share2, RefreshCw } from 'lucide-react';
+import SavedPrompts from '@/components/SavedPrompts';
+import { Copy, Check, Star, Share2, RefreshCw, Save } from 'lucide-react';
+import type { Language, Tone, SavedPrompt } from '@/lib/types';
+import { MAX_TITLE_LENGTH } from '@/lib/types';
 
 const HISTORY_KEY = 'promptlab_history';
 const FAVORITES_KEY = 'promptlab_favorites';
@@ -19,9 +22,7 @@ type HistoryEntry = {
   createdAt: string;
 };
 
-type Tab = 'generate' | 'templates' | 'history' | 'favorites';
-type Language = 'tr' | 'en';
-type Tone = 'professional' | 'creative' | 'technical' | 'concise';
+type Tab = 'generate' | 'templates' | 'history' | 'favorites' | 'saved';
 
 const TONE_LABELS: Record<Tone, string> = {
   professional: 'Profesyonel',
@@ -60,6 +61,11 @@ export default function Home() {
   const [refining, setRefining] = useState(false);
   const [showRefine, setShowRefine] = useState(false);
   const [currentFavoriteId, setCurrentFavoriteId] = useState<number | null>(null);
+  const [savedPrompts, setSavedPrompts] = useState<SavedPrompt[]>([]);
+  const [saveTitle, setSaveTitle] = useState('');
+  const [showSaveInput, setShowSaveInput] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [savedNotice, setSavedNotice] = useState(false);
   const resultRef = useRef<HTMLDivElement>(null);
 
   // Load persisted data from localStorage
@@ -72,6 +78,14 @@ export default function Home() {
     } catch {
       // localStorage may be unavailable
     }
+  }, []);
+
+  // Fetch server-saved prompts from the API
+  useEffect(() => {
+    fetch('/api/prompts')
+      .then((res) => (res.ok ? res.json() : []))
+      .then((data: SavedPrompt[]) => setSavedPrompts(data))
+      .catch(() => {});
   }, []);
 
   // Decode shared prompt from URL hash on initial load
@@ -150,6 +164,8 @@ export default function Home() {
     setStarred(false);
     setCurrentFavoriteId(null);
     setShowRefine(false);
+    setShowSaveInput(false);
+    setSavedNotice(false);
     setActiveTab('generate');
 
     try {
@@ -260,12 +276,53 @@ export default function Home() {
     try { localStorage.removeItem(HISTORY_KEY); } catch { /* ignore */ }
   };
 
+  const handleOpenSaveForm = () => {
+    setSaveTitle(userInput.slice(0, MAX_TITLE_LENGTH));
+    setShowSaveInput(true);
+  };
+
+  const handleSavePrompt = async () => {
+    if (!result || !saveTitle.trim() || saving) return;
+    setSaving(true);
+    try {
+      const res = await fetch('/api/prompts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: saveTitle.trim(),
+          input: userInput,
+          output: result,
+          language,
+          tone,
+        }),
+      });
+      if (res.ok) {
+        const saved: SavedPrompt = await res.json();
+        setSavedPrompts((prev) => [saved, ...prev]);
+        setSaveTitle('');
+        setShowSaveInput(false);
+        setSavedNotice(true);
+        setTimeout(() => setSavedNotice(false), 2500);
+      }
+    } catch { /* ignore */ } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDeleteSaved = async (id: string) => {
+    try {
+      await fetch(`/api/prompts/${id}`, { method: 'DELETE' });
+      setSavedPrompts((prev) => prev.filter((p) => p.id !== id));
+    } catch { /* ignore */ }
+  };
+
   const charCount = userInput.length;
   const tabs: { id: Tab; label: string }[] = [
     { id: 'generate', label: '✏️ Oluştur' },
     { id: 'templates', label: '⚡ Şablonlar' },
     { id: 'history', label: `🕒 Geçmiş${history.length ? ` (${history.length})` : ''}` },
     { id: 'favorites', label: `⭐ Favoriler${favorites.length ? ` (${favorites.length})` : ''}` },
+    { id: 'saved', label: `💾 Kaydedilenler${savedPrompts.length ? ` (${savedPrompts.length})` : ''}` },
   ];
 
   return (
@@ -528,8 +585,109 @@ export default function Home() {
                     {copied ? <Check size={14} /> : <Copy size={14} />}
                     {copied ? 'Kopyalandı!' : 'Kopyala'}
                   </button>
+
+                  {/* Save button */}
+                  {!loading && !refining && (
+                    <button
+                      onClick={handleOpenSaveForm}
+                      title="Promptu kaydet"
+                      style={{
+                        background: savedNotice ? '#14532d22' : '#1a1a1a',
+                        border: `1px solid ${savedNotice ? '#16a34a' : '#333'}`,
+                        borderRadius: '6px',
+                        padding: '0.35rem 0.6rem',
+                        color: savedNotice ? '#4ade80' : '#888',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                        fontSize: '0.8rem',
+                        transition: 'all 0.2s',
+                      }}
+                    >
+                      <Save size={14} />
+                      {savedNotice ? 'Kaydedildi!' : 'Kaydet'}
+                    </button>
+                  )}
                 </div>
               </div>
+
+              {/* Inline save form */}
+              {showSaveInput && !loading && !refining && (
+                <div
+                  style={{
+                    marginBottom: '0.75rem',
+                    padding: '0.75rem',
+                    background: '#0a0a0a',
+                    borderRadius: '8px',
+                    border: '1px solid #1e2a1e',
+                    display: 'flex',
+                    gap: '0.5rem',
+                    alignItems: 'center',
+                    flexWrap: 'wrap',
+                  }}
+                >
+                  <Save size={14} color="#22c55e" style={{ flexShrink: 0 }} />
+                  <input
+                    type="text"
+                    value={saveTitle}
+                    onChange={(e) => setSaveTitle(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') handleSavePrompt();
+                      if (e.key === 'Escape') setShowSaveInput(false);
+                    }}
+                    placeholder="Kayıt adı..."
+                    maxLength={MAX_TITLE_LENGTH}
+                    autoFocus
+                    style={{
+                      flex: 1,
+                      minWidth: '140px',
+                      background: '#0d0d0d',
+                      border: '1px solid #2a3a2a',
+                      borderRadius: '6px',
+                      color: '#fff',
+                      fontSize: '0.85rem',
+                      padding: '0.35rem 0.6rem',
+                      outline: 'none',
+                    }}
+                  />
+                  <button
+                    onClick={handleSavePrompt}
+                    disabled={saving || !saveTitle.trim()}
+                    style={{
+                      padding: '0.35rem 0.9rem',
+                      background:
+                        saving || !saveTitle.trim() ? '#1a3a5c' : '#16a34a',
+                      color:
+                        saving || !saveTitle.trim() ? '#5a8ab8' : '#fff',
+                      border: 'none',
+                      borderRadius: '6px',
+                      cursor:
+                        saving || !saveTitle.trim()
+                          ? 'not-allowed'
+                          : 'pointer',
+                      fontSize: '0.82rem',
+                      fontWeight: '600',
+                    }}
+                  >
+                    {saving ? '...' : 'Kaydet'}
+                  </button>
+                  <button
+                    onClick={() => setShowSaveInput(false)}
+                    style={{
+                      padding: '0.35rem 0.6rem',
+                      background: 'none',
+                      border: '1px solid #333',
+                      borderRadius: '6px',
+                      color: '#666',
+                      cursor: 'pointer',
+                      fontSize: '0.82rem',
+                    }}
+                  >
+                    İptal
+                  </button>
+                </div>
+              )}
 
               {/* Result Text */}
               <pre
@@ -664,6 +822,15 @@ export default function Home() {
           favorites={favorites}
           onSelect={handleHistorySelect}
           onDelete={handleDeleteFavorite}
+        />
+      )}
+
+      {/* Saved Prompts Tab */}
+      {activeTab === 'saved' && (
+        <SavedPrompts
+          prompts={savedPrompts}
+          onLoad={handleHistorySelect}
+          onDelete={handleDeleteSaved}
         />
       )}
     </main>
