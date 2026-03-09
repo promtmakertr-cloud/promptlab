@@ -3,8 +3,8 @@
 import { useState, useEffect, useRef, useCallback, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import AIToolSelector from '@/components/AIToolSelector';
-import { Copy, Check, Star, Share2, RefreshCw, Save } from 'lucide-react';
-import type { Language, Tone } from '@/lib/types';
+import { Copy, Check, Star, Share2, RefreshCw, Save, Mic, ArrowUp } from 'lucide-react';
+import type { Language, Tone, SavedPrompt } from '@/lib/types';
 import { MAX_TITLE_LENGTH } from '@/lib/types';
 
 const HISTORY_KEY = 'promptlab_history';
@@ -26,6 +26,29 @@ const TONE_LABELS: Record<Tone, string> = {
   concise: 'Kısa & Öz',
 };
 
+const floatingExamples = [
+  {
+    title: 'Pazarlama',
+    text: 'Instagram için dikkat çekici ve etkileşim odaklı ürün lansman postu.',
+    pos: { top: '18%', left: '3%' },
+  },
+  {
+    title: 'Veri Analizi',
+    text: 'E-ticaret satış verilerini inceleyerek müşteri sadakatini artıracak stratejiler öner.',
+    pos: { top: '18%', right: '5%' },
+  },
+  {
+    title: 'İçerik Üretimi',
+    text: 'Teknoloji blogu için SEO uyumlu ve okuyucuyu içine çeken makale taslağı.',
+    pos: { top: '44%', left: '3%' },
+  },
+  {
+    title: 'Sunum',
+    text: 'Yapay zekanın iş dünyasındaki geleceği hakkında yöneticilere yapılacak 10 slaytlık sunum taslağı.',
+    pos: { top: '49%', right: '5%' },
+  },
+];
+
 function encodeForShare(text: string): string {
   const bytes = new TextEncoder().encode(text);
   return btoa(Array.from(bytes).map((b) => String.fromCharCode(b)).join(''));
@@ -38,6 +61,38 @@ function decodeFromShare(encoded: string): string {
   } catch {
     return '';
   }
+}
+
+function PromptLabLogo({ size = 'sm' }: { size?: 'sm' | 'lg' }) {
+  const isLg = size === 'lg';
+  return (
+    <div
+      style={{
+        fontFamily: 'Georgia, "Times New Roman", serif',
+        fontSize: isLg ? '2.6rem' : '1.05rem',
+        letterSpacing: '-0.02em',
+        lineHeight: 1,
+        display: 'inline-flex',
+        alignItems: 'baseline',
+        gap: '1px',
+      }}
+    >
+      <span style={{ fontStyle: 'italic', fontWeight: '400', color: '#fff' }}>prompt</span>
+      <span style={{ fontStyle: 'normal', fontWeight: '700', color: '#fff' }}>lab</span>
+      <span
+        style={{
+          color: '#fff',
+          fontSize: isLg ? '1.6rem' : '0.75rem',
+          marginLeft: isLg ? '4px' : '2px',
+          fontFamily: 'Arial, sans-serif',
+          fontStyle: 'normal',
+          fontWeight: '400',
+        }}
+      >
+        ·✦
+      </span>
+    </div>
+  );
 }
 
 export default function Home() {
@@ -55,6 +110,7 @@ function HomeContent() {
   const [loading, setLoading] = useState(false);
   const [history, setHistory] = useState<HistoryEntry[]>([]);
   const [favorites, setFavorites] = useState<HistoryEntry[]>([]);
+  const [savedPrompts, setSavedPrompts] = useState<SavedPrompt[]>([]);
   const [copied, setCopied] = useState(false);
   const [shared, setShared] = useState(false);
   const [starred, setStarred] = useState(false);
@@ -70,7 +126,6 @@ function HomeContent() {
   const [savedNotice, setSavedNotice] = useState(false);
   const resultRef = useRef<HTMLDivElement>(null);
 
-  // Load persisted data from localStorage
   useEffect(() => {
     try {
       const savedHistory = localStorage.getItem(HISTORY_KEY);
@@ -82,7 +137,13 @@ function HomeContent() {
     }
   }, []);
 
-  // Pre-fill input/output from URL params (template or loaded saved prompt)
+  useEffect(() => {
+    fetch('/api/prompts')
+      .then((res) => (res.ok ? res.json() : []))
+      .then((data: SavedPrompt[]) => setSavedPrompts(data))
+      .catch(() => {});
+  }, []);
+
   useEffect(() => {
     const template = searchParams.get('template');
     const input = searchParams.get('input');
@@ -98,7 +159,6 @@ function HomeContent() {
     window.history.replaceState(null, '', window.location.pathname);
   }, [searchParams]);
 
-  // Decode shared prompt from URL hash on initial load
   useEffect(() => {
     const hash = window.location.hash;
     if (hash.startsWith('#share=')) {
@@ -157,7 +217,6 @@ function HomeContent() {
       fullText += decoder.decode(value, { stream: true });
       setResult(fullText);
     }
-    // Flush any remaining buffered bytes (important for multi-byte UTF-8 characters)
     const remaining = decoder.decode();
     if (remaining) {
       fullText += remaining;
@@ -215,9 +274,7 @@ function HomeContent() {
     navigator.clipboard.writeText(result).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-    }).catch(() => {
-      // Clipboard access may be denied; fail silently
-    });
+    }).catch(() => {});
   };
 
   const handleShare = () => {
@@ -227,9 +284,7 @@ function HomeContent() {
     navigator.clipboard.writeText(url).then(() => {
       setShared(true);
       setTimeout(() => setShared(false), 3000);
-    }).catch(() => {
-      // Clipboard access may be denied; fail silently
-    });
+    }).catch(() => {});
   };
 
   const handleToggleFavorite = () => {
@@ -259,14 +314,6 @@ function HomeContent() {
     }
   };
 
-  const handleDeleteFavorite = (id: number) => {
-    setFavorites((prev) => {
-      const updated = prev.filter((f) => f.id !== id);
-      try { localStorage.setItem(FAVORITES_KEY, JSON.stringify(updated)); } catch { /* ignore */ }
-      return updated;
-    });
-  };
-
   const handleOpenSaveForm = () => {
     setSaveTitle(userInput.slice(0, MAX_TITLE_LENGTH));
     setShowSaveInput(true);
@@ -288,6 +335,8 @@ function HomeContent() {
         }),
       });
       if (res.ok) {
+        const saved: SavedPrompt = await res.json();
+        setSavedPrompts((prev) => [saved, ...prev]);
         setSaveTitle('');
         setShowSaveInput(false);
         setSavedNotice(true);
@@ -298,488 +347,582 @@ function HomeContent() {
     }
   };
 
-  const charCount = userInput.length;
+  const showHero = !result && !loading;
 
   return (
-    <main
+    <div
       style={{
-        padding: '2rem',
+        position: 'relative',
+        minHeight: '100vh',
         background: '#050505',
         color: '#fff',
-        minHeight: '100vh',
         fontFamily: 'Arial, sans-serif',
-        maxWidth: '860px',
-        margin: '0 auto',
+        overflowX: 'hidden',
       }}
     >
-      {/* Header */}
-      <div style={{ marginBottom: '2rem' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '0.75rem' }}>
-          <div>
-            <h1 style={{ fontSize: '1.8rem', fontWeight: '700', margin: 0 }}>🎯 PromptLab</h1>
-            <p style={{ color: '#666', fontSize: '0.9rem', marginTop: '0.4rem' }}>
-              Fikrinizi profesyonel yapay zeka promptlarına dönüştürün
-            </p>
-          </div>
-          <nav style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', paddingTop: '0.25rem' }}>
-            <a
-              href="/library"
-              style={{
-                color: '#888',
-                fontSize: '0.85rem',
-                textDecoration: 'none',
-                padding: '0.35rem 0.75rem',
-                border: '1px solid #222',
-                borderRadius: '6px',
-                transition: 'color 0.2s, border-color 0.2s',
-              }}
-              onMouseEnter={(e) => { e.currentTarget.style.color = '#fff'; e.currentTarget.style.borderColor = '#444'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.color = '#888'; e.currentTarget.style.borderColor = '#222'; }}
-            >
-              ⚡ Kütüphane
-            </a>
-            <a
-              href="/saved"
-              style={{
-                color: '#888',
-                fontSize: '0.85rem',
-                textDecoration: 'none',
-                padding: '0.35rem 0.75rem',
-                border: '1px solid #222',
-                borderRadius: '6px',
-                transition: 'color 0.2s, border-color 0.2s',
-              }}
-              onMouseEnter={(e) => { e.currentTarget.style.color = '#fff'; e.currentTarget.style.borderColor = '#444'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.color = '#888'; e.currentTarget.style.borderColor = '#222'; }}
-            >
-              💾 Kaydedilenler
-            </a>
-          </nav>
-        </div>
+      {/* Top-left logo */}
+      <div style={{ position: 'fixed', top: '1.5rem', left: '2rem', zIndex: 20 }}>
+        <PromptLabLogo size="sm" />
       </div>
 
-      {/* Prompt Generator */}
-      <div>
-          {/* Textarea */}
-          <div style={{ position: 'relative', marginBottom: '1rem' }}>
+      {/* Floating background examples (only in hero/idle state) */}
+      {showHero && floatingExamples.map((ex) => (
+        <div
+          key={ex.title}
+          onClick={() => setUserInput(ex.text)}
+          style={{
+            position: 'absolute',
+            ...ex.pos,
+            maxWidth: '280px',
+            cursor: 'pointer',
+            padding: '0.5rem',
+            transition: 'opacity 0.2s',
+          }}
+          onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.opacity = '0.8'; }}
+          onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.opacity = '1'; }}
+        >
+          <h3
+            style={{
+              fontFamily: 'Georgia, "Times New Roman", serif',
+              fontStyle: 'italic',
+              fontWeight: '400',
+              color: '#ffffff',
+              fontSize: '1.05rem',
+              margin: '0 0 0.5rem',
+              letterSpacing: '-0.01em',
+            }}
+          >
+            {ex.title}
+          </h3>
+          <p
+            style={{
+              color: '#555',
+              fontSize: '0.82rem',
+              lineHeight: '1.55',
+              margin: 0,
+            }}
+          >
+            {ex.text}
+          </p>
+        </div>
+      ))}
+
+      {/* Main content area */}
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: showHero ? 'flex-end' : 'flex-start',
+          minHeight: '100vh',
+          padding: showHero ? '0 2rem 8vh' : '5rem 2rem 4rem',
+        }}
+      >
+        {/* Hero content (logo + headline + subtitle) */}
+        {showHero && (
+          <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
+            <div style={{ marginBottom: '1.5rem' }}>
+              <PromptLabLogo size="lg" />
+            </div>
+            <h1
+              style={{
+                fontSize: 'clamp(1.8rem, 4vw, 2.6rem)',
+                fontWeight: '800',
+                margin: '0 0 1rem',
+                letterSpacing: '-0.04em',
+                lineHeight: 1.15,
+                maxWidth: '680px',
+              }}
+            >
+              Fikirlerini Güçlü Promptlara Dönüştür.
+            </h1>
+            <p
+              style={{
+                color: '#888',
+                fontSize: '1rem',
+                margin: 0,
+                lineHeight: '1.6',
+                maxWidth: '460px',
+                marginLeft: 'auto',
+                marginRight: 'auto',
+              }}
+            >
+              Metni yaz. Optimize edilmiş promptu al. Kopyala ve diğer AI araçlarında kullan.
+            </p>
+          </div>
+        )}
+
+        {/* Result area (shown when result exists, above input) */}
+        {result && (
+          <div ref={resultRef} style={{ width: '100%', maxWidth: '700px', marginBottom: '1.5rem' }}>
+            {/* Back / new prompt button */}
+            <button
+              onClick={() => { setResult(''); setUserInput(''); setStarred(false); setCurrentFavoriteId(null); setShowRefine(false); setShowSaveInput(false); }}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: '#555',
+                fontSize: '0.82rem',
+                cursor: 'pointer',
+                padding: '0 0 0.75rem',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px',
+              }}
+            >
+              ← Yeni prompt
+            </button>
+
+            {/* Result header with action buttons */}
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: '0.75rem',
+                flexWrap: 'wrap',
+                gap: '0.5rem',
+              }}
+            >
+              <h2 style={{ margin: 0, fontSize: '0.9rem', color: '#555', fontWeight: '500' }}>
+                Oluşturulan Prompt
+              </h2>
+              <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                <button
+                  onClick={handleToggleFavorite}
+                  title={starred ? 'Favorilerden çıkar' : 'Favorilere ekle'}
+                  style={{
+                    background: starred ? '#78350f22' : '#111',
+                    border: `1px solid ${starred ? '#d97706' : '#222'}`,
+                    borderRadius: '6px',
+                    padding: '0.3rem 0.55rem',
+                    color: starred ? '#f59e0b' : '#666',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    fontSize: '0.78rem',
+                    transition: 'all 0.2s',
+                  }}
+                >
+                  <Star size={13} fill={starred ? '#f59e0b' : 'none'} />
+                  {starred ? 'Favorilerde' : 'Favorile'}
+                </button>
+
+                <button
+                  onClick={handleShare}
+                  title="Paylaşım bağlantısını kopyala"
+                  style={{
+                    background: shared ? '#1e3a5f22' : '#111',
+                    border: `1px solid ${shared ? '#3b82f6' : '#222'}`,
+                    borderRadius: '6px',
+                    padding: '0.3rem 0.55rem',
+                    color: shared ? '#60a5fa' : '#666',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    fontSize: '0.78rem',
+                    transition: 'all 0.2s',
+                  }}
+                >
+                  <Share2 size={13} />
+                  {shared ? 'Link Kopyalandı!' : 'Paylaş'}
+                </button>
+
+                <button
+                  onClick={handleCopyResult}
+                  style={{
+                    background: copied ? '#16a34a22' : '#111',
+                    border: `1px solid ${copied ? '#16a34a' : '#222'}`,
+                    borderRadius: '6px',
+                    padding: '0.3rem 0.7rem',
+                    color: copied ? '#4ade80' : '#888',
+                    fontSize: '0.78rem',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '5px',
+                    transition: 'all 0.2s',
+                  }}
+                >
+                  {copied ? <Check size={13} /> : <Copy size={13} />}
+                  {copied ? 'Kopyalandı!' : 'Kopyala'}
+                </button>
+
+                {!loading && !refining && (
+                  <button
+                    onClick={handleOpenSaveForm}
+                    title="Promptu kaydet"
+                    style={{
+                      background: savedNotice ? '#14532d22' : '#111',
+                      border: `1px solid ${savedNotice ? '#16a34a' : '#222'}`,
+                      borderRadius: '6px',
+                      padding: '0.3rem 0.55rem',
+                      color: savedNotice ? '#4ade80' : '#666',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                      fontSize: '0.78rem',
+                      transition: 'all 0.2s',
+                    }}
+                  >
+                    <Save size={13} />
+                    {savedNotice ? 'Kaydedildi!' : 'Kaydet'}
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Inline save form */}
+            {showSaveInput && !loading && !refining && (
+              <div
+                style={{
+                  marginBottom: '0.75rem',
+                  padding: '0.75rem',
+                  background: '#0a0a0a',
+                  borderRadius: '10px',
+                  border: '1px solid #1e2a1e',
+                  display: 'flex',
+                  gap: '0.5rem',
+                  alignItems: 'center',
+                  flexWrap: 'wrap',
+                }}
+              >
+                <Save size={13} color="#22c55e" style={{ flexShrink: 0 }} />
+                <input
+                  type="text"
+                  value={saveTitle}
+                  onChange={(e) => setSaveTitle(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') handleSavePrompt();
+                    if (e.key === 'Escape') setShowSaveInput(false);
+                  }}
+                  placeholder="Kayıt adı..."
+                  maxLength={MAX_TITLE_LENGTH}
+                  autoFocus
+                  style={{
+                    flex: 1,
+                    minWidth: '140px',
+                    background: '#0d0d0d',
+                    border: '1px solid #2a3a2a',
+                    borderRadius: '6px',
+                    color: '#fff',
+                    fontSize: '0.85rem',
+                    padding: '0.35rem 0.6rem',
+                    outline: 'none',
+                  }}
+                />
+                <button
+                  onClick={handleSavePrompt}
+                  disabled={saving || !saveTitle.trim()}
+                  style={{
+                    padding: '0.35rem 0.9rem',
+                    background: saving || !saveTitle.trim() ? '#1a3a5c' : '#16a34a',
+                    color: saving || !saveTitle.trim() ? '#5a8ab8' : '#fff',
+                    border: 'none',
+                    borderRadius: '6px',
+                    cursor: saving || !saveTitle.trim() ? 'not-allowed' : 'pointer',
+                    fontSize: '0.82rem',
+                    fontWeight: '600',
+                  }}
+                >
+                  {saving ? '...' : 'Kaydet'}
+                </button>
+                <button
+                  onClick={() => setShowSaveInput(false)}
+                  style={{
+                    padding: '0.35rem 0.6rem',
+                    background: 'none',
+                    border: '1px solid #333',
+                    borderRadius: '6px',
+                    color: '#666',
+                    cursor: 'pointer',
+                    fontSize: '0.82rem',
+                  }}
+                >
+                  İptal
+                </button>
+              </div>
+            )}
+
+            {/* Result text */}
+            <pre
+              style={{
+                background: '#0d0d0d',
+                border: '1px solid #1a1a1a',
+                borderRadius: '14px',
+                padding: '1.25rem',
+                color: '#e0e0e0',
+                fontSize: '0.88rem',
+                lineHeight: '1.7',
+                whiteSpace: 'pre-wrap',
+                wordBreak: 'break-word',
+                margin: 0,
+                fontFamily: 'inherit',
+              }}
+            >
+              {result}
+              {(loading || refining) && <span style={{ opacity: 0.5 }}>▌</span>}
+            </pre>
+
+            {/* Refine section */}
+            {!loading && (
+              <div style={{ marginTop: '1rem' }}>
+                <button
+                  onClick={() => setShowRefine(!showRefine)}
+                  style={{
+                    background: 'none',
+                    border: '1px solid #1a1a1a',
+                    borderRadius: '6px',
+                    padding: '0.35rem 0.75rem',
+                    color: showRefine ? '#fff' : '#555',
+                    fontSize: '0.8rem',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '5px',
+                  }}
+                >
+                  <RefreshCw size={12} />
+                  Promptu Geliştir
+                </button>
+
+                {showRefine && (
+                  <div
+                    style={{
+                      marginTop: '0.75rem',
+                      padding: '1rem',
+                      background: '#0a0a0a',
+                      borderRadius: '10px',
+                      border: '1px solid #1a1a1a',
+                    }}
+                  >
+                    <p style={{ color: '#555', fontSize: '0.8rem', margin: '0 0 0.6rem' }}>
+                      Mevcut promptu nasıl geliştirmek istersiniz?
+                    </p>
+                    <textarea
+                      value={refineInput}
+                      onChange={(e) => setRefineInput(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) handleRefine();
+                      }}
+                      placeholder="Örn: Daha kısa yap, teknik detayları artır..."
+                      rows={2}
+                      style={{
+                        width: '100%',
+                        background: '#0d0d0d',
+                        border: '1px solid #222',
+                        borderRadius: '8px',
+                        color: '#fff',
+                        fontSize: '0.88rem',
+                        padding: '0.75rem',
+                        resize: 'vertical',
+                        outline: 'none',
+                        fontFamily: 'inherit',
+                        boxSizing: 'border-box',
+                        marginBottom: '0.6rem',
+                      }}
+                    />
+                    <button
+                      onClick={handleRefine}
+                      disabled={refining || !refineInput.trim()}
+                      style={{
+                        padding: '0.45rem 1.2rem',
+                        background: refining || !refineInput.trim() ? '#1a3a5c' : '#0070f3',
+                        color: refining || !refineInput.trim() ? '#5a8ab8' : '#fff',
+                        border: 'none',
+                        borderRadius: '6px',
+                        cursor: refining || !refineInput.trim() ? 'not-allowed' : 'pointer',
+                        fontSize: '0.88rem',
+                        fontWeight: '600',
+                      }}
+                    >
+                      {refining ? '⏳ Geliştiriliyor...' : '🔄 Geliştir'}
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* AI Tool Selector */}
+            {!loading && !refining && (
+              <div style={{ marginTop: '1.25rem' }}>
+                <div style={{ color: '#444', fontSize: '0.78rem', marginBottom: '0.5rem' }}>
+                  Bu promptu açmak istediğiniz AI aracına gönderin:
+                </div>
+                <AIToolSelector generatedText={result} />
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Input box with glow */}
+        <div style={{ position: 'relative', width: '100%', maxWidth: '700px' }}>
+          {/* Blue glow effect (hero state only) */}
+          {showHero && (
+            <div
+              style={{
+                position: 'absolute',
+                bottom: '-40px',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                width: '90%',
+                height: '120px',
+                background:
+                  'radial-gradient(ellipse at center, rgba(56, 139, 253, 0.28) 0%, rgba(56, 139, 253, 0.06) 50%, transparent 75%)',
+                filter: 'blur(18px)',
+                zIndex: 0,
+                pointerEvents: 'none',
+              }}
+            />
+          )}
+
+          {/* Input container */}
+          <div
+            style={{
+              position: 'relative',
+              background: '#0f0f0f',
+              border: '1px solid #252525',
+              borderRadius: '22px',
+              padding: '0.85rem 4.5rem 0.85rem 1.4rem',
+              zIndex: 1,
+              boxShadow: showHero ? '0 0 0 1px #1a1a1a' : 'none',
+            }}
+          >
             <textarea
               value={userInput}
               onChange={(e) => setUserInput(e.target.value)}
               onKeyDown={(e) => {
-                if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) handleGenerate();
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault();
+                  handleGenerate();
+                }
               }}
-              placeholder="Ne yapmak istediğinizi yazın... (örn: 'Sinematik bir portre fotoğrafı' veya 'B2B satış e-postası')"
-              rows={4}
+              placeholder={`Ne oluşturmak istiyorsun?\nÖrn: "Siberpunk t"`}
+              rows={2}
               style={{
                 width: '100%',
-                background: '#0d0d0d',
-                border: '1px solid #222',
-                borderRadius: '10px',
+                background: 'none',
+                border: 'none',
                 color: '#fff',
-                fontSize: '0.95rem',
-                padding: '1rem',
-                resize: 'vertical',
+                fontSize: '0.93rem',
                 outline: 'none',
+                resize: 'none',
                 fontFamily: 'inherit',
-                lineHeight: '1.6',
+                lineHeight: '1.55',
                 boxSizing: 'border-box',
               }}
             />
+
+            {/* Mic + Send buttons */}
             <div
               style={{
                 position: 'absolute',
-                bottom: '0.6rem',
-                right: '0.75rem',
-                color: charCount > 800 ? '#ef4444' : '#444',
-                fontSize: '0.75rem',
+                right: '0.65rem',
+                bottom: '0.65rem',
+                display: 'flex',
+                gap: '0.4rem',
+                alignItems: 'center',
               }}
             >
-              {charCount} karakter
+              <button
+                title="Sesli giriş (yakında)"
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'default',
+                  color: '#3a3a3a',
+                  padding: '4px',
+                  display: 'flex',
+                  alignItems: 'center',
+                }}
+              >
+                <Mic size={19} />
+              </button>
+              <button
+                onClick={handleGenerate}
+                disabled={loading || !userInput.trim()}
+                title="Prompt Oluştur"
+                style={{
+                  background: loading || !userInput.trim() ? '#1c1c1c' : '#ffffff',
+                  border: 'none',
+                  borderRadius: '50%',
+                  width: '34px',
+                  height: '34px',
+                  cursor: loading || !userInput.trim() ? 'not-allowed' : 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: loading || !userInput.trim() ? '#444' : '#000',
+                  transition: 'all 0.2s',
+                  flexShrink: 0,
+                }}
+              >
+                {loading ? (
+                  <span style={{ fontSize: '12px', animation: 'spin 1s linear infinite' }}>⏳</span>
+                ) : (
+                  <ArrowUp size={17} />
+                )}
+              </button>
             </div>
           </div>
 
-          {/* Options Row: Language + Tone */}
+          {/* Language + Tone options (compact row below input) */}
           <div
             style={{
               display: 'flex',
-              flexWrap: 'wrap',
-              gap: '0.75rem',
+              gap: '0.4rem',
               alignItems: 'center',
-              marginBottom: '1rem',
-              padding: '0.75rem',
-              background: '#0a0a0a',
-              borderRadius: '8px',
-              border: '1px solid #1a1a1a',
+              marginTop: '0.6rem',
+              flexWrap: 'wrap',
+              justifyContent: 'center',
+              paddingLeft: '0.25rem',
             }}
           >
-            {/* Language Toggle */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-              <span style={{ color: '#555', fontSize: '0.8rem' }}>Dil:</span>
-              {(['tr', 'en'] as Language[]).map((lang) => (
-                <button
-                  key={lang}
-                  onClick={() => setLanguage(lang)}
-                  style={{
-                    padding: '0.25rem 0.6rem',
-                    background: language === lang ? '#0070f3' : 'none',
-                    border: `1px solid ${language === lang ? '#0070f3' : '#333'}`,
-                    borderRadius: '5px',
-                    color: language === lang ? '#fff' : '#888',
-                    fontSize: '0.8rem',
-                    cursor: 'pointer',
-                    transition: 'all 0.15s',
-                  }}
-                >
-                  {lang === 'tr' ? '🇹🇷 TR' : '🇬🇧 EN'}
-                </button>
-              ))}
-            </div>
-
-            <div style={{ width: '1px', height: '20px', background: '#222' }} />
-
-            {/* Tone Selector */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap' }}>
-              <span style={{ color: '#555', fontSize: '0.8rem' }}>Ton:</span>
-              {(Object.keys(TONE_LABELS) as Tone[]).map((t) => (
-                <button
-                  key={t}
-                  onClick={() => setTone(t)}
-                  style={{
-                    padding: '0.25rem 0.6rem',
-                    background: tone === t ? '#1a1a1a' : 'none',
-                    border: `1px solid ${tone === t ? '#0070f3' : '#2a2a2a'}`,
-                    borderRadius: '5px',
-                    color: tone === t ? '#fff' : '#888',
-                    fontSize: '0.8rem',
-                    cursor: 'pointer',
-                    transition: 'all 0.15s',
-                  }}
-                >
-                  {TONE_LABELS[t]}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Generate Button */}
-          <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', marginBottom: '2rem' }}>
-            <button
-              onClick={handleGenerate}
-              disabled={loading || !userInput.trim()}
-              style={{
-                padding: '0.65rem 1.5rem',
-                background: loading || !userInput.trim() ? '#1a3a5c' : '#0070f3',
-                color: loading || !userInput.trim() ? '#5a8ab8' : '#fff',
-                border: 'none',
-                borderRadius: '8px',
-                cursor: loading || !userInput.trim() ? 'not-allowed' : 'pointer',
-                fontSize: '0.95rem',
-                fontWeight: '600',
-                transition: 'background 0.2s',
-              }}
-            >
-              {loading ? '⏳ Oluşturuluyor...' : '✨ Prompt Oluştur'}
-            </button>
-            <span style={{ color: '#444', fontSize: '0.8rem' }}>veya Ctrl+Enter</span>
-          </div>
-
-          {/* Result Area */}
-          {result && (
-            <div ref={resultRef}>
-              {/* Result Header */}
-              <div
+            {(['tr', 'en'] as Language[]).map((lang) => (
+              <button
+                key={lang}
+                onClick={() => setLanguage(lang)}
                 style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  marginBottom: '0.75rem',
-                  flexWrap: 'wrap',
-                  gap: '0.5rem',
+                  padding: '0.18rem 0.5rem',
+                  background: language === lang ? '#1a1a1a' : 'none',
+                  border: `1px solid ${language === lang ? '#333' : '#1e1e1e'}`,
+                  borderRadius: '5px',
+                  color: language === lang ? '#ccc' : '#444',
+                  fontSize: '0.72rem',
+                  cursor: 'pointer',
+                  transition: 'all 0.15s',
                 }}
               >
-                <h2 style={{ margin: 0, fontSize: '1rem', color: '#aaa', fontWeight: '500' }}>
-                  Oluşturulan Prompt
-                </h2>
-                <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-                  {/* Favorite button */}
-                  <button
-                    onClick={handleToggleFavorite}
-                    title={starred ? 'Favorilerden çıkar' : 'Favorilere ekle'}
-                    style={{
-                      background: starred ? '#78350f22' : '#1a1a1a',
-                      border: `1px solid ${starred ? '#d97706' : '#333'}`,
-                      borderRadius: '6px',
-                      padding: '0.35rem 0.6rem',
-                      color: starred ? '#f59e0b' : '#888',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '4px',
-                      fontSize: '0.8rem',
-                      transition: 'all 0.2s',
-                    }}
-                  >
-                    <Star size={14} fill={starred ? '#f59e0b' : 'none'} />
-                    {starred ? 'Favorilerde' : 'Favorile'}
-                  </button>
+                {lang === 'tr' ? '🇹🇷 TR' : '🇬🇧 EN'}
+              </button>
+            ))}
 
-                  {/* Share button */}
-                  <button
-                    onClick={handleShare}
-                    title="Paylaşım bağlantısını kopyala"
-                    style={{
-                      background: shared ? '#1e3a5f22' : '#1a1a1a',
-                      border: `1px solid ${shared ? '#3b82f6' : '#333'}`,
-                      borderRadius: '6px',
-                      padding: '0.35rem 0.6rem',
-                      color: shared ? '#60a5fa' : '#888',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '4px',
-                      fontSize: '0.8rem',
-                      transition: 'all 0.2s',
-                    }}
-                  >
-                    <Share2 size={14} />
-                    {shared ? 'Link Kopyalandı!' : 'Paylaş'}
-                  </button>
+            <div style={{ width: '1px', height: '14px', background: '#1e1e1e' }} />
 
-                  {/* Copy button */}
-                  <button
-                    onClick={handleCopyResult}
-                    style={{
-                      background: copied ? '#16a34a22' : '#1a1a1a',
-                      border: `1px solid ${copied ? '#16a34a' : '#333'}`,
-                      borderRadius: '6px',
-                      padding: '0.35rem 0.75rem',
-                      color: copied ? '#4ade80' : '#aaa',
-                      fontSize: '0.8rem',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '5px',
-                      transition: 'all 0.2s',
-                    }}
-                  >
-                    {copied ? <Check size={14} /> : <Copy size={14} />}
-                    {copied ? 'Kopyalandı!' : 'Kopyala'}
-                  </button>
-
-                  {/* Save button */}
-                  {!loading && !refining && (
-                    <button
-                      onClick={handleOpenSaveForm}
-                      title="Promptu kaydet"
-                      style={{
-                        background: savedNotice ? '#14532d22' : '#1a1a1a',
-                        border: `1px solid ${savedNotice ? '#16a34a' : '#333'}`,
-                        borderRadius: '6px',
-                        padding: '0.35rem 0.6rem',
-                        color: savedNotice ? '#4ade80' : '#888',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '4px',
-                        fontSize: '0.8rem',
-                        transition: 'all 0.2s',
-                      }}
-                    >
-                      <Save size={14} />
-                      {savedNotice ? 'Kaydedildi!' : 'Kaydet'}
-                    </button>
-                  )}
-                </div>
-              </div>
-
-              {/* Inline save form */}
-              {showSaveInput && !loading && !refining && (
-                <div
-                  style={{
-                    marginBottom: '0.75rem',
-                    padding: '0.75rem',
-                    background: '#0a0a0a',
-                    borderRadius: '8px',
-                    border: '1px solid #1e2a1e',
-                    display: 'flex',
-                    gap: '0.5rem',
-                    alignItems: 'center',
-                    flexWrap: 'wrap',
-                  }}
-                >
-                  <Save size={14} color="#22c55e" style={{ flexShrink: 0 }} />
-                  <input
-                    type="text"
-                    value={saveTitle}
-                    onChange={(e) => setSaveTitle(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') handleSavePrompt();
-                      if (e.key === 'Escape') setShowSaveInput(false);
-                    }}
-                    placeholder="Kayıt adı..."
-                    maxLength={MAX_TITLE_LENGTH}
-                    autoFocus
-                    style={{
-                      flex: 1,
-                      minWidth: '140px',
-                      background: '#0d0d0d',
-                      border: '1px solid #2a3a2a',
-                      borderRadius: '6px',
-                      color: '#fff',
-                      fontSize: '0.85rem',
-                      padding: '0.35rem 0.6rem',
-                      outline: 'none',
-                    }}
-                  />
-                  <button
-                    onClick={handleSavePrompt}
-                    disabled={saving || !saveTitle.trim()}
-                    style={{
-                      padding: '0.35rem 0.9rem',
-                      background:
-                        saving || !saveTitle.trim() ? '#1a3a5c' : '#16a34a',
-                      color:
-                        saving || !saveTitle.trim() ? '#5a8ab8' : '#fff',
-                      border: 'none',
-                      borderRadius: '6px',
-                      cursor:
-                        saving || !saveTitle.trim()
-                          ? 'not-allowed'
-                          : 'pointer',
-                      fontSize: '0.82rem',
-                      fontWeight: '600',
-                    }}
-                  >
-                    {saving ? '...' : 'Kaydet'}
-                  </button>
-                  <button
-                    onClick={() => setShowSaveInput(false)}
-                    style={{
-                      padding: '0.35rem 0.6rem',
-                      background: 'none',
-                      border: '1px solid #333',
-                      borderRadius: '6px',
-                      color: '#666',
-                      cursor: 'pointer',
-                      fontSize: '0.82rem',
-                    }}
-                  >
-                    İptal
-                  </button>
-                </div>
-              )}
-
-              {/* Result Text */}
-              <pre
+            {(Object.keys(TONE_LABELS) as Tone[]).map((t) => (
+              <button
+                key={t}
+                onClick={() => setTone(t)}
                 style={{
-                  background: '#0d0d0d',
-                  border: '1px solid #1a1a1a',
-                  borderRadius: '10px',
-                  padding: '1.25rem',
-                  color: '#e0e0e0',
-                  fontSize: '0.88rem',
-                  lineHeight: '1.7',
-                  whiteSpace: 'pre-wrap',
-                  wordBreak: 'break-word',
-                  margin: 0,
-                  fontFamily: 'inherit',
+                  padding: '0.18rem 0.5rem',
+                  background: tone === t ? '#1a1a1a' : 'none',
+                  border: `1px solid ${tone === t ? '#0070f3' : '#1e1e1e'}`,
+                  borderRadius: '5px',
+                  color: tone === t ? '#fff' : '#444',
+                  fontSize: '0.72rem',
+                  cursor: 'pointer',
+                  transition: 'all 0.15s',
                 }}
               >
-                {result}
-                {(loading || refining) && <span style={{ opacity: 0.5 }}>▌</span>}
-              </pre>
-
-              {/* Iterative Refinement Section */}
-              {!loading && (
-                <div style={{ marginTop: '1rem' }}>
-                  <button
-                    onClick={() => setShowRefine(!showRefine)}
-                    style={{
-                      background: 'none',
-                      border: '1px solid #222',
-                      borderRadius: '6px',
-                      padding: '0.4rem 0.8rem',
-                      color: showRefine ? '#fff' : '#666',
-                      fontSize: '0.82rem',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '5px',
-                    }}
-                  >
-                    <RefreshCw size={13} />
-                    Promptu Geliştir
-                  </button>
-
-                  {showRefine && (
-                    <div
-                      style={{
-                        marginTop: '0.75rem',
-                        padding: '1rem',
-                        background: '#0a0a0a',
-                        borderRadius: '8px',
-                        border: '1px solid #1a1a1a',
-                      }}
-                    >
-                      <p style={{ color: '#666', fontSize: '0.82rem', margin: '0 0 0.6rem' }}>
-                        Mevcut promptu nasıl geliştirmek istersiniz?
-                      </p>
-                      <textarea
-                        value={refineInput}
-                        onChange={(e) => setRefineInput(e.target.value)}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) handleRefine();
-                        }}
-                        placeholder="Örn: Daha kısa yap, teknik detayları artır, daha yaratıcı bir ton ekle..."
-                        rows={2}
-                        style={{
-                          width: '100%',
-                          background: '#0d0d0d',
-                          border: '1px solid #222',
-                          borderRadius: '8px',
-                          color: '#fff',
-                          fontSize: '0.88rem',
-                          padding: '0.75rem',
-                          resize: 'vertical',
-                          outline: 'none',
-                          fontFamily: 'inherit',
-                          boxSizing: 'border-box',
-                          marginBottom: '0.6rem',
-                        }}
-                      />
-                      <button
-                        onClick={handleRefine}
-                        disabled={refining || !refineInput.trim()}
-                        style={{
-                          padding: '0.5rem 1.2rem',
-                          background: refining || !refineInput.trim() ? '#1a3a5c' : '#0070f3',
-                          color: refining || !refineInput.trim() ? '#5a8ab8' : '#fff',
-                          border: 'none',
-                          borderRadius: '6px',
-                          cursor: refining || !refineInput.trim() ? 'not-allowed' : 'pointer',
-                          fontSize: '0.88rem',
-                          fontWeight: '600',
-                        }}
-                      >
-                        {refining ? '⏳ Geliştiriliyor...' : '🔄 Geliştir'}
-                      </button>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* AI Tool Selector */}
-              {!loading && !refining && (
-                <div style={{ marginTop: '1.25rem' }}>
-                  <div style={{ color: '#555', fontSize: '0.8rem', marginBottom: '0.5rem' }}>
-                    Bu promptu açmak istediğiniz AI aracına gönderin:
-                  </div>
-                  <AIToolSelector generatedText={result} />
-                </div>
-              )}
-            </div>
-          )}
+                {TONE_LABELS[t]}
+              </button>
+            ))}
+          </div>
         </div>
-    </main>
+      </div>
+    </div>
   );
 }
