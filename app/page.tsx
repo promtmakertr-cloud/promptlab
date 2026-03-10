@@ -79,44 +79,52 @@ const IconCopy = <svg viewBox="0 0 24 24" width="16" height="16" fill="none" str
 type SpeechWindow = Window & { SpeechRecognition?: new () => any; webkitSpeechRecognition?: new () => any };
 type AIPlatformButtonProps = { url: string; icon: ReactNode; name: string };
 
-// 🔥 MATRIX / QUANTUM ŞİFRE ÇÖZÜCÜ EFEKT BİLEŞENİ 🔥
+// 🔥 YENİ NESİL VURGULU ŞİFRE ÇÖZÜCÜ BİLEŞENİ 🔥
 const ScrambleText = ({ text, initialDelayMs }: { text: string; initialDelayMs: number }) => {
-  const [displayText, setDisplayText] = useState(text);
+  const [items, setItems] = useState<{char: string, isScrambled: boolean}[]>([]);
   const isFirstRender = useRef(true);
 
   useEffect(() => {
     let iteration = 0;
-    const chars = "01@#$ΣλΠ⌘xX>_"; // Siber karakter havuzu
+    const chars = "01@#$ΣλΠ⌘xX>_";
     let interval: any;
     
-    // Sadece ilk yüklemede (CSS delay ile uyumlu) bir gecikme ekliyoruz, 
-    // sonraki animasyon döngülerinde hemen (400ms) başlıyor.
-    const delay = isFirstRender.current ? initialDelayMs + 400 : 400;
+    // Gecikmeyi ayarlıyoruz
+    const delay = isFirstRender.current ? initialDelayMs + 200 : 200;
     isFirstRender.current = false;
+
+    // İlk başta tüm metni scrambled sembollerle doldur
+    setItems(text.split("").map(() => ({ char: chars[Math.floor(Math.random() * chars.length)], isScrambled: true })));
 
     const timeout = setTimeout(() => {
       interval = setInterval(() => {
-        setDisplayText(text.split("").map((letter, index) => {
-          if (index < iteration) return letter;
-          if (letter === " ") return " ";
-          return chars[Math.floor(Math.random() * chars.length)];
-        }).join(""));
+        setItems(text.split("").map((letter, index) => {
+          if (index < iteration) return { char: letter, isScrambled: false };
+          if (letter === " ") return { char: " ", isScrambled: false };
+          return { char: chars[Math.floor(Math.random() * chars.length)], isScrambled: true };
+        }));
         
-        if (iteration >= text.length) {
-          clearInterval(interval);
-        }
-        // Kelime uzunluğuna göre tarama hızını ayarlar, yaklaşık 12 karede tamamlar
-        iteration += Math.max(1, text.length / 12); 
-      }, 45); // Şifre çözülme kare hızı
+        if (iteration >= text.length) clearInterval(interval);
+        iteration += Math.max(0.6, text.length / 25); // Daha akışkan ve uzun süreli tarama
+      }, 50);
     }, delay);
     
-    return () => {
-      clearTimeout(timeout);
-      clearInterval(interval);
-    };
+    return () => { clearTimeout(timeout); clearInterval(interval); };
   }, [text, initialDelayMs]);
 
-  return <>{displayText}</>;
+  return (
+    <>
+      {items.map((item, i) => (
+        <span key={i} style={{ 
+          color: item.isScrambled ? '#00E5FF' : 'inherit',
+          textShadow: item.isScrambled ? '0 0 8px rgba(0, 229, 255, 0.6)' : 'none',
+          transition: 'color 0.2s ease'
+        }}>
+          {item.char}
+        </span>
+      ))}
+    </>
+  );
 };
 
 export default function Home() {
@@ -276,7 +284,14 @@ export default function Home() {
         50%  { box-shadow: 0 0 20px rgba(131, 56, 236, 0.35), inset 0 0 8px rgba(131, 56, 236, 0.15); border-color: rgba(131, 56, 236, 0.45); }
         100% { box-shadow: 0 0 8px rgba(58, 134, 255, 0.15), inset 0 0 4px rgba(58, 134, 255, 0.05); border-color: rgba(58, 134, 255, 0.2); }
       }
-      @keyframes perfectBreathing { 0% { opacity: 0; filter: blur(10px); transform: translateY(10px); } 10% { opacity: 1; filter: blur(0px); transform: translateY(0px); } 25% { opacity: 1; filter: blur(0px); transform: translateY(0px); } 35% { opacity: 0; filter: blur(10px); transform: translateY(-10px); } 100% { opacity: 0; filter: blur(10px); transform: translateY(-10px); } }
+      /* Opaklık geçişini hızlandırıyoruz ki şifre çözme görünsün */
+      @keyframes perfectBreathing { 
+        0% { opacity: 0; filter: blur(5px); transform: translateY(10px); } 
+        5% { opacity: 1; filter: blur(0px); transform: translateY(0px); } 
+        25% { opacity: 1; filter: blur(0px); transform: translateY(0px); } 
+        35% { opacity: 0; filter: blur(10px); transform: translateY(-10px); } 
+        100% { opacity: 0; filter: blur(10px); transform: translateY(-10px); } 
+      }
       @keyframes loadingPulse { 0% { opacity: 0.6; transform: scale(0.98); } 50% { opacity: 1; transform: scale(1); } 100% { opacity: 0.6; transform: scale(0.98); } }
       @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
       @keyframes glowingBorder { 0% { background-position: 0% 50%; } 100% { background-position: 200% 50%; } }
@@ -292,7 +307,6 @@ export default function Home() {
       .loading-text { font-size: 1.1rem; color: #00E5FF; font-weight: 500; margin-top: 15px; letter-spacing: 0.5px; }
       .cursor-blink { display: inline-block; width: 8px; height: 1.2em; background-color: #00E5FF; vertical-align: middle; margin-left: 4px; animation: blink 1s step-end infinite; }
       
-      /* BOTH eklendi: Animasyon başlamadan önce görünmez olmasını sağlar */
       .cinematic-text { position: absolute; color: #888888; cursor: pointer; animation: perfectBreathing 24s infinite linear both; text-align: left; line-height: 1.5; font-weight: 300; transition: transform 0.3s ease, filter 0.3s ease; pointer-events: auto; opacity: 0; }
       .cinematic-text:hover { animation-play-state: paused; z-index: 50; }
       .cinematic-text:hover .prompt-category { color: #00E5FF; text-shadow: 0 0 10px rgba(0, 229, 255, 0.5); }
@@ -339,18 +353,15 @@ export default function Home() {
             <div style={floatingContainer}>
               {slots.map((slot) => {
                 const { category, promptText } = parsePromptData(slot.text);
-                // Delay'i CSS'teki string formattan milisaniyeye çeviriyoruz (örn: "6s" -> 6000)
                 const delayMs = parseFloat(slot.delay || '0') * 1000;
                 return (
                   <div key={slot.id} className={`cinematic-text slot-${slot.id}`} onClick={() => setInput(promptText)} onAnimationIteration={() => handleAnimationIteration(slot.id)}
                     style={{ top: slot.pos.top || 'auto', bottom: slot.pos.bottom || 'auto', left: slot.pos.left || 'auto', right: slot.pos.right || 'auto', maxWidth: slot.pos.maxWidth, fontSize: slot.size, animationDelay: slot.delay, display: slot.pos.display || 'block' }}
                   >
                     {category && <div className="prompt-category">
-                      {/* Şifre çözücü bileşen devrede */}
                       <ScrambleText text={category} initialDelayMs={delayMs} />
                     </div>}
                     <div className="prompt-body">
-                      {/* Şifre çözücü bileşen devrede */}
                       <ScrambleText text={promptText} initialDelayMs={delayMs} />
                     </div>
                   </div>
