@@ -2,48 +2,47 @@
 
 import { useState, useEffect, useRef, type MouseEvent, type ReactNode } from 'react';
 
-// 🔥 KISALTILMIŞ VİZYONER PROMPT HAVUZU 🔥
+// 🔥 GÜNCELLENMİŞ, YÜKSEK HACİMLİ VE GERÇEKÇİ PROMPT HAVUZU 🔥
 const allPrompts = [
-  "Sinema | Wong Kar-wai estetiğinde neon sokaklar ve melankolik bir sahne.",
-  "Ürün Tasarımı | Mental sağlık uygulaması için UX akışı ve backend mimarisi.",
-  "Reklam | Premium su markası için buz gibi ferahlık hissini yansıtan sinematik konsept.",
-  "Kripto | Death cross formasyonunu analiz ederek risk odaklı portföy stratejisi.",
-  "Çocuk Hikâyesi | Mini Kedi Mavi'nin balonla yaşadığı pedagojik olarak uygun maceraları.",
-  "Felsefe | Öğrenilmiş benlik ile gerçek benlik arasındaki çatışmayı inceleyen makale.",
-  "Müzik | Aşık Mahzuni Şerif ekolünden ilham alan modern Türk halk müziği.",
-  "DevOps | Yüksek trafikli bir platform için mikroservis tabanlı DevOps altyapısı.",
-  "Pazarlama | Karar vericileri hedefleyen etkili B2B cold email sekansları.",
-  "Hukuk | GDPR standartlarına tam uyumlu kapsamlı veri gizliliği sözleşmesi.",
-  "Senaryo | Rick and Morty tarzında varoluşsal krizi anlatan mizahi bir hikâye.",
-  "Prompt Engineering | Karmaşık bir fikri analiz edip master prompta dönüştür.",
-  "Startup | SaaS ürünü için yatırımcıları etkileyecek pitch deck taslağı.",
-  "UX Yazımı | Mobil uygulama için net ve sade onboarding metinleri.",
-  "Marka Stratejisi | Teknoloji markası için konumlandırma, slogan ve marka hikâyesi.",
-  "İçerik Üretimi | YouTube kanalı için dikkat çekici video başlıkları.",
-  "Kod | Gerçek zamanlı veri işleyen ölçeklenebilir Node.js mikroservisi.",
-  "Veri Analizi | Satış verilerini analiz ederek büyüme fırsatlarını raporla.",
-  "UI Tasarımı | Minimal ve modern bir AI dashboard arayüzü.",
-  "Yazarlık | Distopik bir gelecekte geçen etkileyici bilimkurgu hikâyesi.",
-  "SEO | Teknoloji blogu için yüksek trafik potansiyeline sahip içerik planı.",
-  "Sunum | Karmaşık bir konuyu yöneticilere anlatan sunum yapısı.",
-  "Eğitim | Yeni başlayanlar için yapay zekâ kavramlarını basitçe anlat.",
-  "Finans | Startup için sürdürülebilir gelir modeli ve finansal projeksiyon.",
-  "Strateji | Yeni bir dijital ürünün pazara giriş stratejisini planla."
+  "Pazarlama | Instagram için dikkat çekici ve etkileşim odaklı ürün lansman postu.",
+  "İçerik Üretimi | Teknoloji blogu için SEO uyumlu ve okuyucuyu içine çeken makale taslağı.",
+  "Görsel Tasarım | Unreal Engine 5 tarzında, neon ışıklı fütüristik bir siberpunk şehir manzarası.",
+  "İş Dünyası | Potansiyel müşterilere gönderilecek, ikna edici ve profesyonel soğuk e-posta (cold email).",
+  "Yazılım | React ve Tailwind kullanarak modern ve duyarlı (responsive) bir landing page kodu.",
+  "Eğitim | Kuantum bilgisayarların çalışma mantığını 10 yaşındaki bir çocuğa anlatır gibi açıkla.",
+  "Kişisel Gelişim | Zaman yönetimi ve odaklanma becerilerini artırmak için 30 günlük eylem planı.",
+  "Girişimcilik | Yeni bir e-ticaret markası için rakip analizi ve pazara giriş stratejisi.",
+  "Verimlilik | Karmaşık ve uzun bir PDF raporunu yöneticiler için 3 maddede özetle.",
+  "Metin Yazarlığı | Kullanıcıları bültene abone olmaya ikna edecek vurucu bir 'Call to Action' (CTA) metni.",
+  "Kariyer | Yazılım mühendisliği mülakatı için en sık sorulan teknik ve davranışsal sorular.",
+  "Senaryo | Bir kafede yanlışlıkla kahveleri karışan iki yabancının romantik komedi tarzında tanışma hikayesi.",
+  "Logo Tasarımı | Minimalist, modern ve güven veren bir finans teknolojisi (FinTech) girişimi logosu.",
+  "Çeviri | Akademik bir İngilizce metni, anlam bütünlüğünü bozmadan akıcı bir Türkçeye çevir.",
+  "Veri Analizi | E-ticaret satış verilerini inceleyerek müşteri sadakatini artıracak stratejiler öner.",
+  "Sunum | Yapay zekanın iş dünyasındaki geleceği hakkında yöneticilere yapılacak 10 slaytlık sunum taslağı.",
+  "Seyahat | Roma'da düşük bütçeli, yerel lezzetleri ve gizli kalmış mekanları kapsayan 3 günlük gezi planı.",
+  "Sağlık | Evde ekipmansız yapılabilecek, yeni başlayanlar için 20 dakikalık yağ yakıcı HIIT antrenmanı.",
+  "Arayüz (UI) | Koyu tema (dark mode) destekli, kullanıcı dostu ve modern bir mobil bankacılık ekranı.",
+  "Marka Stratejisi | Organik cilt bakım ürünleri satan bir marka için isim önerileri ve marka hikayesi.",
+  "Satış | Bir B2B yazılım ürünü (SaaS) için müşterinin itirazlarını çürütecek satış konuşması (pitch).",
+  "YouTube | Yemek tarifi kanalı için izlenme rekorları kıracak, merak uyandırıcı 5 video başlığı.",
+  "Oyun Tasarımı | Orta Çağ'da geçen bir RPG oyunu için derinlikli bir ana karakter arka plan hikayesi.",
+  "Finans | Küçük bir işletme için aylık gelir-gider tablosu ve nakit akışı optimizasyon önerileri."
 ];
 
+// 🔥 YAZIM ALANI (TYPEWRITER) İÇİN HIZLI VE POPÜLER ÖRNEKLER 🔥
 const typewriterExamples = [
-  "Wong Kar-wai estetiğinde sahne kurgula",
-  "Premium su markası için reklam konsepti",
-  "Mental sağlık uygulaması için UX tasarla",
-  "Kripto portföy stratejisi geliştir",
-  "Mini Kedi Mavi'nin maceralarını yaz",
-  "Etkili B2B cold email sekansları",
-  "Mikroservis tabanlı DevOps mimarisi",
-  "Öğrenilmiş benlik çatışmasını incele",
-  "Aşık Mahzuni motiflerini modern yorumla",
-  "Teknoloji markası için slogan bul",
-  "Node.js mikroservisi oluştur",
-  "GDPR uyumlu veri sözleşmesi hazırla"
+  "Instagram için etkili bir post yaz",
+  "Siberpunk tarzı şehir görseli üret",
+  "İkna edici bir satış e-postası hazırla",
+  "React ile landing page kodla",
+  "Kuantum fiziğini basitçe anlat",
+  "Yeni girişimim için iş planı oluştur",
+  "YouTube videom için SEO başlıkları bul",
+  "Minimalist bir şirket logosu tasarla",
+  "3 günlük Roma seyahati planla",
+  "İngilizce makaleyi Türkçeye çevir",
+  "Yöneticiler için raporu özetle"
 ];
 
 const fontSizes = ['0.85rem', '0.95rem', '1.05rem', '1.1rem'];
