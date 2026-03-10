@@ -160,22 +160,25 @@ export default function Home() {
   const [typewriterIndex, setTypewriterIndex] = useState(0);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  // Scroll Target Ref
   const howItWorksRef = useRef<HTMLDivElement>(null);
 
   const scrollToHowItWorks = () => {
     howItWorksRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  // 🔥 MOBİL İÇİN KUSURSUZ KONUMLANDIRMA 🔥
   const getRandomPos = (slotId: number) => {
     const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
     const r1 = Math.random();
     const r2 = Math.random();
+    
     if (isMobile) {
-      if (slotId === 0) return { top: `${8 + (r1 * 10)}%`, left: '0', right: '0', margin: '0 auto', maxWidth: '85vw' };
-      if (slotId === 1) return { top: `${26 + (r1 * 10)}%`, left: '0', right: '0', margin: '0 auto', maxWidth: '85vw' };
+      // Mobilde SADECE 1 prompt gösteriyoruz ve tam üste (safe zone'a) sabitliyoruz.
+      if (slotId === 0) return { top: `12%`, left: '0', right: '0', margin: '0 auto', maxWidth: '85vw' };
+      // Diğer tüm slotları gizliyoruz ki karmaşa olmasın
       return { top: '-100%', left: '-100%', display: 'none' }; 
     }
+
     let top, left, right;
     const maxWidth = '340px'; 
     if (slotId === 0) { top = `${6 + (r1 * 6)}%`; left = `${2 + (r2 * 12)}%`; right = 'auto'; } 
@@ -364,14 +367,17 @@ export default function Home() {
       .btn-midjourney:hover { border-color: #ffffff !important; background: rgba(255, 255, 255, 0.1) !important; box-shadow: 0 0 20px rgba(255, 255, 255, 0.2) !important; }
       .btn-leonardo:hover { border-color: #ffbf00 !important; background: rgba(255, 191, 0, 0.1) !important; box-shadow: 0 0 20px rgba(255, 191, 0, 0.2) !important; }
 
+      /* 🔥 MOBİL OPTİMİZASYONU 🔥 */
       @media (max-width: 768px) {
-        .hero-section { margin-top: 42vh !important; }
-        .hero-title { font-size: 1.55rem !important; }
-        .cinematic-text { font-size: 0.85rem !important; }
-        .slot-2, .slot-3 { display: none !important; }
+        .hero-section { margin-top: 52vh !important; gap: 8px !important; }
+        .hero-title { font-size: 1.35rem !important; line-height: 1.25 !important; padding: 0 15px !important; }
+        .hero-sub { font-size: 0.8rem !important; padding: 0 20px !important; }
+        .cinematic-text { font-size: 0.8rem !important; text-align: center !important; }
+        .slot-1, .slot-2, .slot-3 { display: none !important; } /* Mobilde tek prompt göster */
         .floor-glow { opacity: 0.2 !important; height: 50px !important; }
         .input-box-inner { padding: 12px 14px 12px 18px !important; border-radius: 28px !important; }
-        .discovery-trigger { top: 40% !important; }
+        .discovery-trigger { top: 36% !important; } /* Soru işareti mobilde biraz daha yukarıda */
+        .question-mark { font-size: 2.8rem !important; }
       }
     `;
     document.head.appendChild(styleSheet);
@@ -416,7 +422,7 @@ export default function Home() {
               onClick={scrollToHowItWorks} 
               className="discovery-trigger"
               style={{ 
-                position: 'absolute', top: '45%', left: '50%', transform: 'translate(-50%, -50%)', 
+                position: 'absolute', top: '42%', left: '50%', transform: 'translate(-50%, -50%)', 
                 cursor: 'pointer', zIndex: 15, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px'
               }}
             >
