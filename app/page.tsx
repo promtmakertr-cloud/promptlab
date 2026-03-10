@@ -45,6 +45,9 @@ const typewriterExamples = [
   "Yöneticiler için raporu özetle"
 ];
 
+// ✅ EKSİK OLAN SATIR BURAYA EKLENDİ ✅
+const fontSizes = ['0.85rem', '0.95rem', '1.05rem', '1.1rem'];
+
 // 🔥 ŞIK YÜKLEME ADIMLARI VE TEKNİK JARGON 🔥
 const loadingSteps = [
   {
@@ -100,6 +103,15 @@ const IconCopy = <svg viewBox="0 0 24 24" width="16" height="16" fill="none" str
 
 type SpeechWindow = Window & { SpeechRecognition?: new () => any; webkitSpeechRecognition?: new () => any };
 type AIPlatformButtonProps = { url: string; icon: ReactNode; name: string; platformClass?: string };
+
+const parsePromptData = (fullText: string) => {
+  if (!fullText) return { category: '', promptText: '' };
+  const match = fullText.match(/^([^|]*)\|\s*(.*)$/);
+  if (match) {
+    return { category: match[1].trim(), promptText: match[2].trim() };
+  }
+  return { category: '', promptText: fullText };
+};
 
 // 🔥 VURGULU ŞİFRE ÇÖZÜCÜ BİLEŞENİ 🔥
 const ScrambleText = ({ text, initialDelayMs }: { text: string; initialDelayMs: number }) => {
