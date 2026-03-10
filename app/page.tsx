@@ -110,7 +110,6 @@ const parsePromptData = (fullText: string) => {
   return { category: '', promptText: fullText };
 };
 
-// 🔥 VURGULU ŞİFRE ÇÖZÜCÜ BİLEŞENİ 🔥
 const ScrambleText = ({ text, initialDelayMs }: { text: string; initialDelayMs: number }) => {
   const [items, setItems] = useState<{char: string, isScrambled: boolean}[]>([]);
   const isFirstRender = useRef(true);
@@ -173,14 +172,14 @@ export default function Home() {
     const r2 = Math.random();
     
     if (isMobile) {
-      // Mobilde prompt tam ortada ve üstte (safe zone)
-      if (slotId === 0) return { top: `18%`, left: '0', right: '0', margin: '0 auto', maxWidth: '85vw' };
+      // MOBİLDE YATAYDA TAM MERKEZDE, DİKEYDE EN ÜSTTE
+      if (slotId === 0) return { top: `20%`, left: '50%', transform: 'translateX(-50%)', maxWidth: '85vw', width: 'fit-content' };
       return { top: '-100%', left: '-100%', display: 'none' }; 
     }
 
     let top, left, right;
     const maxWidth = '340px'; 
-    // Masaüstü Köşe Dağılımı (Orijinal Tasarım Korundu)
+    // MASAÜSTÜ KÖŞE YERLEŞİMLERİ (ORİJİNAL HALİNE GETİRİLDİ)
     if (slotId === 0) { top = `${6 + (r1 * 6)}%`; left = `${2 + (r2 * 12)}%`; right = 'auto'; } 
     else if (slotId === 1) { top = `${10 + (r1 * 6)}%`; left = 'auto'; right = `${2 + (r2 * 12)}%`; } 
     else if (slotId === 2) { top = `${38 + (r1 * 5)}%`; left = `${2 + (r2 * 12)}%`; right = 'auto'; } 
@@ -344,7 +343,7 @@ export default function Home() {
       .cinematic-text:hover .prompt-category { color: #00E5FF; text-shadow: 0 0 10px rgba(0, 229, 255, 0.5); }
       .cinematic-text:hover .prompt-body { color: #ffffff; opacity: 1; text-shadow: 0 0 10px rgba(255, 255, 255, 0.4); }
       
-      /* 🔥 BEĞENDİĞİN SERIF KATEGORİ STİLİ GERİ GELDİ 🔥 */
+      /* 🔥 SERIF KATEGORİ STİLİ (TIMES NEW ROMAN) 🔥 */
       .prompt-category { font-family: "Times New Roman", Times, serif; font-size: 1.35em; font-style: italic; color: #ffffff; margin-bottom: 6px; letter-spacing: 0.5px; opacity: 0.95; transition: color 0.3s ease, text-shadow 0.3s ease; }
       .prompt-body { font-family: inherit; font-size: 0.95em; opacity: 0.75; transition: color 0.3s ease, opacity 0.3s ease, text-shadow 0.3s ease; }
       
@@ -358,15 +357,16 @@ export default function Home() {
       .btn-perplexity:hover { border-color: #20b2aa !important; background: rgba(32, 178, 170, 0.1) !important; box-shadow: 0 0 20px rgba(32, 178, 170, 0.2) !important; }
       .btn-copilot:hover { border-color: #3c78d8 !important; background: rgba(60, 120, 216, 0.1) !important; box-shadow: 0 0 20px rgba(60, 120, 216, 0.2) !important; }
 
+      /* 🔥 MOBİL OPTİMİZASYONU 🔥 */
       @media (max-width: 768px) {
         .hero-section { margin-top: 52vh !important; gap: 8px !important; }
         .hero-title { font-size: 1.35rem !important; line-height: 1.25 !important; padding: 0 15px !important; }
         .hero-sub { font-size: 0.8rem !important; padding: 0 20px !important; }
-        .cinematic-text { font-size: 0.8rem !important; text-align: center !important; }
+        .cinematic-text { font-size: 0.8rem !important; text-align: left !important; }
         .slot-1, .slot-2, .slot-3 { display: none !important; }
         .floor-glow { opacity: 0.2 !important; height: 50px !important; }
         .input-box-inner { padding: 12px 14px 12px 18px !important; border-radius: 28px !important; }
-        .discovery-trigger { top: 44% !important; } /* Soru işareti aşağı çekildi */
+        .discovery-trigger { top: 46% !important; } /* Soru işareti aşağı çekildi */
         .question-mark { font-size: 2.8rem !important; }
       }
     `;
@@ -394,7 +394,18 @@ export default function Home() {
                 const delayMs = parseFloat(slot.delay || '0') * 1000;
                 return (
                   <div key={slot.id} className={`cinematic-text slot-${slot.id}`} onClick={() => setInput(promptText)} onAnimationIteration={() => handleAnimationIteration(slot.id)}
-                    style={{ top: slot.pos.top || 'auto', bottom: slot.pos.bottom || 'auto', left: slot.pos.left || 'auto', right: slot.pos.right || 'auto', maxWidth: slot.pos.maxWidth, fontSize: slot.size, animationDelay: slot.delay, display: slot.pos.display || 'block' }}
+                    style={{ 
+                      top: slot.pos.top || 'auto', 
+                      bottom: slot.pos.bottom || 'auto', 
+                      left: slot.pos.left || 'auto', 
+                      right: slot.pos.right || 'auto', 
+                      transform: slot.pos.transform || 'none',
+                      maxWidth: slot.pos.maxWidth, 
+                      width: slot.pos.width || 'auto',
+                      fontSize: slot.size, 
+                      animationDelay: slot.delay, 
+                      display: slot.pos.display || 'block' 
+                    }}
                   >
                     {category && <div className="prompt-category">
                       <ScrambleText text={category} initialDelayMs={delayMs} />
@@ -407,12 +418,12 @@ export default function Home() {
               })}
             </div>
 
-            {/* 🔥 KUTUSUZ, TEMİZ SORU İŞARETİ 🔥 */}
+            {/* 🔥 TEMİZ, KUTUSUZ, YALIN SORU İŞARETİ 🔥 */}
             <div 
               onClick={scrollToHowItWorks} 
               className="discovery-trigger"
               style={{ 
-                position: 'absolute', top: '48%', left: '50%', transform: 'translate(-50%, -50%)', 
+                position: 'absolute', top: '42%', left: '50%', transform: 'translate(-50%, -50%)', 
                 cursor: 'pointer', zIndex: 15, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px'
               }}
             >
