@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, type MouseEvent, type ReactNode } from 'react';
 
-// 🔥 SABİT VERİLER 🔥
+// 🔥 GERÇEKÇİ PROMPT HAVUZU 🔥
 const allPrompts = [
   "Pazarlama | Instagram için dikkat çekici ve etkileşim odaklı ürün lansman postu.",
   "İçerik Üretimi | Teknoloji blogu için SEO uyumlu ve okuyucuyu içine çeken makale taslağı.",
@@ -110,6 +110,7 @@ const parsePromptData = (fullText: string) => {
   return { category: '', promptText: fullText };
 };
 
+// 🔥 VURGULU ŞİFRE ÇÖZÜCÜ BİLEŞENİ 🔥
 const ScrambleText = ({ text, initialDelayMs }: { text: string; initialDelayMs: number }) => {
   const [items, setItems] = useState<{char: string, isScrambled: boolean}[]>([]);
   const isFirstRender = useRef(true);
@@ -166,21 +167,20 @@ export default function Home() {
     howItWorksRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  // 🔥 MOBİL İÇİN KUSURSUZ KONUMLANDIRMA 🔥
   const getRandomPos = (slotId: number) => {
     const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
     const r1 = Math.random();
     const r2 = Math.random();
     
     if (isMobile) {
-      // Mobilde SADECE 1 prompt gösteriyoruz ve tam üste (safe zone'a) sabitliyoruz.
-      if (slotId === 0) return { top: `12%`, left: '0', right: '0', margin: '0 auto', maxWidth: '85vw' };
-      // Diğer tüm slotları gizliyoruz ki karmaşa olmasın
+      // Mobilde prompt tam ortada ve üstte (safe zone)
+      if (slotId === 0) return { top: `18%`, left: '0', right: '0', margin: '0 auto', maxWidth: '85vw' };
       return { top: '-100%', left: '-100%', display: 'none' }; 
     }
 
     let top, left, right;
     const maxWidth = '340px'; 
+    // Masaüstü Köşe Dağılımı (Orijinal Tasarım Korundu)
     if (slotId === 0) { top = `${6 + (r1 * 6)}%`; left = `${2 + (r2 * 12)}%`; right = 'auto'; } 
     else if (slotId === 1) { top = `${10 + (r1 * 6)}%`; left = 'auto'; right = `${2 + (r2 * 12)}%`; } 
     else if (slotId === 2) { top = `${38 + (r1 * 5)}%`; left = `${2 + (r2 * 12)}%`; right = 'auto'; } 
@@ -324,38 +324,31 @@ export default function Home() {
       @keyframes glowingBorder { 0% { background-position: 0% 50%; } 100% { background-position: 200% 50%; } }
       @keyframes starPulse { 0% { filter: drop-shadow(0 0 2px rgba(0, 229, 255, 0.2)) drop-shadow(0 0 8px rgba(131, 56, 236, 0.2)); } 50% { filter: drop-shadow(0 0 8px rgba(0, 229, 255, 0.6)) drop-shadow(0 0 16px rgba(131, 56, 236, 0.5)); } 100% { filter: drop-shadow(0 0 2px rgba(0, 229, 255, 0.2)) drop-shadow(0 0 8px rgba(131, 56, 236, 0.2)); } }
       
-      /* 🔥 BASİT VE ZARİF SORU İŞARETİ ANİMASYONU 🔥 */
       @keyframes pulseTextOrb {
         0% { opacity: 0.6; text-shadow: 0 0 10px rgba(0, 229, 255, 0.3); transform: translateY(0); }
         50% { opacity: 1; text-shadow: 0 0 25px rgba(0, 229, 255, 0.8), 0 0 40px rgba(131, 56, 236, 0.6); transform: translateY(-3px); }
         100% { opacity: 0.6; text-shadow: 0 0 10px rgba(0, 229, 255, 0.3); transform: translateY(0); }
       }
 
-      .discovery-trigger {
-        transition: all 0.3s ease;
-      }
-      .discovery-trigger:hover {
-        transform: translate(-50%, -52%) scale(1.05) !important;
-      }
-      .discovery-trigger .question-mark {
-        animation: pulseTextOrb 3s infinite ease-in-out;
-      }
+      .discovery-trigger { transition: all 0.3s ease; pointer-events: auto; }
+      .discovery-trigger:hover { transform: translate(-50%, -52%) scale(1.05) !important; }
+      .discovery-trigger .question-mark { animation: pulseTextOrb 3s infinite ease-in-out; }
 
       .glowing-logo { animation: starPulse 3s infinite alternate ease-in-out; }
       .loading-box { width: 100%; max-width: 600px; background: rgba(10, 10, 10, 0.85); border: 1px solid rgba(131, 56, 236, 0.3); border-radius: 16px; padding: 40px 20px; text-align: center; box-shadow: 0 0 40px rgba(58, 134, 255, 0.1); }
       .loading-text { font-size: 0.95rem; color: #ECECEC; font-weight: 400; margin-top: 20px; letter-spacing: 0.8px; opacity: 0.8; font-family: monospace; }
       .cursor-blink { display: inline-block; width: 8px; height: 1.2em; background-color: #00E5FF; vertical-align: middle; margin-left: 4px; animation: blink 1s step-end infinite; }
+      
       .cinematic-text { position: absolute; color: #888888; cursor: pointer; animation: perfectBreathing 24s infinite linear both; text-align: left; line-height: 1.5; font-weight: 300; transition: transform 0.3s ease, filter 0.3s ease; pointer-events: auto; opacity: 0; }
       .cinematic-text:hover { animation-play-state: paused; z-index: 50; }
       .cinematic-text:hover .prompt-category { color: #00E5FF; text-shadow: 0 0 10px rgba(0, 229, 255, 0.5); }
       .cinematic-text:hover .prompt-body { color: #ffffff; opacity: 1; text-shadow: 0 0 10px rgba(255, 255, 255, 0.4); }
       
-      .prompt-output b, .prompt-output strong {
-        color: #00E5FF;
-        font-weight: 600;
-        text-shadow: 0 0 15px rgba(0, 229, 255, 0.3);
-      }
-
+      /* 🔥 BEĞENDİĞİN SERIF KATEGORİ STİLİ GERİ GELDİ 🔥 */
+      .prompt-category { font-family: "Times New Roman", Times, serif; font-size: 1.35em; font-style: italic; color: #ffffff; margin-bottom: 6px; letter-spacing: 0.5px; opacity: 0.95; transition: color 0.3s ease, text-shadow 0.3s ease; }
+      .prompt-body { font-family: inherit; font-size: 0.95em; opacity: 0.75; transition: color 0.3s ease, opacity 0.3s ease, text-shadow 0.3s ease; }
+      
+      .prompt-output b, .prompt-output strong { color: #00E5FF; font-weight: 600; text-shadow: 0 0 15px rgba(0, 229, 255, 0.3); }
       .ai-brand-btn { transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1); }
       .ai-brand-btn:hover { color: #fff; transform: translateY(-3px) scale(1.02); }
       
@@ -364,19 +357,16 @@ export default function Home() {
       .btn-claude:hover { border-color: #d97757 !important; background: rgba(217, 119, 87, 0.1) !important; box-shadow: 0 0 20px rgba(217, 119, 87, 0.2) !important; }
       .btn-perplexity:hover { border-color: #20b2aa !important; background: rgba(32, 178, 170, 0.1) !important; box-shadow: 0 0 20px rgba(32, 178, 170, 0.2) !important; }
       .btn-copilot:hover { border-color: #3c78d8 !important; background: rgba(60, 120, 216, 0.1) !important; box-shadow: 0 0 20px rgba(60, 120, 216, 0.2) !important; }
-      .btn-midjourney:hover { border-color: #ffffff !important; background: rgba(255, 255, 255, 0.1) !important; box-shadow: 0 0 20px rgba(255, 255, 255, 0.2) !important; }
-      .btn-leonardo:hover { border-color: #ffbf00 !important; background: rgba(255, 191, 0, 0.1) !important; box-shadow: 0 0 20px rgba(255, 191, 0, 0.2) !important; }
 
-      /* 🔥 MOBİL OPTİMİZASYONU 🔥 */
       @media (max-width: 768px) {
         .hero-section { margin-top: 52vh !important; gap: 8px !important; }
         .hero-title { font-size: 1.35rem !important; line-height: 1.25 !important; padding: 0 15px !important; }
         .hero-sub { font-size: 0.8rem !important; padding: 0 20px !important; }
         .cinematic-text { font-size: 0.8rem !important; text-align: center !important; }
-        .slot-1, .slot-2, .slot-3 { display: none !important; } /* Mobilde tek prompt göster */
+        .slot-1, .slot-2, .slot-3 { display: none !important; }
         .floor-glow { opacity: 0.2 !important; height: 50px !important; }
         .input-box-inner { padding: 12px 14px 12px 18px !important; border-radius: 28px !important; }
-        .discovery-trigger { top: 36% !important; } /* Soru işareti mobilde biraz daha yukarıda */
+        .discovery-trigger { top: 44% !important; } /* Soru işareti aşağı çekildi */
         .question-mark { font-size: 2.8rem !important; }
       }
     `;
@@ -417,12 +407,12 @@ export default function Home() {
               })}
             </div>
 
-            {/* 🔥 TEMİZ, KUTUSUZ, YALIN SORU İŞARETİ (TAM ORTADA) 🔥 */}
+            {/* 🔥 KUTUSUZ, TEMİZ SORU İŞARETİ 🔥 */}
             <div 
               onClick={scrollToHowItWorks} 
               className="discovery-trigger"
               style={{ 
-                position: 'absolute', top: '42%', left: '50%', transform: 'translate(-50%, -50%)', 
+                position: 'absolute', top: '48%', left: '50%', transform: 'translate(-50%, -50%)', 
                 cursor: 'pointer', zIndex: 15, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px'
               }}
             >
@@ -434,7 +424,6 @@ export default function Home() {
               </div>
             </div>
 
-            {/* HERO METİN VE LOGO (ESKİ YERİNDE - ALTTA) */}
             <div style={heroSection} className="hero-section">
               <div style={logoFrame}> 
                 <img src="/logo.png" alt="Logo" className="glowing-logo" style={centerLogo} /> 
@@ -528,10 +517,9 @@ export default function Home() {
         </div>
       </div>
 
-      {/* 🔥 NASIL ÇALIŞIR SECTION (2. GÖRSELDEKİ YAPI) 🔥 */}
+      {/* 🔥 HOW IT WORKS SECTION 🔥 */}
       <div ref={howItWorksRef} style={howItWorksSection}>
          <div style={{ maxWidth: '1100px', width: '100%', display: 'flex', gap: '60px', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
-            {/* SOL TARAF: VİDEO ALANI */}
             <div style={videoContainer}>
                <div style={videoPlaceholder}>
                   <div style={{ color: '#8338EC', fontSize: '4rem', marginBottom: '20px' }}>▶</div>
@@ -539,14 +527,11 @@ export default function Home() {
                   <div style={{ color: '#555', fontSize: '0.8rem', marginTop: '10px' }}>Yapay Zekaya Hükmetmeyi Öğrenin</div>
                </div>
             </div>
-
-            {/* SAĞ TARAF: AÇIKLAMA VE ADIMLAR */}
             <div style={{ flex: 1, minWidth: '350px' }}>
                <img src="/logo.png" alt="Logo" style={{ height: '30px', marginBottom: '20px' }} />
                <h3 style={{ fontSize: '3.5rem', fontWeight: '900', color: '#fff', marginBottom: '30px', lineHeight: '1', letterSpacing: '-2px' }}>
                   NASIL <br/> <span style={{ color: '#8338EC', textShadow: '0 0 30px rgba(131, 56, 236, 0.4)' }}>ÇALIŞIYOR?</span>
                </h3>
-               
                <div style={stepItem}>
                   <div style={stepNumber}>01</div>
                   <div>
@@ -554,7 +539,6 @@ export default function Home() {
                     <p style={stepDesc}>Sadece ne istediğini yaz. Sektörel terimler veya karmaşık detaylar için endişelenme. Sistemimiz doğal dilini anlar.</p>
                   </div>
                </div>
-
                <div style={stepItem}>
                   <div style={stepNumber}>02</div>
                   <div>
@@ -562,7 +546,6 @@ export default function Home() {
                     <p style={stepDesc}>PromptLab nöral motoru, cümleni analiz eder ve onu AI modellerinin en iyi anlayacağı "Master Prompt" yapısına dönüştürür.</p>
                   </div>
                </div>
-
                <div style={stepItem}>
                   <div style={stepNumber}>03</div>
                   <div>
@@ -611,70 +594,11 @@ const actionButtons = { display: 'flex', alignItems: 'center', gap: '6px' } as c
 const iconButton = { background: 'none', border: 'none', cursor: 'pointer', padding: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center' } as const;
 const sendButton = { width: '32px', height: '32px', borderRadius: '50%', border: 'none', backgroundColor: '#fff', color: '#000', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', transition: 'transform 0.2s ease', fontSize: '1.2rem' } as const;
 
-// 🔥 NASIL ÇALIŞIR STİLLERİ 🔥
-const howItWorksSection = {
-  minHeight: '100vh',
-  backgroundColor: '#0a0a0a',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  padding: '100px 50px',
-  position: 'relative',
-  borderTop: '1px solid #222',
-  zIndex: 10
-} as const;
-
-const videoContainer = {
-  flex: 1,
-  minWidth: '400px',
-  height: '500px',
-  background: 'linear-gradient(135deg, rgba(20,20,20,1) 0%, rgba(5,5,5,1) 100%)',
-  borderRadius: '32px',
-  border: '1px solid rgba(131, 56, 236, 0.2)',
-  boxShadow: '0 40px 100px rgba(0,0,0,0.8), inset 0 0 30px rgba(131, 56, 236, 0.05)',
-  overflow: 'hidden',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center'
-} as const;
-
-const videoPlaceholder = {
-  textAlign: 'center' as const,
-  display: 'flex',
-  flexDirection: 'column' as const,
-  alignItems: 'center'
-};
-
-const stepItem = {
-  display: 'flex',
-  gap: '20px',
-  marginBottom: '40px',
-  alignItems: 'flex-start'
-} as const;
-
-const stepNumber = {
-  fontSize: '0.9rem',
-  fontWeight: '900',
-  color: '#00E5FF',
-  background: 'rgba(0, 229, 255, 0.1)',
-  width: '35px',
-  height: '35px',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  borderRadius: '10px',
-  fontFamily: 'monospace'
-} as const;
-
-const stepTitle = {
-  fontSize: '1.25rem',
-  fontWeight: '700',
-  color: '#fff',
-  marginBottom: '8px'
-} as const;
-
-const stepDesc = {
-  fontSize: '0.95rem',
-  color: '#888',
-  lineHeight: '1.6'
-} as const;
+// 🔥 HOW IT WORKS STİLLERİ 🔥
+const howItWorksSection = { minHeight: '100vh', backgroundColor: '#0a0a0a', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '100px 50px', position: 'relative', borderTop: '1px solid #222', zIndex: 10 } as const;
+const videoContainer = { flex: 1, minWidth: '400px', height: '500px', background: 'linear-gradient(135deg, rgba(20,20,20,1) 0%, rgba(5,5,5,1) 100%)', borderRadius: '32px', border: '1px solid rgba(131, 56, 236, 0.2)', boxShadow: '0 40px 100px rgba(0,0,0,0.8), inset 0 0 30px rgba(131, 56, 236, 0.05)', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' } as const;
+const videoPlaceholder = { textAlign: 'center' as const, display: 'flex', flexDirection: 'column' as const, alignItems: 'center' };
+const stepItem = { display: 'flex', gap: '20px', marginBottom: '40px', alignItems: 'flex-start' } as const;
+const stepNumber = { fontSize: '0.9rem', fontWeight: '900', color: '#00E5FF', background: 'rgba(0, 229, 255, 0.1)', width: '35px', height: '35px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '10px', fontFamily: 'monospace' } as const;
+const stepTitle = { fontSize: '1.25rem', fontWeight: '700', color: '#fff', marginBottom: '8px' } as const;
+const stepDesc = { fontSize: '0.95rem', color: '#888', lineHeight: '1.6' } as const;
