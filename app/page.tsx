@@ -324,9 +324,9 @@ export default function Home() {
       
       /* NASIL ÇALIŞIR TETİKLEYİCİ ANİMASYONU */
       @keyframes pulseRing {
-        0% { transform: scale(0.9) translate(-50%, -50%); opacity: 0.4; }
-        50% { transform: scale(1.05) translate(-47%, -47%); opacity: 0.9; }
-        100% { transform: scale(0.9) translate(-50%, -50%); opacity: 0.4; }
+        0% { transform: scale(0.9); opacity: 0.4; }
+        50% { transform: scale(1.05); opacity: 0.9; }
+        100% { transform: scale(0.9); opacity: 0.4; }
       }
 
       .pulse-discovery {
@@ -406,8 +406,8 @@ export default function Home() {
                 );
               })}
             </div>
-            
-            {/* 🔥 YENİ NESİL, IŞILTILI SORU İŞARETİ (TAM ORTADA) 🔥 */}
+
+            {/* 🔥 YENİ NESİL, IŞILTILI ORB (KUTU YOK - TAM ORTADA) 🔥 */}
             <div 
               onClick={scrollToHowItWorks} 
               className="pulse-discovery"
@@ -431,6 +431,7 @@ export default function Home() {
                     <stop stopColor="#3A86FF"/><stop offset="1" stopColor="#00E5FF" stopOpacity="0"/>
                   </linearGradient>
                 </defs>
+                {/* Şık Soru İşareti */}
                 <text x="50%" y="60%" textAnchor="middle" dy=".3em" fontSize="110" fontWeight="900" fill="#fff" fontFamily="Arial, sans-serif" style={{ textShadow: '0 0 20px rgba(0, 229, 255, 0.8), 0 0 40px rgba(131, 56, 236, 0.6)' }}>?</text>
               </svg>
             </div>
@@ -482,7 +483,7 @@ export default function Home() {
                     <div style={{ marginTop: '35px', paddingTop: '20px', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
                         <span style={{ fontSize: '0.85rem', color: '#888', letterSpacing: '0.5px' }}>✨ ÜRETİMİ BAŞLAT:</span>
-                        <button onClick={handleCopy} style={copyBtn}> {IconCopy} {copyStatus} </button>
+                        <button onClick={handleCopy} style={copyBtn} className="copy-btn-primary"> {IconCopy} {copyStatus} </button>
                       </div>
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
                         {!isVisual ? (
@@ -515,10 +516,7 @@ export default function Home() {
         <div className="floor-glow" style={floorGlow}></div>
         <div style={glowWrapper}>
           <div style={inputBoxInner} className="input-box-inner">
-            <textarea 
-                className="main-input" style={inputField} placeholder={dynamicPlaceholder} rows={2} 
-                value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => { if(e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleGenerate(); }}}
-            />
+            <textarea className="main-input" style={inputField} placeholder={dynamicPlaceholder} rows={2} value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => { if(e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleGenerate(); }}} />
             <div style={actionButtons}>
               <button onClick={handleVoiceTyping} style={iconButton} className={isListening ? "pulse-mic" : ""} title="Sesle Yaz">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#888" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
@@ -544,6 +542,7 @@ export default function Home() {
             {/* AÇIKLAMA METİNLERİ */}
             <div style={{ flex: 1, minWidth: '300px' }}>
                <img src="/logo.png" alt="Logo" style={{ height: '25px', marginBottom: '15px' }} />
+               {/* HAYALİNDEKİ NASIL ÇALIŞIR METNİ */}
                <h3 style={{ fontSize: '2.8rem', fontWeight: '700', color: '#fff', marginBottom: '20px', lineHeight: '1', textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}>NASIL <br/> <span style={{ color: '#8338EC' }}>ÇALIŞIYOR?</span></h3>
                
                <div style={stepItem}>
@@ -576,7 +575,7 @@ export default function Home() {
   );
 }
 
-// 🔥 KUSURSUZ STİLLER (DEĞİŞMEDİ) 🔥
+// 🔥 KUSURSUZ STİLLER 🔥
 const container = { backgroundColor: '#050505', minHeight: '100vh', color: '#ECECEC', fontFamily: 'Inter, sans-serif', display: 'flex', flexDirection: 'column', position: 'relative', overflowX: 'hidden' } as const;
 const topBar = { padding: '20px 25px', position: 'absolute', top: 0, left: 0, right: 0, zIndex: 100, display: 'flex', justifyContent: 'space-between', alignItems: 'center' } as const;
 const logoWrapper = { display: 'flex', alignItems: 'center', gap: '10px', opacity: 0.8, cursor: 'pointer' } as const;
@@ -595,6 +594,7 @@ const userPromptHeader = { padding: '16px 20px', display: 'flex', justifyContent
 const userPromptTitle = { fontSize: '0.9rem', color: '#ccc', fontWeight: '500', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '75%' } as const;
 const editBtn = { background: 'rgba(131, 56, 236, 0.1)', color: '#00E5FF', border: '1px solid rgba(131, 56, 236, 0.4)', padding: '6px 14px', borderRadius: '6px', fontSize: '0.8rem', cursor: 'pointer', fontWeight: '600', transition: 'all 0.2s ease' } as const;
 const userPromptBody = { padding: '20px', borderTop: '1px solid #222', fontSize: '0.95rem', color: '#aaa', lineHeight: '1.6', whiteSpace: 'pre-wrap' } as const;
+
 const aiResponseWrapper = { width: '100%', backgroundColor: '#0a0a0a', padding: '25px', borderRadius: '16px', border: '1px solid rgba(131, 56, 236, 0.3)', boxShadow: '0 0 20px rgba(58, 134, 255, 0.15)' } as const;
 const aiLabel = { fontSize: '0.75rem', fontWeight: '700', color: '#00E5FF', marginBottom: '20px', letterSpacing: '2px' } as const;
 const aiText = { fontSize: '1rem', lineHeight: '1.6', color: '#E0E0E0', whiteSpace: 'pre-wrap', fontFamily: 'monospace', opacity: 0.9 } as const;
