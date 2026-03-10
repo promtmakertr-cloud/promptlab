@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, type MouseEvent, type ReactNode } from 'react';
 
-// 🔥 SABİT VERİLER (DEĞİŞMEDI, STABİL HALE GELDİ) 🔥
+// 🔥 SABİT VERİLER (DEĞİŞMEDİ) 🔥
 const allPrompts = [
   "Pazarlama | Instagram için dikkat çekici ve etkileşim odaklı ürün lansman postu.",
   "İçerik Üretimi | Teknoloji blogu için SEO uyumlu ve okuyucuyu içine çeken makale taslağı.",
@@ -110,7 +110,6 @@ const parsePromptData = (fullText: string) => {
   return { category: '', promptText: fullText };
 };
 
-// 🔥 VURGULU ŞİFRE ÇÖZÜCÜ BİLEŞENİ 🔥
 const ScrambleText = ({ text, initialDelayMs }: { text: string; initialDelayMs: number }) => {
   const [items, setItems] = useState<{char: string, isScrambled: boolean}[]>([]);
   const isFirstRender = useRef(true);
@@ -323,15 +322,14 @@ export default function Home() {
       @keyframes starPulse { 0% { filter: drop-shadow(0 0 2px rgba(0, 229, 255, 0.2)) drop-shadow(0 0 8px rgba(131, 56, 236, 0.2)); } 50% { filter: drop-shadow(0 0 8px rgba(0, 229, 255, 0.6)) drop-shadow(0 0 16px rgba(131, 56, 236, 0.5)); } 100% { filter: drop-shadow(0 0 2px rgba(0, 229, 255, 0.2)) drop-shadow(0 0 8px rgba(131, 56, 236, 0.2)); } }
       
       /* NASIL ÇALIŞIR TETİKLEYİCİ ANİMASYONU */
-      @keyframes pulseRing {
-        0% { transform: scale(0.9); opacity: 0.4; }
-        50% { transform: scale(1.05); opacity: 0.9; }
-        100% { transform: scale(0.9); opacity: 0.4; }
+      @keyframes pulseOrb {
+        0% { transform: translate(-50%, -50%) scale(1); opacity: 0.5; filter: drop-shadow(0 0 5px rgba(0, 229, 255, 0.4)); }
+        50% { transform: translate(-50%, -50%) scale(1.1); opacity: 0.9; filter: drop-shadow(0 0 20px rgba(131, 56, 236, 0.7)); }
+        100% { transform: translate(-50%, -50%) scale(1); opacity: 0.5; filter: drop-shadow(0 0 5px rgba(0, 229, 255, 0.4)); }
       }
 
-      .pulse-discovery {
-        animation: pulseRing 5s infinite ease-in-out;
-        box-shadow: 0 0 20px rgba(0, 229, 255, 0.4);
+      .discovery-orb {
+        animation: pulseOrb 4s infinite ease-in-out;
         pointer-events: auto;
       }
 
@@ -368,6 +366,7 @@ export default function Home() {
         .slot-2, .slot-3 { display: none !important; }
         .floor-glow { opacity: 0.2 !important; height: 50px !important; }
         .input-box-inner { padding: 12px 14px 12px 18px !important; border-radius: 28px !important; }
+        .discovery-orb-container { top: 40% !important; }
       }
     `;
     document.head.appendChild(styleSheet);
@@ -407,33 +406,28 @@ export default function Home() {
               })}
             </div>
 
-            {/* 🔥 YENİ NESİL, IŞILTILI ORB (KUTU YOK - TAM ORTADA) 🔥 */}
+            {/* 🔥 YENİ NESİL, ZARİF VE KUTUSUZ SORU İŞARETİ (TAM ORTADA) 🔥 */}
             <div 
               onClick={scrollToHowItWorks} 
-              className="pulse-discovery"
+              className="discovery-orb-container"
               style={{ 
-                position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', 
+                position: 'absolute', top: '45%', left: '50%', transform: 'translate(-50%, -50%)', 
                 cursor: 'pointer', zIndex: 15
               }}
             >
-              <svg width="220" height="220" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="100" cy="100" r="98" stroke="url(#paint0_linear_orb)" strokeWidth="4" strokeDasharray="10 10"/>
-                <circle cx="100" cy="100" r="85" stroke="url(#paint1_linear_orb)" strokeWidth="2" opacity="0.3"/>
-                <circle cx="100" cy="100" r="70" stroke="url(#paint2_linear_orb)" strokeWidth="1" opacity="0.15"/>
-                <defs>
-                  <linearGradient id="paint0_linear_orb" x1="0" y1="0" x2="200" y2="200" gradientUnits="userSpaceOnUse">
-                    <stop stopColor="#00E5FF"/><stop offset="0.5" stopColor="#8338EC"/><stop offset="1" stopColor="#3A86FF"/>
-                  </linearGradient>
-                  <linearGradient id="paint1_linear_orb" x1="200" y1="200" x2="0" y2="0" gradientUnits="userSpaceOnUse">
-                    <stop stopColor="#00E5FF" stopOpacity="0"/><stop offset="0.5" stopColor="#8338EC"/><stop offset="1" stopColor="#00E5FF" stopOpacity="0"/>
-                  </linearGradient>
-                  <linearGradient id="paint2_linear_orb" x1="100" y1="0" x2="100" y2="200" gradientUnits="userSpaceOnUse">
-                    <stop stopColor="#3A86FF"/><stop offset="1" stopColor="#00E5FF" stopOpacity="0"/>
-                  </linearGradient>
-                </defs>
-                {/* Şık Soru İşareti */}
-                <text x="50%" y="60%" textAnchor="middle" dy=".3em" fontSize="110" fontWeight="900" fill="#fff" fontFamily="Arial, sans-serif" style={{ textShadow: '0 0 20px rgba(0, 229, 255, 0.8), 0 0 40px rgba(131, 56, 236, 0.6)' }}>?</text>
-              </svg>
+              <div className="discovery-orb" style={{ position: 'relative', width: '120px', height: '120px' }}>
+                <svg width="100%" height="100%" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="50" cy="50" r="48" stroke="url(#quantum_grad)" strokeWidth="0.5" strokeDasharray="4 4" opacity="0.6" />
+                  <circle cx="50" cy="50" r="38" stroke="#8338EC" strokeWidth="0.2" opacity="0.3" />
+                  <defs>
+                    <linearGradient id="quantum_grad" x1="0" y1="0" x2="100" y2="100" gradientUnits="userSpaceOnUse">
+                      <stop stopColor="#00E5FF"/><stop offset="1" stopColor="#8338EC"/>
+                    </linearGradient>
+                  </defs>
+                  <text x="50%" y="50%" textAnchor="middle" dy=".35em" fontSize="45" fontWeight="200" fill="#fff" fontFamily="serif" style={{ textShadow: '0 0 15px rgba(0, 229, 255, 0.5)' }}>?</text>
+                </svg>
+              </div>
+              <div style={{ textAlign: 'center', marginTop: '-15px', color: '#666', fontSize: '0.65rem', letterSpacing: '2px', fontWeight: 'bold' }}>NASIL ÇALIŞIR?</div>
             </div>
 
             {/* HERO METİN VE LOGO (ESKİ YERİNDE - ALTTA) */}
@@ -516,7 +510,10 @@ export default function Home() {
         <div className="floor-glow" style={floorGlow}></div>
         <div style={glowWrapper}>
           <div style={inputBoxInner} className="input-box-inner">
-            <textarea className="main-input" style={inputField} placeholder={dynamicPlaceholder} rows={2} value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => { if(e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleGenerate(); }}} />
+            <textarea 
+                className="main-input" style={inputField} placeholder={dynamicPlaceholder} rows={2} 
+                value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => { if(e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleGenerate(); }}}
+            />
             <div style={actionButtons}>
               <button onClick={handleVoiceTyping} style={iconButton} className={isListening ? "pulse-mic" : ""} title="Sesle Yaz">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#888" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
@@ -527,29 +524,30 @@ export default function Home() {
         </div>
       </div>
 
-      {/* 🔥 NASIL ÇALIŞIR SECTION (THE DISCOVERY PAGE) 🔥 */}
+      {/* 🔥 NASIL ÇALIŞIR SECTION (2. GÖRSELDEKİ YAPI) 🔥 */}
       <div ref={howItWorksRef} style={howItWorksSection}>
-         <div style={{ maxWidth: '1000px', width: '100%', display: 'flex', gap: '50px', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
-            {/* VİDEO ALANI */}
+         <div style={{ maxWidth: '1100px', width: '100%', display: 'flex', gap: '60px', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
+            {/* SOL TARAF: VİDEO ALANI */}
             <div style={videoContainer}>
                <div style={videoPlaceholder}>
-                  <div style={{ color: '#00E5FF', fontSize: '3rem', marginBottom: '10px' }}>▶</div>
-                  <div style={{ color: '#888', fontSize: '0.9rem' }}>PromptLab Tanıtım Videosu</div>
-                  <div style={{ color: '#444', fontSize: '0.7rem', marginTop: '5px' }}>(Yakında Burada)</div>
+                  <div style={{ color: '#8338EC', fontSize: '4rem', marginBottom: '20px' }}>▶</div>
+                  <div style={{ color: '#fff', fontSize: '1.2rem', fontWeight: 'bold' }}>PromptLab Masterclass</div>
+                  <div style={{ color: '#555', fontSize: '0.8rem', marginTop: '10px' }}>Yapay Zekaya Hükmetmeyi Öğrenin</div>
                </div>
             </div>
 
-            {/* AÇIKLAMA METİNLERİ */}
-            <div style={{ flex: 1, minWidth: '300px' }}>
-               <img src="/logo.png" alt="Logo" style={{ height: '25px', marginBottom: '15px' }} />
-               {/* HAYALİNDEKİ NASIL ÇALIŞIR METNİ */}
-               <h3 style={{ fontSize: '2.8rem', fontWeight: '700', color: '#fff', marginBottom: '20px', lineHeight: '1', textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}>NASIL <br/> <span style={{ color: '#8338EC' }}>ÇALIŞIYOR?</span></h3>
+            {/* SAĞ TARAF: AÇIKLAMA VE ADIMLAR */}
+            <div style={{ flex: 1, minWidth: '350px' }}>
+               <img src="/logo.png" alt="Logo" style={{ height: '30px', marginBottom: '20px' }} />
+               <h3 style={{ fontSize: '3.5rem', fontWeight: '900', color: '#fff', marginBottom: '30px', lineHeight: '1', letterSpacing: '-2px' }}>
+                  NASIL <br/> <span style={{ color: '#8338EC', textShadow: '0 0 30px rgba(131, 56, 236, 0.4)' }}>ÇALIŞIYOR?</span>
+               </h3>
                
                <div style={stepItem}>
                   <div style={stepNumber}>01</div>
                   <div>
                     <h4 style={stepTitle}>Fikrini Fısılda</h4>
-                    <p style={stepDesc}>Sadece ne istediğini yaz. Sektörel terimler veya karmaşık detaylar için endişelenme.</p>
+                    <p style={stepDesc}>Sadece ne istediğini yaz. Sektörel terimler veya karmaşık detaylar için endişelenme. Sistemimiz doğal dilini anlar.</p>
                   </div>
                </div>
 
@@ -557,15 +555,15 @@ export default function Home() {
                   <div style={stepNumber}>02</div>
                   <div>
                     <h4 style={stepTitle}>Nöral Dönüşüm</h4>
-                    <p style={stepDesc}>Sistemimiz saniyeler içinde cümleni analiz eder, uzman roller atar ve "Master Prompt" haline getirir.</p>
+                    <p style={stepDesc}>PromptLab nöral motoru, cümleni analiz eder ve onu AI modellerinin en iyi anlayacağı "Master Prompt" yapısına dönüştürür.</p>
                   </div>
                </div>
 
                <div style={stepItem}>
                   <div style={stepNumber}>03</div>
                   <div>
-                    <h4 style={stepTitle}>Yapay Zekayı Yönet</h4>
-                    <p style={stepDesc}>Kopyala ve dilediğin AI aracında kullan. Artık AI'dan %100 verim almaya hazırsın.</p>
+                    <h4 style={stepTitle}>Sonucu Kopyala</h4>
+                    <p style={stepDesc}>Üretilen promptu kopyala ve ChatGPT, Midjourney gibi favori AI aracında kullan. Farkı hemen göreceksin.</p>
                   </div>
                </div>
             </div>
@@ -624,12 +622,12 @@ const howItWorksSection = {
 
 const videoContainer = {
   flex: 1,
-  minWidth: '350px',
-  height: '450px',
-  background: '#000',
-  borderRadius: '24px',
-  border: '1px solid rgba(131, 56, 236, 0.3)',
-  boxShadow: '0 0 40px rgba(131, 56, 236, 0.1)',
+  minWidth: '400px',
+  height: '500px',
+  background: 'linear-gradient(135deg, rgba(20,20,20,1) 0%, rgba(5,5,5,1) 100%)',
+  borderRadius: '32px',
+  border: '1px solid rgba(131, 56, 236, 0.2)',
+  boxShadow: '0 40px 100px rgba(0,0,0,0.8), inset 0 0 30px rgba(131, 56, 236, 0.05)',
   overflow: 'hidden',
   display: 'flex',
   alignItems: 'center',
@@ -646,29 +644,33 @@ const videoPlaceholder = {
 const stepItem = {
   display: 'flex',
   gap: '20px',
-  marginBottom: '30px',
+  marginBottom: '40px',
   alignItems: 'flex-start'
 } as const;
 
 const stepNumber = {
-  fontSize: '0.8rem',
-  fontWeight: '800',
+  fontSize: '0.9rem',
+  fontWeight: '900',
   color: '#00E5FF',
   background: 'rgba(0, 229, 255, 0.1)',
-  padding: '5px 10px',
-  borderRadius: '8px',
+  width: '35px',
+  height: '35px',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  borderRadius: '10px',
   fontFamily: 'monospace'
 } as const;
 
 const stepTitle = {
-  fontSize: '1.1rem',
-  fontWeight: '600',
+  fontSize: '1.25rem',
+  fontWeight: '700',
   color: '#fff',
-  marginBottom: '5px'
+  marginBottom: '8px'
 } as const;
 
 const stepDesc = {
-  fontSize: '0.9rem',
+  fontSize: '0.95rem',
   color: '#888',
-  lineHeight: '1.5'
+  lineHeight: '1.6'
 } as const;
