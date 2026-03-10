@@ -58,12 +58,13 @@ const parsePromptData = (fullText: string) => {
 };
 
 const loadingMessages = [
-  "🧠 Fikriniz yapay zeka tarafından analiz ediliyor...",
+  "🧠 Fikriniz kuantum motorunda analiz ediliyor...",
   "📚 Master Kütüphane standartlarına uyarlanıyor...",
   "⚙️ Sektörel jargon ve teknik detaylar ekleniyor...",
   "✨ Son rötuşlar yapılıyor, promptunuz hazır olmak üzere..."
 ];
 
+// İkonlar
 const IconChatGPT = <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M22.2819 9.8211a5.9847 5.9847 0 0 0-.5157-4.9108 6.0462 6.0462 0 0 0-6.5098-2.9A6.0651 6.0651 0 0 0 4.9" /></svg>;
 const IconGemini = <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 0C12 6.62742 6.62742 12 0 12C6.62742 12 12 17.3726 12 24C12 17.3726 17.3726 12 24 12C17.3726 12 12 6" /></svg>;
 const IconClaude = <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><rect width="24" height="24" rx="4" fill="none" stroke="currentColor" strokeWidth="2"/><text x="50%" y="50%" textAnchor="middle" dy=".35em" fontFamily="Georgia, serif" fontSize="14" fontWeight="bold">C</text></svg>;
@@ -227,32 +228,42 @@ export default function Home() {
     );
   };
 
+  // 🔥 CSS İÇERİĞİ: YENİ QUANTUM VIOLET VE CYBER BLUE TEMASI 🔥
   useEffect(() => {
     const styleSheet = document.createElement("style");
     styleSheet.innerText = `
       @keyframes elegantGlow {
-        0%   { box-shadow: 0 0 8px rgba(255, 191, 0, 0.1), inset 0 0 4px rgba(255, 191, 0, 0.05); border-color: rgba(255, 191, 0, 0.15); }
-        50%  { box-shadow: 0 0 20px rgba(255, 126, 0, 0.25), inset 0 0 8px rgba(255, 126, 0, 0.1); border-color: rgba(255, 126, 0, 0.35); }
-        100% { box-shadow: 0 0 8px rgba(255, 191, 0, 0.1), inset 0 0 4px rgba(255, 191, 0, 0.05); border-color: rgba(255, 191, 0, 0.15); }
+        0%   { box-shadow: 0 0 8px rgba(58, 134, 255, 0.15), inset 0 0 4px rgba(58, 134, 255, 0.05); border-color: rgba(58, 134, 255, 0.2); }
+        50%  { box-shadow: 0 0 20px rgba(131, 56, 236, 0.35), inset 0 0 8px rgba(131, 56, 236, 0.15); border-color: rgba(131, 56, 236, 0.45); }
+        100% { box-shadow: 0 0 8px rgba(58, 134, 255, 0.15), inset 0 0 4px rgba(58, 134, 255, 0.05); border-color: rgba(58, 134, 255, 0.2); }
       }
       @keyframes perfectBreathing { 0% { opacity: 0; filter: blur(10px); transform: translateY(10px); } 10% { opacity: 1; filter: blur(0px); transform: translateY(0px); } 25% { opacity: 1; filter: blur(0px); transform: translateY(0px); } 35% { opacity: 0; filter: blur(10px); transform: translateY(-10px); } 100% { opacity: 0; filter: blur(10px); transform: translateY(-10px); } }
       @keyframes loadingPulse { 0% { opacity: 0.6; transform: scale(0.98); } 50% { opacity: 1; transform: scale(1); } 100% { opacity: 0.6; transform: scale(0.98); } }
       @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
       @keyframes glowingBorder { 0% { background-position: 0% 50%; } 100% { background-position: 200% 50%; } }
-      .loading-box { width: 100%; max-width: 600px; background: rgba(10, 10, 10, 0.8); border: 1px solid rgba(255, 191, 0, 0.3); border-radius: 16px; padding: 40px 20px; text-align: center; box-shadow: 0 0 30px rgba(255, 191, 0, 0.1); animation: loadingPulse 2s infinite ease-in-out; }
-      .loading-text { font-size: 1.1rem; color: #ffbf00; font-weight: 500; margin-top: 15px; letter-spacing: 0.5px; }
-      .cursor-blink { display: inline-block; width: 8px; height: 1.2em; background-color: #ffbf00; vertical-align: middle; margin-left: 4px; animation: blink 1s step-end infinite; }
+      
+      /* LOGO YILDIZ PARLAMA EFEKTİ */
+      @keyframes starPulse {
+        0% { filter: drop-shadow(0 0 2px rgba(0, 229, 255, 0.2)) drop-shadow(0 0 8px rgba(131, 56, 236, 0.2)); }
+        50% { filter: drop-shadow(0 0 8px rgba(0, 229, 255, 0.6)) drop-shadow(0 0 16px rgba(131, 56, 236, 0.5)); }
+        100% { filter: drop-shadow(0 0 2px rgba(0, 229, 255, 0.2)) drop-shadow(0 0 8px rgba(131, 56, 236, 0.2)); }
+      }
+      .glowing-logo { animation: starPulse 3s infinite alternate ease-in-out; }
+
+      .loading-box { width: 100%; max-width: 600px; background: rgba(10, 10, 10, 0.8); border: 1px solid rgba(131, 56, 236, 0.4); border-radius: 16px; padding: 40px 20px; text-align: center; box-shadow: 0 0 30px rgba(58, 134, 255, 0.15); animation: loadingPulse 2s infinite ease-in-out; }
+      .loading-text { font-size: 1.1rem; color: #00E5FF; font-weight: 500; margin-top: 15px; letter-spacing: 0.5px; }
+      .cursor-blink { display: inline-block; width: 8px; height: 1.2em; background-color: #00E5FF; vertical-align: middle; margin-left: 4px; animation: blink 1s step-end infinite; }
       .cinematic-text { position: absolute; color: #888888; cursor: pointer; animation: perfectBreathing 24s infinite linear; text-align: left; line-height: 1.5; font-weight: 300; transition: transform 0.3s ease, filter 0.3s ease; pointer-events: auto; }
       .cinematic-text:hover { animation-play-state: paused; z-index: 50; }
-      .cinematic-text:hover .prompt-category { color: #ffbf00; text-shadow: 0 0 10px rgba(255, 191, 0, 0.5); }
+      .cinematic-text:hover .prompt-category { color: #00E5FF; text-shadow: 0 0 10px rgba(0, 229, 255, 0.5); }
       .cinematic-text:hover .prompt-body { color: #ffffff; opacity: 1; text-shadow: 0 0 10px rgba(255, 255, 255, 0.4); }
       .prompt-category { font-family: "Times New Roman", Times, serif; font-size: 1.35em; font-style: italic; color: #ffffff; margin-bottom: 6px; letter-spacing: 0.5px; opacity: 0.95; transition: color 0.3s ease, text-shadow 0.3s ease; }
       .prompt-body { font-family: inherit; font-size: 0.95em; opacity: 0.75; transition: color 0.3s ease, opacity 0.3s ease, text-shadow 0.3s ease; }
-      .pulse-mic { animation: pulse 1.5s infinite; color: #ffbf00 !important; }
+      .pulse-mic { animation: pulse 1.5s infinite; color: #00E5FF !important; }
       @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
-      .edit-btn:hover { background: rgba(255, 191, 0, 0.2) !important; color: #fff !important; }
+      .edit-btn:hover { background: rgba(131, 56, 236, 0.25) !important; color: #fff !important; }
       .ai-brand-btn { display: inline-flex; align-items: center; gap: 8px; background: rgba(20, 20, 20, 0.8); border: 1px solid rgba(255, 255, 255, 0.1); color: #d1d1d1; padding: 8px 15px; border-radius: 10px; font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); font-family: inherit; backdrop-filter: blur(10px); outline: none; }
-      .ai-brand-btn:hover { background: rgba(255, 191, 0, 0.1); border-color: rgba(255, 191, 0, 0.5); color: #fff; transform: translateY(-2px); box-shadow: 0 4px 15px rgba(255, 191, 0, 0.2); }
+      .ai-brand-btn:hover { background: rgba(58, 134, 255, 0.1); border-color: rgba(0, 229, 255, 0.5); color: #fff; transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0, 229, 255, 0.2); }
       @media (max-width: 768px) {
         .hero-section { margin-top: 42vh !important; gap: 10px !important; }
         .hero-title { font-size: 1.55rem !important; line-height: 1.2 !important; padding: 0 10px !important; margin-bottom: 0 !important; }
@@ -276,7 +287,8 @@ export default function Home() {
     <main style={container}>
       <div style={topBar}>
         <div style={logoWrapper} onClick={handleReset}>
-          <img src="/logo.png" alt="Logo" style={miniLogo} />
+          {/* LOGO SINIFI EKLENDİ */}
+          <img src="/logo.png" alt="Logo" className="glowing-logo" style={miniLogo} />
         </div>
         {(submittedPrompt) && ( <button onClick={handleReset} style={backButton}>← Ana Sayfa</button> )}
       </div>
@@ -298,7 +310,10 @@ export default function Home() {
               })}
             </div>
             <div style={heroSection} className="hero-section">
-              <div style={logoFrame}> <img src="/logo.png" alt="Logo" style={centerLogo} /> </div>
+              <div style={logoFrame}> 
+                {/* LOGO SINIFI EKLENDİ */}
+                <img src="/logo.png" alt="Logo" className="glowing-logo" style={centerLogo} /> 
+              </div>
               <h2 style={heroTitle} className="hero-title">Fikirlerini Güçlü Promptlara Dönüştür.</h2>
               <p style={heroSub} className="hero-sub">Metni yaz. Optimize edilmiş promptu al. Kopyala ve diğer AI araçlarında kullan.</p>
             </div>
@@ -308,7 +323,8 @@ export default function Home() {
              <div style={userPromptWrapper}>
                <div style={userPromptHeader} onClick={() => setIsPromptExpanded(!isPromptExpanded)}>
                  <div style={userPromptTitle}>
-                    <span style={{ color: '#ffbf00', marginRight: '8px' }}>✦</span>
+                    {/* YILDIZ İKONU RENGİ GÜNCELLENDİ */}
+                    <span style={{ color: '#00E5FF', marginRight: '8px' }}>✦</span>
                     {isPromptExpanded ? "Senin Promptun" : `Senin Promptun: "${submittedPrompt.length > 45 ? submittedPrompt.slice(0, 45) + '...' : submittedPrompt}"`}
                  </div>
                  <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
@@ -321,7 +337,8 @@ export default function Home() {
              {(!result && loading) ? (
                <div className="flex flex-col items-center justify-center mt-10">
                  <div className="loading-box">
-                   <svg className="animate-spin" style={{ margin: '0 auto', width: '40px', height: '40px', color: '#ffbf00' }} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                   {/* YÜKLEME SPİNNER RENGİ GÜNCELLENDİ */}
+                   <svg className="animate-spin" style={{ margin: '0 auto', width: '40px', height: '40px', color: '#00E5FF' }} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                    </svg>
@@ -407,17 +424,23 @@ const resultContainer = { maxWidth: '850px', width: '100%', marginTop: '80px', m
 const userPromptWrapper = { width: '100%', backgroundColor: '#0f0f0f', borderRadius: '12px', border: '1px solid #222', marginBottom: '20px', overflow: 'hidden', transition: 'all 0.3s ease' } as const;
 const userPromptHeader = { padding: '16px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', backgroundColor: '#141414' } as const;
 const userPromptTitle = { fontSize: '0.9rem', color: '#ccc', fontWeight: '500', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '75%' } as const;
-const editBtn = { background: 'rgba(255, 191, 0, 0.08)', color: '#ffbf00', border: '1px solid rgba(255, 191, 0, 0.25)', padding: '6px 14px', borderRadius: '6px', fontSize: '0.8rem', cursor: 'pointer', fontWeight: '600', transition: 'all 0.2s ease' } as const;
+
+// Renkleri güncelledim (Quantum Purple & Cyber Blue)
+const editBtn = { background: 'rgba(131, 56, 236, 0.1)', color: '#00E5FF', border: '1px solid rgba(131, 56, 236, 0.4)', padding: '6px 14px', borderRadius: '6px', fontSize: '0.8rem', cursor: 'pointer', fontWeight: '600', transition: 'all 0.2s ease' } as const;
 const userPromptBody = { padding: '20px', borderTop: '1px solid #222', fontSize: '0.95rem', color: '#aaa', lineHeight: '1.6', whiteSpace: 'pre-wrap' } as const;
-const aiResponseWrapper = { width: '100%', backgroundColor: '#0a0a0a', padding: '25px', borderRadius: '16px', border: '1px solid rgba(255, 191, 0, 0.2)', boxShadow: '0 0 20px rgba(255, 126, 0, 0.15)' } as const;
-const aiLabel = { fontSize: '0.75rem', fontWeight: '700', color: '#ffbf00', marginBottom: '20px', letterSpacing: '2px' } as const;
+const aiResponseWrapper = { width: '100%', backgroundColor: '#0a0a0a', padding: '25px', borderRadius: '16px', border: '1px solid rgba(131, 56, 236, 0.3)', boxShadow: '0 0 20px rgba(58, 134, 255, 0.15)' } as const;
+const aiLabel = { fontSize: '0.75rem', fontWeight: '700', color: '#00E5FF', marginBottom: '20px', letterSpacing: '2px' } as const;
+
 const aiText = { fontSize: '1rem', lineHeight: '1.6', color: '#E0E0E0', whiteSpace: 'pre-wrap', fontFamily: 'monospace', opacity: 0.9 } as const;
 const copyBtn = { display: 'flex', alignItems: 'center', gap: '6px', background: '#fff', color: '#000', border: 'none', padding: '8px 16px', borderRadius: '8px', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 'bold', transition: 'all 0.2s ease' } as const;
 const bottomArea = { position: 'fixed', bottom: 0, left: 0, right: 0, padding: '30px 20px 40px 20px', background: 'transparent', display: 'flex', flexDirection: 'column', alignItems: 'center', zIndex: 20, pointerEvents: 'none' } as const;
-const cyberGradient = 'linear-gradient(90deg, #ffbf00, #ff7e00, #ffbf00, #ff7e00)';
-const floorGlow = { position: 'absolute', bottom: '-10px', left: '50%', transform: 'translateX(-50%)', width: '50vw', maxWidth: '600px', height: '60px', background: cyberGradient, backgroundSize: '200% 100%', filter: 'blur(45px)', opacity: 0.35, zIndex: 1, pointerEvents: 'none', animation: 'glowingBorder 15s linear infinite' } as const;
+
+// YENİ KUANTUM GRADİENT
+const cyberGradient = 'linear-gradient(90deg, #3A86FF, #8338EC, #00E5FF, #8338EC, #3A86FF)';
+const floorGlow = { position: 'absolute', bottom: '-10px', left: '50%', transform: 'translateX(-50%)', width: '50vw', maxWidth: '600px', height: '60px', background: cyberGradient, backgroundSize: '200% 100%', filter: 'blur(45px)', opacity: 0.25, zIndex: 1, pointerEvents: 'none', animation: 'glowingBorder 15s linear infinite' } as const;
+
 const glowWrapper = { position: 'relative', width: '100%', maxWidth: '680px', zIndex: 2, pointerEvents: 'auto' } as const;
-const inputBoxInner = { backgroundColor: '#0a0a0a', borderRadius: '40px', border: '1px solid rgba(255, 191, 0, 0.2)', animation: 'elegantGlow 8s infinite alternate', display: 'flex', alignItems: 'center', padding: '6px 10px 6px 18px', width: '100%', height: '100%' } as const;
+const inputBoxInner = { backgroundColor: '#0a0a0a', borderRadius: '40px', border: '1px solid rgba(58, 134, 255, 0.2)', animation: 'elegantGlow 8s infinite alternate', display: 'flex', alignItems: 'center', padding: '6px 10px 6px 18px', width: '100%', height: '100%' } as const;
 const inputField = { flex: 1, background: 'transparent', border: 'none', color: '#fff', fontSize: '1rem', outline: 'none', resize: 'none', padding: '8px 0', maxHeight: '150px', fontFamily: 'inherit' } as const;
 const actionButtons = { display: 'flex', alignItems: 'center', gap: '6px' } as const;
 const iconButton = { background: 'none', border: 'none', cursor: 'pointer', padding: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center' } as const;
