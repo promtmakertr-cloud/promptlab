@@ -30,9 +30,8 @@ const allPrompts = [
   "Finans | Küçük bir işletme için aylık gelir-gider tablosu ve nakit akışı optimizasyon önerileri."
 ];
 
-// 🔥 YAZIM ALANI (TYPEWRITER) İÇİN HIZLI VE POPÜLER ÖRNEKLER 🔥
 const typewriterExamples = [
-  "Instagram için etkili bir post yaz",
+  "Instagram için etkileşim odaklı post yaz",
   "Siberpunk tarzı şehir görseli üret",
   "İkna edici bir satış e-postası hazırla",
   "React ile landing page kodla",
@@ -47,6 +46,47 @@ const typewriterExamples = [
 
 const fontSizes = ['0.85rem', '0.95rem', '1.05rem', '1.1rem'];
 
+// 🔥 ŞIK YÜKLEME İKONLARI VE MESAJLARI 🔥
+const loadingSteps = [
+  {
+    text: "Girdi semantiği analiz ediliyor ve nöral haritalama yapılıyor...",
+    icon: (
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="12" cy="12" r="9" stroke="#3A86FF" strokeWidth="2" strokeDasharray="4 4" className="animate-spin" />
+        <path d="M12 8V12L15 15" stroke="#00E5FF" strokeWidth="2" strokeLinecap="round" />
+      </svg>
+    )
+  },
+  {
+    text: "Sektörel veri setleri ve bağlamsal parametreler enjekte ediliyor...",
+    icon: (
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="4" y="4" width="16" height="16" rx="2" stroke="#8338EC" strokeWidth="2" />
+        <path d="M9 9H15V15H9V9Z" fill="#8338EC" className="animate-pulse" />
+      </svg>
+    )
+  },
+  {
+    text: "Prompt mimarisi Master Standartlarına göre rafine ediliyor...",
+    icon: (
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="#00E5FF" strokeWidth="2" strokeLinejoin="round" />
+        <path d="M2 17L12 22L22 17" stroke="#3A86FF" strokeWidth="2" strokeLinecap="round" />
+        <path d="M2 12L12 17L22 12" stroke="#3A86FF" strokeWidth="2" opacity="0.5" />
+      </svg>
+    )
+  },
+  {
+    text: "Kuantum çıktı sentezleniyor, işlem sonlandırılıyor...",
+    icon: (
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 3L4 21L12 17L20 21L12 3Z" stroke="#8338EC" strokeWidth="2" strokeLinejoin="round" className="animate-bounce" />
+        <circle cx="12" cy="13" r="3" fill="#00E5FF" />
+      </svg>
+    )
+  }
+];
+
 const parsePromptData = (fullText: string) => {
   if (!fullText) return { category: '', promptText: '' };
   const match = fullText.match(/^([^|]*)\|\s*(.*)$/);
@@ -56,14 +96,7 @@ const parsePromptData = (fullText: string) => {
   return { category: '', promptText: fullText };
 };
 
-const loadingMessages = [
-  "🧠 Fikriniz kuantum motorunda analiz ediliyor...",
-  "📚 Master Kütüphane standartlarına uyarlanıyor...",
-  "⚙️ Sektörel jargon ve teknik detaylar ekleniyor...",
-  "✨ Son rötuşlar yapılıyor, promptunuz hazır olmak üzere..."
-];
-
-// İkonlar
+// İkonlar (Üretim Sonu Platformlar)
 const IconChatGPT = <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M22.2819 9.8211a5.9847 5.9847 0 0 0-.5157-4.9108 6.0462 6.0462 0 0 0-6.5098-2.9A6.0651 6.0651 0 0 0 4.9" /></svg>;
 const IconGemini = <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 0C12 6.62742 6.62742 12 0 12C6.62742 12 12 17.3726 12 24C12 17.3726 17.3726 12 24 12C17.3726 12 12 6" /></svg>;
 const IconClaude = <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><rect width="24" height="24" rx="4" fill="none" stroke="currentColor" strokeWidth="2"/><text x="50%" y="50%" textAnchor="middle" dy=".35em" fontFamily="Georgia, serif" fontSize="14" fontWeight="bold">C</text></svg>;
@@ -78,7 +111,6 @@ const IconCopy = <svg viewBox="0 0 24 24" width="16" height="16" fill="none" str
 type SpeechWindow = Window & { SpeechRecognition?: new () => any; webkitSpeechRecognition?: new () => any };
 type AIPlatformButtonProps = { url: string; icon: ReactNode; name: string };
 
-// 🔥 YENİ NESİL VURGULU ŞİFRE ÇÖZÜCÜ BİLEŞENİ 🔥
 const ScrambleText = ({ text, initialDelayMs }: { text: string; initialDelayMs: number }) => {
   const [items, setItems] = useState<{char: string, isScrambled: boolean}[]>([]);
   const isFirstRender = useRef(true);
@@ -87,12 +119,8 @@ const ScrambleText = ({ text, initialDelayMs }: { text: string; initialDelayMs: 
     let iteration = 0;
     const chars = "01@#$ΣλΠ⌘xX>_";
     let interval: any;
-    
-    // Gecikmeyi ayarlıyoruz
     const delay = isFirstRender.current ? initialDelayMs + 200 : 200;
     isFirstRender.current = false;
-
-    // İlk başta tüm metni scrambled sembollerle doldur
     setItems(text.split("").map(() => ({ char: chars[Math.floor(Math.random() * chars.length)], isScrambled: true })));
 
     const timeout = setTimeout(() => {
@@ -102,25 +130,17 @@ const ScrambleText = ({ text, initialDelayMs }: { text: string; initialDelayMs: 
           if (letter === " ") return { char: " ", isScrambled: false };
           return { char: chars[Math.floor(Math.random() * chars.length)], isScrambled: true };
         }));
-        
         if (iteration >= text.length) clearInterval(interval);
-        iteration += Math.max(0.6, text.length / 25); // Daha akışkan ve uzun süreli tarama
+        iteration += Math.max(0.6, text.length / 25);
       }, 50);
     }, delay);
-    
     return () => { clearTimeout(timeout); clearInterval(interval); };
   }, [text, initialDelayMs]);
 
   return (
     <>
       {items.map((item, i) => (
-        <span key={i} style={{ 
-          color: item.isScrambled ? '#00E5FF' : 'inherit',
-          textShadow: item.isScrambled ? '0 0 8px rgba(0, 229, 255, 0.6)' : 'none',
-          transition: 'color 0.2s ease'
-        }}>
-          {item.char}
-        </span>
+        <span key={i} style={{ color: item.isScrambled ? '#00E5FF' : 'inherit', textShadow: item.isScrambled ? '0 0 8px rgba(0, 229, 255, 0.6)' : 'none', transition: 'color 0.2s ease' }}>{item.char}</span>
       ))}
     </>
   );
@@ -163,7 +183,7 @@ export default function Home() {
     let interval: any;
     if (loading && !result) {
       setLoadingStep(0);
-      interval = setInterval(() => { setLoadingStep((prev) => (prev + 1) % loadingMessages.length); }, 1800);
+      interval = setInterval(() => { setLoadingStep((prev) => (prev + 1) % loadingSteps.length); }, 1800);
     }
     return () => clearInterval(interval);
   }, [loading, result]);
@@ -283,34 +303,19 @@ export default function Home() {
         50%  { box-shadow: 0 0 20px rgba(131, 56, 236, 0.35), inset 0 0 8px rgba(131, 56, 236, 0.15); border-color: rgba(131, 56, 236, 0.45); }
         100% { box-shadow: 0 0 8px rgba(58, 134, 255, 0.15), inset 0 0 4px rgba(58, 134, 255, 0.05); border-color: rgba(58, 134, 255, 0.2); }
       }
-      /* Opaklık geçişini hızlandırıyoruz ki şifre çözme görünsün */
-      @keyframes perfectBreathing { 
-        0% { opacity: 0; filter: blur(5px); transform: translateY(10px); } 
-        5% { opacity: 1; filter: blur(0px); transform: translateY(0px); } 
-        25% { opacity: 1; filter: blur(0px); transform: translateY(0px); } 
-        35% { opacity: 0; filter: blur(10px); transform: translateY(-10px); } 
-        100% { opacity: 0; filter: blur(10px); transform: translateY(-10px); } 
-      }
+      @keyframes perfectBreathing { 0% { opacity: 0; filter: blur(5px); transform: translateY(10px); } 5% { opacity: 1; filter: blur(0px); transform: translateY(0px); } 25% { opacity: 1; filter: blur(0px); transform: translateY(0px); } 35% { opacity: 0; filter: blur(10px); transform: translateY(-10px); } 100% { opacity: 0; filter: blur(10px); transform: translateY(-10px); } }
       @keyframes loadingPulse { 0% { opacity: 0.6; transform: scale(0.98); } 50% { opacity: 1; transform: scale(1); } 100% { opacity: 0.6; transform: scale(0.98); } }
       @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
       @keyframes glowingBorder { 0% { background-position: 0% 50%; } 100% { background-position: 200% 50%; } }
-      
-      @keyframes starPulse {
-        0% { filter: drop-shadow(0 0 2px rgba(0, 229, 255, 0.2)) drop-shadow(0 0 8px rgba(131, 56, 236, 0.2)); }
-        50% { filter: drop-shadow(0 0 8px rgba(0, 229, 255, 0.6)) drop-shadow(0 0 16px rgba(131, 56, 236, 0.5)); }
-        100% { filter: drop-shadow(0 0 2px rgba(0, 229, 255, 0.2)) drop-shadow(0 0 8px rgba(131, 56, 236, 0.2)); }
-      }
+      @keyframes starPulse { 0% { filter: drop-shadow(0 0 2px rgba(0, 229, 255, 0.2)) drop-shadow(0 0 8px rgba(131, 56, 236, 0.2)); } 50% { filter: drop-shadow(0 0 8px rgba(0, 229, 255, 0.6)) drop-shadow(0 0 16px rgba(131, 56, 236, 0.5)); } 100% { filter: drop-shadow(0 0 2px rgba(0, 229, 255, 0.2)) drop-shadow(0 0 8px rgba(131, 56, 236, 0.2)); } }
       .glowing-logo { animation: starPulse 3s infinite alternate ease-in-out; }
-
-      .loading-box { width: 100%; max-width: 600px; background: rgba(10, 10, 10, 0.8); border: 1px solid rgba(131, 56, 236, 0.4); border-radius: 16px; padding: 40px 20px; text-align: center; box-shadow: 0 0 30px rgba(58, 134, 255, 0.15); animation: loadingPulse 2s infinite ease-in-out; }
-      .loading-text { font-size: 1.1rem; color: #00E5FF; font-weight: 500; margin-top: 15px; letter-spacing: 0.5px; }
+      .loading-box { width: 100%; max-width: 600px; background: rgba(10, 10, 10, 0.85); border: 1px solid rgba(131, 56, 236, 0.3); border-radius: 16px; padding: 40px 20px; text-align: center; box-shadow: 0 0 40px rgba(58, 134, 255, 0.1); transition: all 0.5s ease; }
+      .loading-text { font-size: 0.95rem; color: #ECECEC; font-weight: 400; margin-top: 20px; letter-spacing: 0.8px; opacity: 0.8; font-family: monospace; }
       .cursor-blink { display: inline-block; width: 8px; height: 1.2em; background-color: #00E5FF; vertical-align: middle; margin-left: 4px; animation: blink 1s step-end infinite; }
-      
       .cinematic-text { position: absolute; color: #888888; cursor: pointer; animation: perfectBreathing 24s infinite linear both; text-align: left; line-height: 1.5; font-weight: 300; transition: transform 0.3s ease, filter 0.3s ease; pointer-events: auto; opacity: 0; }
       .cinematic-text:hover { animation-play-state: paused; z-index: 50; }
       .cinematic-text:hover .prompt-category { color: #00E5FF; text-shadow: 0 0 10px rgba(0, 229, 255, 0.5); }
       .cinematic-text:hover .prompt-body { color: #ffffff; opacity: 1; text-shadow: 0 0 10px rgba(255, 255, 255, 0.4); }
-      
       .prompt-category { font-family: "Times New Roman", Times, serif; font-size: 1.35em; font-style: italic; color: #ffffff; margin-bottom: 6px; letter-spacing: 0.5px; opacity: 0.95; transition: color 0.3s ease, text-shadow 0.3s ease; }
       .prompt-body { font-family: inherit; font-size: 0.95em; opacity: 0.75; transition: color 0.3s ease, opacity 0.3s ease, text-shadow 0.3s ease; }
       .pulse-mic { animation: pulse 1.5s infinite; color: #00E5FF !important; }
@@ -392,12 +397,14 @@ export default function Home() {
              </div>
              {(!result && loading) ? (
                <div className="flex flex-col items-center justify-center mt-10">
+                 {/* 🔥 YENİ NESİL LOADER 🔥 */}
                  <div className="loading-box">
-                   <svg className="animate-spin" style={{ margin: '0 auto', width: '40px', height: '40px', color: '#00E5FF' }} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                   </svg>
-                   <div className="loading-text">{loadingMessages[loadingStep]}</div>
+                   <div className="flex justify-center mb-4 transition-all duration-500">
+                     {loadingSteps[loadingStep].icon}
+                   </div>
+                   <div className="loading-text">
+                     {loadingSteps[loadingStep].text}
+                   </div>
                  </div>
                </div>
              ) : (
