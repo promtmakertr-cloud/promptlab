@@ -166,20 +166,31 @@ export default function Home() {
     howItWorksRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  // 🔥 MOBİL KONUM HAVUZU (ÇİZDİĞİN KIRMIZI ALANLAR) 🔥
+  const getMobileRandomPos = () => {
+    const r = Math.random();
+    // 3 Farklı "U" Bölgesi Stratejisi
+    if (r < 0.33) return { top: '8%', left: '10%', right: 'auto', transform: 'none' }; // Sol Üst
+    if (r < 0.66) return { top: '22%', right: '10%', left: 'auto', transform: 'none' }; // Sağ Orta-Üst
+    return { top: '15%', left: '50%', right: 'auto', transform: 'translateX(-50%)' }; // Merkez-Üst
+  };
+
   const getRandomPos = (slotId: number) => {
     const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
     const r1 = Math.random();
     const r2 = Math.random();
     
     if (isMobile) {
-      // MOBİLDE YATAYDA TAM MERKEZDE, DİKEYDE EN ÜSTTE
-      if (slotId === 0) return { top: `20%`, left: '50%', transform: 'translateX(-50%)', maxWidth: '85vw', width: 'fit-content' };
+      if (slotId === 0) {
+        const mPos = getMobileRandomPos();
+        return { ...mPos, maxWidth: '80vw', width: 'fit-content' };
+      }
       return { top: '-100%', left: '-100%', display: 'none' }; 
     }
 
     let top, left, right;
     const maxWidth = '340px'; 
-    // MASAÜSTÜ KÖŞE YERLEŞİMLERİ (ORİJİNAL HALİNE GETİRİLDİ)
+    // MASAÜSTÜ (ORIGINAL CORNERS PROTECTION)
     if (slotId === 0) { top = `${6 + (r1 * 6)}%`; left = `${2 + (r2 * 12)}%`; right = 'auto'; } 
     else if (slotId === 1) { top = `${10 + (r1 * 6)}%`; left = 'auto'; right = `${2 + (r2 * 12)}%`; } 
     else if (slotId === 2) { top = `${38 + (r1 * 5)}%`; left = `${2 + (r2 * 12)}%`; right = 'auto'; } 
@@ -330,7 +341,6 @@ export default function Home() {
       }
 
       .discovery-trigger { transition: all 0.3s ease; pointer-events: auto; }
-      .discovery-trigger:hover { transform: translate(-50%, -52%) scale(1.05) !important; }
       .discovery-trigger .question-mark { animation: pulseTextOrb 3s infinite ease-in-out; }
 
       .glowing-logo { animation: starPulse 3s infinite alternate ease-in-out; }
@@ -343,7 +353,6 @@ export default function Home() {
       .cinematic-text:hover .prompt-category { color: #00E5FF; text-shadow: 0 0 10px rgba(0, 229, 255, 0.5); }
       .cinematic-text:hover .prompt-body { color: #ffffff; opacity: 1; text-shadow: 0 0 10px rgba(255, 255, 255, 0.4); }
       
-      /* 🔥 SERIF KATEGORİ STİLİ (TIMES NEW ROMAN) 🔥 */
       .prompt-category { font-family: "Times New Roman", Times, serif; font-size: 1.35em; font-style: italic; color: #ffffff; margin-bottom: 6px; letter-spacing: 0.5px; opacity: 0.95; transition: color 0.3s ease, text-shadow 0.3s ease; }
       .prompt-body { font-family: inherit; font-size: 0.95em; opacity: 0.75; transition: color 0.3s ease, opacity 0.3s ease, text-shadow 0.3s ease; }
       
@@ -366,7 +375,7 @@ export default function Home() {
         .slot-1, .slot-2, .slot-3 { display: none !important; }
         .floor-glow { opacity: 0.2 !important; height: 50px !important; }
         .input-box-inner { padding: 12px 14px 12px 18px !important; border-radius: 28px !important; }
-        .discovery-trigger { top: 46% !important; } /* Soru işareti aşağı çekildi */
+        .discovery-trigger { top: 46% !important; left: 50%; transform: translate(-50%, -50%); } 
         .question-mark { font-size: 2.8rem !important; }
       }
     `;
@@ -418,7 +427,7 @@ export default function Home() {
               })}
             </div>
 
-            {/* 🔥 TEMİZ, KUTUSUZ, YALIN SORU İŞARETİ 🔥 */}
+            {/* 🔥 TEMİZ, KUTUSUZ SORU İŞARETİ 🔥 */}
             <div 
               onClick={scrollToHowItWorks} 
               className="discovery-trigger"
