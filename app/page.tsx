@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, type MouseEvent, type ReactNode } from 'react';
 
-// 🔥 SABİT VERİLER (DEĞİŞMEDİ) 🔥
+// 🔥 SABİT VERİLER 🔥
 const allPrompts = [
   "Pazarlama | Instagram için dikkat çekici ve etkileşim odaklı ürün lansman postu.",
   "İçerik Üretimi | Teknoloji blogu için SEO uyumlu ve okuyucuyu içine çeken makale taslağı.",
@@ -321,16 +321,21 @@ export default function Home() {
       @keyframes glowingBorder { 0% { background-position: 0% 50%; } 100% { background-position: 200% 50%; } }
       @keyframes starPulse { 0% { filter: drop-shadow(0 0 2px rgba(0, 229, 255, 0.2)) drop-shadow(0 0 8px rgba(131, 56, 236, 0.2)); } 50% { filter: drop-shadow(0 0 8px rgba(0, 229, 255, 0.6)) drop-shadow(0 0 16px rgba(131, 56, 236, 0.5)); } 100% { filter: drop-shadow(0 0 2px rgba(0, 229, 255, 0.2)) drop-shadow(0 0 8px rgba(131, 56, 236, 0.2)); } }
       
-      /* NASIL ÇALIŞIR TETİKLEYİCİ ANİMASYONU */
-      @keyframes pulseOrb {
-        0% { transform: translate(-50%, -50%) scale(1); opacity: 0.5; filter: drop-shadow(0 0 5px rgba(0, 229, 255, 0.4)); }
-        50% { transform: translate(-50%, -50%) scale(1.1); opacity: 0.9; filter: drop-shadow(0 0 20px rgba(131, 56, 236, 0.7)); }
-        100% { transform: translate(-50%, -50%) scale(1); opacity: 0.5; filter: drop-shadow(0 0 5px rgba(0, 229, 255, 0.4)); }
+      /* 🔥 BASİT VE ZARİF SORU İŞARETİ ANİMASYONU 🔥 */
+      @keyframes pulseTextOrb {
+        0% { opacity: 0.6; text-shadow: 0 0 10px rgba(0, 229, 255, 0.3); transform: translateY(0); }
+        50% { opacity: 1; text-shadow: 0 0 25px rgba(0, 229, 255, 0.8), 0 0 40px rgba(131, 56, 236, 0.6); transform: translateY(-3px); }
+        100% { opacity: 0.6; text-shadow: 0 0 10px rgba(0, 229, 255, 0.3); transform: translateY(0); }
       }
 
-      .discovery-orb {
-        animation: pulseOrb 4s infinite ease-in-out;
-        pointer-events: auto;
+      .discovery-trigger {
+        transition: all 0.3s ease;
+      }
+      .discovery-trigger:hover {
+        transform: translate(-50%, -52%) scale(1.05) !important;
+      }
+      .discovery-trigger .question-mark {
+        animation: pulseTextOrb 3s infinite ease-in-out;
       }
 
       .glowing-logo { animation: starPulse 3s infinite alternate ease-in-out; }
@@ -366,7 +371,7 @@ export default function Home() {
         .slot-2, .slot-3 { display: none !important; }
         .floor-glow { opacity: 0.2 !important; height: 50px !important; }
         .input-box-inner { padding: 12px 14px 12px 18px !important; border-radius: 28px !important; }
-        .discovery-orb-container { top: 40% !important; }
+        .discovery-trigger { top: 40% !important; }
       }
     `;
     document.head.appendChild(styleSheet);
@@ -406,28 +411,21 @@ export default function Home() {
               })}
             </div>
 
-            {/* 🔥 YENİ NESİL, ZARİF VE KUTUSUZ SORU İŞARETİ (TAM ORTADA) 🔥 */}
+            {/* 🔥 TEMİZ, KUTUSUZ, YALIN SORU İŞARETİ (TAM ORTADA) 🔥 */}
             <div 
               onClick={scrollToHowItWorks} 
-              className="discovery-orb-container"
+              className="discovery-trigger"
               style={{ 
                 position: 'absolute', top: '45%', left: '50%', transform: 'translate(-50%, -50%)', 
-                cursor: 'pointer', zIndex: 15
+                cursor: 'pointer', zIndex: 15, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px'
               }}
             >
-              <div className="discovery-orb" style={{ position: 'relative', width: '120px', height: '120px' }}>
-                <svg width="100%" height="100%" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <circle cx="50" cy="50" r="48" stroke="url(#quantum_grad)" strokeWidth="0.5" strokeDasharray="4 4" opacity="0.6" />
-                  <circle cx="50" cy="50" r="38" stroke="#8338EC" strokeWidth="0.2" opacity="0.3" />
-                  <defs>
-                    <linearGradient id="quantum_grad" x1="0" y1="0" x2="100" y2="100" gradientUnits="userSpaceOnUse">
-                      <stop stopColor="#00E5FF"/><stop offset="1" stopColor="#8338EC"/>
-                    </linearGradient>
-                  </defs>
-                  <text x="50%" y="50%" textAnchor="middle" dy=".35em" fontSize="45" fontWeight="200" fill="#fff" fontFamily="serif" style={{ textShadow: '0 0 15px rgba(0, 229, 255, 0.5)' }}>?</text>
-                </svg>
+              <div className="question-mark" style={{ fontSize: '3.5rem', fontWeight: '300', color: '#fff', lineHeight: '1' }}>
+                ?
               </div>
-              <div style={{ textAlign: 'center', marginTop: '-15px', color: '#666', fontSize: '0.65rem', letterSpacing: '2px', fontWeight: 'bold' }}>NASIL ÇALIŞIR?</div>
+              <div style={{ color: '#888', fontSize: '0.65rem', letterSpacing: '3px', fontWeight: '600' }}>
+                NASIL ÇALIŞIR?
+              </div>
             </div>
 
             {/* HERO METİN VE LOGO (ESKİ YERİNDE - ALTTA) */}
