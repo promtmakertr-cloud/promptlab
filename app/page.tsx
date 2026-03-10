@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, type MouseEvent, type ReactNode } from 'react';
+import { useState, useEffect, useRef, type MouseEvent, type ReactNode } from 'react';
 
 // 🔥 KISALTILMIŞ VİZYONER PROMPT HAVUZU 🔥
 const allPrompts = [
@@ -78,6 +78,46 @@ const IconCopy = <svg viewBox="0 0 24 24" width="16" height="16" fill="none" str
 
 type SpeechWindow = Window & { SpeechRecognition?: new () => any; webkitSpeechRecognition?: new () => any };
 type AIPlatformButtonProps = { url: string; icon: ReactNode; name: string };
+
+// 🔥 MATRIX / QUANTUM ŞİFRE ÇÖZÜCÜ EFEKT BİLEŞENİ 🔥
+const ScrambleText = ({ text, initialDelayMs }: { text: string; initialDelayMs: number }) => {
+  const [displayText, setDisplayText] = useState(text);
+  const isFirstRender = useRef(true);
+
+  useEffect(() => {
+    let iteration = 0;
+    const chars = "01@#$ΣλΠ⌘xX>_"; // Siber karakter havuzu
+    let interval: any;
+    
+    // Sadece ilk yüklemede (CSS delay ile uyumlu) bir gecikme ekliyoruz, 
+    // sonraki animasyon döngülerinde hemen (400ms) başlıyor.
+    const delay = isFirstRender.current ? initialDelayMs + 400 : 400;
+    isFirstRender.current = false;
+
+    const timeout = setTimeout(() => {
+      interval = setInterval(() => {
+        setDisplayText(text.split("").map((letter, index) => {
+          if (index < iteration) return letter;
+          if (letter === " ") return " ";
+          return chars[Math.floor(Math.random() * chars.length)];
+        }).join(""));
+        
+        if (iteration >= text.length) {
+          clearInterval(interval);
+        }
+        // Kelime uzunluğuna göre tarama hızını ayarlar, yaklaşık 12 karede tamamlar
+        iteration += Math.max(1, text.length / 12); 
+      }, 45); // Şifre çözülme kare hızı
+    }, delay);
+    
+    return () => {
+      clearTimeout(timeout);
+      clearInterval(interval);
+    };
+  }, [text, initialDelayMs]);
+
+  return <>{displayText}</>;
+};
 
 export default function Home() {
   const [input, setInput] = useState('');
@@ -228,7 +268,6 @@ export default function Home() {
     );
   };
 
-  // 🔥 CSS İÇERİĞİ: YENİ QUANTUM VIOLET VE CYBER BLUE TEMASI 🔥
   useEffect(() => {
     const styleSheet = document.createElement("style");
     styleSheet.innerText = `
@@ -242,7 +281,6 @@ export default function Home() {
       @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
       @keyframes glowingBorder { 0% { background-position: 0% 50%; } 100% { background-position: 200% 50%; } }
       
-      /* LOGO YILDIZ PARLAMA EFEKTİ */
       @keyframes starPulse {
         0% { filter: drop-shadow(0 0 2px rgba(0, 229, 255, 0.2)) drop-shadow(0 0 8px rgba(131, 56, 236, 0.2)); }
         50% { filter: drop-shadow(0 0 8px rgba(0, 229, 255, 0.6)) drop-shadow(0 0 16px rgba(131, 56, 236, 0.5)); }
@@ -253,10 +291,13 @@ export default function Home() {
       .loading-box { width: 100%; max-width: 600px; background: rgba(10, 10, 10, 0.8); border: 1px solid rgba(131, 56, 236, 0.4); border-radius: 16px; padding: 40px 20px; text-align: center; box-shadow: 0 0 30px rgba(58, 134, 255, 0.15); animation: loadingPulse 2s infinite ease-in-out; }
       .loading-text { font-size: 1.1rem; color: #00E5FF; font-weight: 500; margin-top: 15px; letter-spacing: 0.5px; }
       .cursor-blink { display: inline-block; width: 8px; height: 1.2em; background-color: #00E5FF; vertical-align: middle; margin-left: 4px; animation: blink 1s step-end infinite; }
-      .cinematic-text { position: absolute; color: #888888; cursor: pointer; animation: perfectBreathing 24s infinite linear; text-align: left; line-height: 1.5; font-weight: 300; transition: transform 0.3s ease, filter 0.3s ease; pointer-events: auto; }
+      
+      /* BOTH eklendi: Animasyon başlamadan önce görünmez olmasını sağlar */
+      .cinematic-text { position: absolute; color: #888888; cursor: pointer; animation: perfectBreathing 24s infinite linear both; text-align: left; line-height: 1.5; font-weight: 300; transition: transform 0.3s ease, filter 0.3s ease; pointer-events: auto; opacity: 0; }
       .cinematic-text:hover { animation-play-state: paused; z-index: 50; }
       .cinematic-text:hover .prompt-category { color: #00E5FF; text-shadow: 0 0 10px rgba(0, 229, 255, 0.5); }
       .cinematic-text:hover .prompt-body { color: #ffffff; opacity: 1; text-shadow: 0 0 10px rgba(255, 255, 255, 0.4); }
+      
       .prompt-category { font-family: "Times New Roman", Times, serif; font-size: 1.35em; font-style: italic; color: #ffffff; margin-bottom: 6px; letter-spacing: 0.5px; opacity: 0.95; transition: color 0.3s ease, text-shadow 0.3s ease; }
       .prompt-body { font-family: inherit; font-size: 0.95em; opacity: 0.75; transition: color 0.3s ease, opacity 0.3s ease, text-shadow 0.3s ease; }
       .pulse-mic { animation: pulse 1.5s infinite; color: #00E5FF !important; }
@@ -287,7 +328,6 @@ export default function Home() {
     <main style={container}>
       <div style={topBar}>
         <div style={logoWrapper} onClick={handleReset}>
-          {/* LOGO SINIFI EKLENDİ */}
           <img src="/logo.png" alt="Logo" className="glowing-logo" style={miniLogo} />
         </div>
         {(submittedPrompt) && ( <button onClick={handleReset} style={backButton}>← Ana Sayfa</button> )}
@@ -299,19 +339,26 @@ export default function Home() {
             <div style={floatingContainer}>
               {slots.map((slot) => {
                 const { category, promptText } = parsePromptData(slot.text);
+                // Delay'i CSS'teki string formattan milisaniyeye çeviriyoruz (örn: "6s" -> 6000)
+                const delayMs = parseFloat(slot.delay || '0') * 1000;
                 return (
                   <div key={slot.id} className={`cinematic-text slot-${slot.id}`} onClick={() => setInput(promptText)} onAnimationIteration={() => handleAnimationIteration(slot.id)}
                     style={{ top: slot.pos.top || 'auto', bottom: slot.pos.bottom || 'auto', left: slot.pos.left || 'auto', right: slot.pos.right || 'auto', maxWidth: slot.pos.maxWidth, fontSize: slot.size, animationDelay: slot.delay, display: slot.pos.display || 'block' }}
                   >
-                    {category && <div className="prompt-category">{category}</div>}
-                    <div className="prompt-body">{promptText}</div>
+                    {category && <div className="prompt-category">
+                      {/* Şifre çözücü bileşen devrede */}
+                      <ScrambleText text={category} initialDelayMs={delayMs} />
+                    </div>}
+                    <div className="prompt-body">
+                      {/* Şifre çözücü bileşen devrede */}
+                      <ScrambleText text={promptText} initialDelayMs={delayMs} />
+                    </div>
                   </div>
                 );
               })}
             </div>
             <div style={heroSection} className="hero-section">
               <div style={logoFrame}> 
-                {/* LOGO SINIFI EKLENDİ */}
                 <img src="/logo.png" alt="Logo" className="glowing-logo" style={centerLogo} /> 
               </div>
               <h2 style={heroTitle} className="hero-title">Fikirlerini Güçlü Promptlara Dönüştür.</h2>
@@ -323,7 +370,6 @@ export default function Home() {
              <div style={userPromptWrapper}>
                <div style={userPromptHeader} onClick={() => setIsPromptExpanded(!isPromptExpanded)}>
                  <div style={userPromptTitle}>
-                    {/* YILDIZ İKONU RENGİ GÜNCELLENDİ */}
                     <span style={{ color: '#00E5FF', marginRight: '8px' }}>✦</span>
                     {isPromptExpanded ? "Senin Promptun" : `Senin Promptun: "${submittedPrompt.length > 45 ? submittedPrompt.slice(0, 45) + '...' : submittedPrompt}"`}
                  </div>
@@ -337,7 +383,6 @@ export default function Home() {
              {(!result && loading) ? (
                <div className="flex flex-col items-center justify-center mt-10">
                  <div className="loading-box">
-                   {/* YÜKLEME SPİNNER RENGİ GÜNCELLENDİ */}
                    <svg className="animate-spin" style={{ margin: '0 auto', width: '40px', height: '40px', color: '#00E5FF' }} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -424,21 +469,15 @@ const resultContainer = { maxWidth: '850px', width: '100%', marginTop: '80px', m
 const userPromptWrapper = { width: '100%', backgroundColor: '#0f0f0f', borderRadius: '12px', border: '1px solid #222', marginBottom: '20px', overflow: 'hidden', transition: 'all 0.3s ease' } as const;
 const userPromptHeader = { padding: '16px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', backgroundColor: '#141414' } as const;
 const userPromptTitle = { fontSize: '0.9rem', color: '#ccc', fontWeight: '500', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '75%' } as const;
-
-// Renkleri güncelledim (Quantum Purple & Cyber Blue)
 const editBtn = { background: 'rgba(131, 56, 236, 0.1)', color: '#00E5FF', border: '1px solid rgba(131, 56, 236, 0.4)', padding: '6px 14px', borderRadius: '6px', fontSize: '0.8rem', cursor: 'pointer', fontWeight: '600', transition: 'all 0.2s ease' } as const;
 const userPromptBody = { padding: '20px', borderTop: '1px solid #222', fontSize: '0.95rem', color: '#aaa', lineHeight: '1.6', whiteSpace: 'pre-wrap' } as const;
 const aiResponseWrapper = { width: '100%', backgroundColor: '#0a0a0a', padding: '25px', borderRadius: '16px', border: '1px solid rgba(131, 56, 236, 0.3)', boxShadow: '0 0 20px rgba(58, 134, 255, 0.15)' } as const;
 const aiLabel = { fontSize: '0.75rem', fontWeight: '700', color: '#00E5FF', marginBottom: '20px', letterSpacing: '2px' } as const;
-
 const aiText = { fontSize: '1rem', lineHeight: '1.6', color: '#E0E0E0', whiteSpace: 'pre-wrap', fontFamily: 'monospace', opacity: 0.9 } as const;
 const copyBtn = { display: 'flex', alignItems: 'center', gap: '6px', background: '#fff', color: '#000', border: 'none', padding: '8px 16px', borderRadius: '8px', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 'bold', transition: 'all 0.2s ease' } as const;
 const bottomArea = { position: 'fixed', bottom: 0, left: 0, right: 0, padding: '30px 20px 40px 20px', background: 'transparent', display: 'flex', flexDirection: 'column', alignItems: 'center', zIndex: 20, pointerEvents: 'none' } as const;
-
-// YENİ KUANTUM GRADİENT
 const cyberGradient = 'linear-gradient(90deg, #3A86FF, #8338EC, #00E5FF, #8338EC, #3A86FF)';
 const floorGlow = { position: 'absolute', bottom: '-10px', left: '50%', transform: 'translateX(-50%)', width: '50vw', maxWidth: '600px', height: '60px', background: cyberGradient, backgroundSize: '200% 100%', filter: 'blur(45px)', opacity: 0.25, zIndex: 1, pointerEvents: 'none', animation: 'glowingBorder 15s linear infinite' } as const;
-
 const glowWrapper = { position: 'relative', width: '100%', maxWidth: '680px', zIndex: 2, pointerEvents: 'auto' } as const;
 const inputBoxInner = { backgroundColor: '#0a0a0a', borderRadius: '40px', border: '1px solid rgba(58, 134, 255, 0.2)', animation: 'elegantGlow 8s infinite alternate', display: 'flex', alignItems: 'center', padding: '6px 10px 6px 18px', width: '100%', height: '100%' } as const;
 const inputField = { flex: 1, background: 'transparent', border: 'none', color: '#fff', fontSize: '1rem', outline: 'none', resize: 'none', padding: '8px 0', maxHeight: '150px', fontFamily: 'inherit' } as const;
