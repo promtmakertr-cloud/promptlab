@@ -86,7 +86,6 @@ const loadingSteps = [
   }
 ];
 
-// İkonlar
 const IconChatGPT = <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M22.2819 9.8211a5.9847 5.9847 0 0 0-.5157-4.9108 6.0462 6.0462 0 0 0-6.5098-2.9A6.0651 6.0651 0 0 0 4.9" /></svg>;
 const IconGemini = <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 0C12 6.62742 6.62742 12 0 12C6.62742 12 12 17.3726 12 24C12 17.3726 17.3726 12 24 12C17.3726 12 12 6" /></svg>;
 const IconClaude = <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><rect width="24" height="24" rx="4" fill="none" stroke="currentColor" strokeWidth="2"/><text x="50%" y="50%" textAnchor="middle" dy=".35em" fontFamily="Georgia, serif" fontSize="14" fontWeight="bold">C</text></svg>;
@@ -166,15 +165,6 @@ export default function Home() {
     howItWorksRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  // 🔥 MOBİL KONUM HAVUZU (ÇİZDİĞİN KIRMIZI ALANLAR) 🔥
-  const getMobileRandomPos = () => {
-    const r = Math.random();
-    // 3 Farklı "U" Bölgesi Stratejisi
-    if (r < 0.33) return { top: '8%', left: '10%', right: 'auto', transform: 'none' }; // Sol Üst
-    if (r < 0.66) return { top: '22%', right: '10%', left: 'auto', transform: 'none' }; // Sağ Orta-Üst
-    return { top: '15%', left: '50%', right: 'auto', transform: 'translateX(-50%)' }; // Merkez-Üst
-  };
-
   const getRandomPos = (slotId: number) => {
     const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
     const r1 = Math.random();
@@ -182,15 +172,16 @@ export default function Home() {
     
     if (isMobile) {
       if (slotId === 0) {
-        const mPos = getMobileRandomPos();
-        return { ...mPos, maxWidth: '80vw', width: 'fit-content' };
+        const r = Math.random();
+        if (r < 0.33) return { top: '10%', left: '10%', right: 'auto', transform: 'none', maxWidth: '80vw', width: 'fit-content' };
+        if (r < 0.66) return { top: '25%', right: '10%', left: 'auto', transform: 'none', maxWidth: '80vw', width: 'fit-content' };
+        return { top: '18%', left: '50%', transform: 'translateX(-50%)', maxWidth: '80vw', width: 'fit-content' };
       }
       return { top: '-100%', left: '-100%', display: 'none' }; 
     }
 
     let top, left, right;
     const maxWidth = '340px'; 
-    // MASAÜSTÜ (ORIGINAL CORNERS PROTECTION)
     if (slotId === 0) { top = `${6 + (r1 * 6)}%`; left = `${2 + (r2 * 12)}%`; right = 'auto'; } 
     else if (slotId === 1) { top = `${10 + (r1 * 6)}%`; left = 'auto'; right = `${2 + (r2 * 12)}%`; } 
     else if (slotId === 2) { top = `${38 + (r1 * 5)}%`; left = `${2 + (r2 * 12)}%`; right = 'auto'; } 
@@ -341,6 +332,7 @@ export default function Home() {
       }
 
       .discovery-trigger { transition: all 0.3s ease; pointer-events: auto; }
+      .discovery-trigger:hover { transform: translate(-50%, -52%) scale(1.05) !important; }
       .discovery-trigger .question-mark { animation: pulseTextOrb 3s infinite ease-in-out; }
 
       .glowing-logo { animation: starPulse 3s infinite alternate ease-in-out; }
@@ -366,7 +358,6 @@ export default function Home() {
       .btn-perplexity:hover { border-color: #20b2aa !important; background: rgba(32, 178, 170, 0.1) !important; box-shadow: 0 0 20px rgba(32, 178, 170, 0.2) !important; }
       .btn-copilot:hover { border-color: #3c78d8 !important; background: rgba(60, 120, 216, 0.1) !important; box-shadow: 0 0 20px rgba(60, 120, 216, 0.2) !important; }
 
-      /* 🔥 MOBİL OPTİMİZASYONU 🔥 */
       @media (max-width: 768px) {
         .hero-section { margin-top: 52vh !important; gap: 8px !important; }
         .hero-title { font-size: 1.35rem !important; line-height: 1.25 !important; padding: 0 15px !important; }
@@ -439,7 +430,7 @@ export default function Home() {
               <div className="question-mark" style={{ fontSize: '3.5rem', fontWeight: '300', color: '#fff', lineHeight: '1' }}>
                 ?
               </div>
-              <div style={{ color: '#888', fontSize: '0.65rem', letterSpacing: '3px', fontWeight: '600' }}>
+              <div style={{ color: '#00E5FF', fontSize: '0.65rem', letterSpacing: '3px', fontWeight: '600' }}>
                 NASIL ÇALIŞIR?
               </div>
             </div>
@@ -537,40 +528,51 @@ export default function Home() {
         </div>
       </div>
 
-      {/* 🔥 HOW IT WORKS SECTION 🔥 */}
+      {/* 🔥 DISCOVERY SECTION (NASIL ÇALIŞIR) 🔥 */}
       <div ref={howItWorksRef} style={howItWorksSection}>
-         <div style={{ maxWidth: '1100px', width: '100%', display: 'flex', gap: '60px', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
+         <div style={{ maxWidth: '1100px', width: '100%', display: 'flex', gap: '80px', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
+            
+            {/* PURE VIDEO FRAME */}
             <div style={videoContainer}>
                <div style={videoPlaceholder}>
-                  <div style={{ color: '#8338EC', fontSize: '4rem', marginBottom: '20px' }}>▶</div>
-                  <div style={{ color: '#fff', fontSize: '1.2rem', fontWeight: 'bold' }}>PromptLab Masterclass</div>
-                  <div style={{ color: '#555', fontSize: '0.8rem', marginTop: '10px' }}>Yapay Zekaya Hükmetmeyi Öğrenin</div>
+                  <div style={{ color: '#00E5FF', fontSize: '3.5rem', opacity: 0.8 }}>▶</div>
+                  <div style={{ color: '#fff', fontSize: '1rem', fontWeight: '500', marginTop: '15px' }}>PROMPTLAB REHBERİ</div>
+                  <div style={{ color: '#444', fontSize: '0.7rem', marginTop: '5px' }}>(Yakında Burada)</div>
                </div>
             </div>
+
+            {/* DESCRIPTION AND STEPS */}
             <div style={{ flex: 1, minWidth: '350px' }}>
-               <img src="/logo.png" alt="Logo" style={{ height: '30px', marginBottom: '20px' }} />
-               <h3 style={{ fontSize: '3.5rem', fontWeight: '900', color: '#fff', marginBottom: '30px', lineHeight: '1', letterSpacing: '-2px' }}>
-                  NASIL <br/> <span style={{ color: '#8338EC', textShadow: '0 0 30px rgba(131, 56, 236, 0.4)' }}>ÇALIŞIYOR?</span>
-               </h3>
+               <img src="/logo.png" alt="Logo" style={{ height: '28px', marginBottom: '20px' }} />
+               <h3 style={refinedTitle}>Promptlab Sizin İçin Ne Yapar?</h3>
+               
                <div style={stepItem}>
-                  <div style={stepNumber}>01</div>
+                  <div style={stepIconArea}>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#00E5FF" strokeWidth="1.5"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                  </div>
                   <div>
-                    <h4 style={stepTitle}>Fikrini Fısılda</h4>
-                    <p style={stepDesc}>Sadece ne istediğini yaz. Sektörel terimler veya karmaşık detaylar için endişelenme. Sistemimiz doğal dilini anlar.</p>
+                    <h4 style={stepTitle}>01 - Fikrini Özgürce Yaz</h4>
+                    <p style={stepDesc}>Aklındaki düşünceyi, bir arkadaşına anlatır gibi doğal bir dille yaz. Teknik terimlere veya karmaşık cümle yapılarına takılma.</p>
                   </div>
                </div>
+
                <div style={stepItem}>
-                  <div style={stepNumber}>02</div>
+                  <div style={stepIconArea}>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#8338EC" strokeWidth="1.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                  </div>
                   <div>
-                    <h4 style={stepTitle}>Nöral Dönüşüm</h4>
-                    <p style={stepDesc}>PromptLab nöral motoru, cümleni analiz eder ve onu AI modellerinin en iyi anlayacağı "Master Prompt" yapısına dönüştürür.</p>
+                    <h4 style={stepTitle}>02 - Akıllı Dönüşümü İzle</h4>
+                    <p style={stepDesc}>Yazdığın metin saniyeler içinde analiz edilir. Yapay zekanın en verimli sonuçları vereceği, profesyonel parametrelerle donatılmış "Master Prompt" yapısına dönüştürür.</p>
                   </div>
                </div>
+
                <div style={stepItem}>
-                  <div style={stepNumber}>03</div>
+                  <div style={stepIconArea}>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#00E5FF" strokeWidth="1.5"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+                  </div>
                   <div>
-                    <h4 style={stepTitle}>Sonucu Kopyala</h4>
-                    <p style={stepDesc}>Üretilen promptu kopyala ve ChatGPT, Midjourney gibi favori AI aracında kullan. Farkı hemen göreceksin.</p>
+                    <h4 style={stepTitle}>03 - AI Aracını Seç ve Başla</h4>
+                    <p style={stepDesc}>Favori yapay zekanı seçtiğin an Master Prompt otomatik olarak kopyalanır ve sistem seni doğrudan o platforma ulaştırır.</p>
                   </div>
                </div>
             </div>
@@ -614,11 +616,12 @@ const actionButtons = { display: 'flex', alignItems: 'center', gap: '6px' } as c
 const iconButton = { background: 'none', border: 'none', cursor: 'pointer', padding: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center' } as const;
 const sendButton = { width: '32px', height: '32px', borderRadius: '50%', border: 'none', backgroundColor: '#fff', color: '#000', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', transition: 'transform 0.2s ease', fontSize: '1.2rem' } as const;
 
-// 🔥 HOW IT WORKS STİLLERİ 🔥
-const howItWorksSection = { minHeight: '100vh', backgroundColor: '#0a0a0a', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '100px 50px', position: 'relative', borderTop: '1px solid #222', zIndex: 10 } as const;
-const videoContainer = { flex: 1, minWidth: '400px', height: '500px', background: 'linear-gradient(135deg, rgba(20,20,20,1) 0%, rgba(5,5,5,1) 100%)', borderRadius: '32px', border: '1px solid rgba(131, 56, 236, 0.2)', boxShadow: '0 40px 100px rgba(0,0,0,0.8), inset 0 0 30px rgba(131, 56, 236, 0.05)', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' } as const;
-const videoPlaceholder = { textAlign: 'center' as const, display: 'flex', flexDirection: 'column' as const, alignItems: 'center' };
-const stepItem = { display: 'flex', gap: '20px', marginBottom: '40px', alignItems: 'flex-start' } as const;
-const stepNumber = { fontSize: '0.9rem', fontWeight: '900', color: '#00E5FF', background: 'rgba(0, 229, 255, 0.1)', width: '35px', height: '35px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '10px', fontFamily: 'monospace' } as const;
-const stepTitle = { fontSize: '1.25rem', fontWeight: '700', color: '#fff', marginBottom: '8px' } as const;
-const stepDesc = { fontSize: '0.95rem', color: '#888', lineHeight: '1.6' } as const;
+// 🔥 HOW IT WORKS SECTION STYLES 🔥
+const howItWorksSection = { minHeight: '100vh', backgroundColor: '#080808', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '100px 40px', position: 'relative', borderTop: '1px solid #1a1a1a', zIndex: 10 } as const;
+const videoContainer = { flex: 1, minWidth: '380px', height: '520px', background: '#000', borderRadius: '24px', border: '1px solid rgba(131, 56, 236, 0.15)', boxShadow: '0 0 60px rgba(131, 56, 236, 0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' } as const;
+const videoPlaceholder = { textAlign: 'center' as const };
+const refinedTitle = { fontSize: '2.4rem', fontWeight: '700', color: '#fff', marginBottom: '40px', lineHeight: '1.2', letterSpacing: '-1px' } as const;
+const stepItem = { display: 'flex', gap: '20px', marginBottom: '35px', alignItems: 'flex-start' } as const;
+const stepIconArea = { minWidth: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.03)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)' } as const;
+const stepTitle = { fontSize: '1.15rem', fontWeight: '600', color: '#fff', marginBottom: '8px' } as const;
+const stepDesc = { fontSize: '0.92rem', color: '#777', lineHeight: '1.6' } as const;
