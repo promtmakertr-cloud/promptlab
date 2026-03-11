@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, type MouseEvent, type ReactNode } from 'react';
 
-// 🔥 KONSTANTLAR (PROMPT DATA) 🔥
+// 🔥 PROMPT DATA 🔥
 const allPrompts = [
   "Pazarlama | Instagram için dikkat çekici ve etkileşim odaklı ürün lansman postu.",
   "İçerik Üretimi | Teknoloji blogu için SEO uyumlu ve okuyucuyu içine çeken makale taslağı.",
@@ -21,7 +21,7 @@ const allPrompts = [
   "Veri Analizi | E-ticaret satış verilerini inceleyerek müşteri sadakatini artıracak stratejiler öner.",
   "Sunum | Yapay zekanın iş dünyasındaki geleceği hakkında yöneticilere yapılacak 10 slaytlık sunum taslağı.",
   "Seyahat | Roma'da düşük bütçeli, yerel lezzetleri ve gizli kalmış mekanları kapsayan 3 günlük gezi planı.",
-  "Sağlık | Evde ekipmansız yapılayacak, yeni başlayanlar için 20 dakikalık yağ yakıcı HIIT antrenmanı.",
+  "Sağlık | Evde ekipmansız yapılabilecek, yeni başlayanlar için 20 dakikalık yağ yakıcı HIIT antrenmanı.",
   "Arayüz (UI) | Koyu tema (dark mode) destekli, kullanıcı dostu ve modern bir mobil bankacılık ekranı.",
   "Marka Stratejisi | Organik cilt bakım ürünleri satan bir marka için isim önerileri ve marka hikayesi.",
   "Satış | Bir B2B yazılım ürünü (SaaS) için müşterinin itirazlarını çürütecek satış konuşması (pitch).",
@@ -166,7 +166,6 @@ export default function Home() {
     howItWorksRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  // 🔥 MOBİL KONUM HAVUZU (ÜST %40 VE 3 BÖLGE) 🔥
   const getMobileRandomPos = () => {
     const r = Math.random();
     if (r < 0.33) return { top: '10%', left: '10%', right: 'auto', transform: 'none' };
@@ -336,25 +335,25 @@ export default function Home() {
         0%, 100% { transform: translateY(0); opacity: 0.3; }
         50% { transform: translateY(10px); opacity: 0.8; }
       }
+      @keyframes starPulse { 
+        0% { filter: drop-shadow(0 0 2px rgba(0, 229, 255, 0.2)); } 
+        100% { filter: drop-shadow(0 0 8px rgba(0, 229, 255, 0.6)); } 
+      }
+      @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 
       .discovery-trigger { transition: all 0.3s ease; pointer-events: auto; }
-      .discovery-trigger:hover { transform: translate(-50%, -52%) scale(1.05) !important; }
+      .discovery-trigger:hover { transform: translate(-50%, -52%) scale(1.05); }
       .discovery-trigger .question-mark { animation: pulseTextOrb 3s infinite ease-in-out; }
-
       .glowing-logo { animation: starPulse 3s infinite alternate ease-in-out; }
       .cursor-blink { display: inline-block; width: 8px; height: 1.2em; background-color: #00E5FF; vertical-align: middle; margin-left: 4px; animation: blink 1s step-end infinite; }
-      
       .cinematic-text { position: absolute; color: #888888; cursor: pointer; animation: perfectBreathing 24s infinite linear both; text-align: left; line-height: 1.5; font-weight: 300; transition: transform 0.3s ease, filter 0.3s ease; pointer-events: auto; opacity: 0; }
       .cinematic-text:hover { animation-play-state: paused; z-index: 50; }
       .cinematic-text:hover .prompt-category { color: #00E5FF; text-shadow: 0 0 10px rgba(0, 229, 255, 0.5); }
       .cinematic-text:hover .prompt-body { color: #ffffff; opacity: 1; text-shadow: 0 0 10px rgba(255, 255, 255, 0.4); }
-      
       .prompt-category { font-family: "Times New Roman", Times, serif; font-size: 1.35em; font-style: italic; color: #ffffff; margin-bottom: 6px; letter-spacing: 0.5px; opacity: 0.95; transition: color 0.3s ease, text-shadow 0.3s ease; }
       .prompt-body { font-family: inherit; font-size: 0.95em; opacity: 0.75; transition: color 0.3s ease, opacity 0.3s ease, text-shadow 0.3s ease; }
-      
       .ai-brand-btn { transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1); }
       .ai-brand-btn:hover { color: #fff; transform: translateY(-3px) scale(1.02); }
-
       .chevron-scroll { animation: bounceChevron 2s infinite ease-in-out; }
 
       @media (max-width: 768px) {
@@ -414,13 +413,10 @@ export default function Home() {
               <div 
                 onClick={scrollToHowItWorks} 
                 className="discovery-trigger"
-                style={{ 
-                  position: 'absolute', top: '42%', left: '50%', transform: 'translate(-50%, -50%)', 
-                  cursor: 'pointer', zIndex: 15, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px'
-                }}
+                style={{ position: 'absolute', top: '42%', left: '50%', transform: 'translate(-50%, -50%)' as const, cursor: 'pointer', zIndex: 15, display: 'flex', flexDirection: 'column' as const, alignItems: 'center', gap: '5px' }}
               >
                 <div className="question-mark" style={{ fontSize: '3.5rem', fontWeight: '300', color: '#fff', lineHeight: '1' }}>?</div>
-                <div style={{ color: '#00E5FF', fontSize: '0.65rem', letterSpacing: '3px', fontWeight: '600', textShadow: '0 0 10px rgba(0, 229, 255, 0.4)' }}>
+                <div style={{ color: '#00E5FF', fontSize: '0.65rem', letterSpacing: '3px', fontWeight: '600' as const, textShadow: '0 0 10px rgba(0, 229, 255, 0.4)' }}>
                   NASIL ÇALIŞIR?
                 </div>
               </div>
@@ -450,11 +446,11 @@ export default function Home() {
                </div>
                {(!result && loading) ? (
                  <div className="flex flex-col items-center justify-center mt-10">
-                   <div className="loading-box">
+                   <div className="loading-box" style={loadingBox}>
                      <div className="flex justify-center mb-4 transition-all duration-500">
                        {loadingSteps[loadingStep].icon}
                      </div>
-                     <div className="loading-text">
+                     <div className="loading-text" style={loadingText}>
                        {loadingSteps[loadingStep].text}
                      </div>
                    </div>
@@ -462,7 +458,7 @@ export default function Home() {
                ) : (
                  <div style={aiResponseWrapper}>
                     <div style={aiLabel}>ÜRETİLEN MASTER PROMPT</div>
-                    <div style={aiText} className="prompt-output">
+                    <div style={aiText}>
                       {result}
                       {loading && <span className="cursor-blink"></span>}
                     </div>
@@ -518,11 +514,9 @@ export default function Home() {
           </div>
         </div>
 
-        {/* 🔥 HOW IT WORKS SECTION (REFACTORED FOR UX) 🔥 */}
         <div ref={howItWorksRef} style={discoverySection}>
            <div className="discovery-row" style={discoveryRow}>
               
-              {/* VIDEO FRAME (DESKTOP: LEFT / MOBILE: BOTTOM) */}
               <div className="discovery-video-frame" style={videoFrame} onClick={() => setIsVideoFullscreen(true)}>
                  <div style={videoAura}></div>
                  <div style={videoOverlay}>
@@ -531,8 +525,7 @@ export default function Home() {
                  </div>
               </div>
 
-              {/* TEXT CONTENT (DESKTOP: RIGHT / MOBILE: TOP) */}
-              <div style={{ flex: 1, minWidth: '320px', position: 'relative' }}>
+              <div style={{ flex: 1, minWidth: '320px', position: 'relative' as const }}>
                  <div style={labelProtocol}>PROTOCOL_01</div>
                  <h3 style={discoveryTitle}>Promptlab Sizin İçin Ne Yapar?</h3>
                  
@@ -560,7 +553,6 @@ export default function Home() {
                     </div>
                  </div>
 
-                 {/* SADECE MOBİLDE GÖRÜNEN YÖNLENDİRME OKU */}
                  <div className="chevron-scroll" style={mobileChevron}>
                     <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#444" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
                  </div>
@@ -568,7 +560,6 @@ export default function Home() {
            </div>
         </div>
 
-        {/* 🔥 FULLSCREEN VIDEO MODAL 🔥 */}
         {isVideoFullscreen && (
           <div style={fullscreenOverlay} onClick={() => setIsVideoFullscreen(false)}>
              <button style={closeFullscreenBtn} onClick={() => setIsVideoFullscreen(false)}>✕</button>
@@ -585,52 +576,54 @@ export default function Home() {
 }
 
 // 🔥 KUSURSUZ STİLLER 🔥
-const container = { backgroundColor: '#050505', minHeight: '100vh', color: '#ECECEC', fontFamily: 'Inter, sans-serif', display: 'flex', flexDirection: 'column', position: 'relative', overflowX: 'hidden' } as const;
-const topBar = { padding: '20px 25px', position: 'absolute', top: 0, left: 0, right: 0, zIndex: 100, display: 'flex', justifyContent: 'space-between', alignItems: 'center' } as const;
-const logoWrapper = { display: 'flex', alignItems: 'center', gap: '10px', opacity: 0.8, cursor: 'pointer' } as const;
-const miniLogo = { height: '20px', width: 'auto', objectFit: 'contain' } as const;
-const backButton = { backgroundColor: 'transparent', color: '#fff', border: '1px solid #333', padding: '8px 16px', borderRadius: '20px', cursor: 'pointer', fontSize: '0.85rem' } as const;
-const contentArea = { minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', position: 'relative', paddingBottom: '150px' } as const;
-const floatingContainer = { position: 'absolute', top: '70px', left: 0, right: 0, height: '70vh', pointerEvents: 'none', zIndex: 5, overflow: 'hidden' } as const;
-const heroSection = { display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', zIndex: 10, marginTop: '60vh', width: '100%', gap: '15px', height: 'auto', minHeight: 'min-content', pointerEvents: 'none' } as const;
-const logoFrame = { display: 'flex', alignItems: 'center', justifyContent: 'center' } as const;
-const centerLogo = { width: '100%', maxWidth: '180px', height: 'auto', display: 'block', objectFit: 'contain' } as const;
-const heroTitle = { fontSize: '2.2rem', fontWeight: '600', color: '#fff', letterSpacing: '-0.5px', margin: 0 } as const;
-const heroSub = { color: '#888', fontSize: '1rem', maxWidth: '550px', padding: '0 20px', lineHeight: '1.5', margin: 0 } as const;
-const resultContainer = { maxWidth: '850px', width: '100%', marginTop: '80px', marginBottom: '160px', zIndex: 10, padding: '0 20px' } as const;
-const userPromptWrapper = { width: '100%', backgroundColor: '#0f0f0f', borderRadius: '12px', border: '1px solid #222', marginBottom: '20px', overflow: 'hidden', transition: 'all 0.3s ease' } as const;
-const userPromptHeader = { padding: '16px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', backgroundColor: '#141414' } as const;
-const userPromptTitle = { fontSize: '0.9rem', color: '#ccc', fontWeight: '500', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '75%' } as const;
-const editBtn = { background: 'rgba(131, 56, 236, 0.1)', color: '#00E5FF', border: '1px solid rgba(131, 56, 236, 0.4)', padding: '6px 14px', borderRadius: '6px', fontSize: '0.8rem', cursor: 'pointer', fontWeight: '600', transition: 'all 0.2s ease' } as const;
-const userPromptBody = { padding: '20px', borderTop: '1px solid #222', fontSize: '0.95rem', color: '#aaa', lineHeight: '1.6', whiteSpace: 'pre-wrap' } as const;
-const aiResponseWrapper = { width: '100%', backgroundColor: '#0a0a0a', padding: '25px', borderRadius: '16px', border: '1px solid rgba(131, 56, 236, 0.3)', boxShadow: '0 0 20px rgba(58, 134, 255, 0.15)' } as const;
-const aiLabel = { fontSize: '0.75rem', fontWeight: '700', color: '#00E5FF', marginBottom: '20px', letterSpacing: '2px' } as const;
-const aiText = { fontSize: '1rem', lineHeight: '1.6', color: '#E0E0E0', whiteSpace: 'pre-wrap', fontFamily: 'monospace', opacity: 0.9 } as const;
-const copyBtn = { display: 'flex', alignItems: 'center', gap: '6px', background: '#fff', color: '#000', border: 'none', padding: '8px 16px', borderRadius: '8px', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 'bold', transition: 'all 0.2s ease' } as const;
-const bottomArea = { position: 'fixed', bottom: 0, left: 0, right: 0, padding: '30px 20px 40px 20px', background: 'transparent', display: 'flex', flexDirection: 'column', alignItems: 'center', zIndex: 50, pointerEvents: 'none' } as const;
-const floorGlow = { position: 'absolute', bottom: '-10px', left: '50%', transform: 'translateX(-50%)', width: '50vw', maxWidth: '600px', height: '60px', background: 'linear-gradient(90deg, #3A86FF, #8338EC, #00E5FF, #8338EC, #3A86FF)', backgroundSize: '200% 100%', filter: 'blur(45px)', opacity: 0.25, zIndex: 1, pointerEvents: 'none' } as const;
-const glowWrapper = { position: 'relative', width: '100%', maxWidth: '680px', zIndex: 2, pointerEvents: 'auto' } as const;
-const inputBoxInner = { backgroundColor: '#0a0a0a', borderRadius: '40px', border: '1px solid rgba(58, 134, 255, 0.2)', animation: 'elegantGlow 8s infinite alternate', display: 'flex', alignItems: 'center', padding: '6px 10px 6px 18px', width: '100%', height: '100%' } as const;
-const inputField = { flex: 1, background: 'transparent', border: 'none', color: '#fff', fontSize: '1rem', outline: 'none', resize: 'none', padding: '8px 0', maxHeight: '150px', fontFamily: 'inherit' } as const;
-const actionButtons = { display: 'flex', alignItems: 'center', gap: '6px' } as const;
-const iconButton = { background: 'none', border: 'none', cursor: 'pointer', padding: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center' } as const;
-const sendButton = { width: '32px', height: '32px', borderRadius: '50%', border: 'none', backgroundColor: '#fff', color: '#000', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', transition: 'transform 0.2s ease', fontSize: '1.2rem' } as const;
+const container = { backgroundColor: '#050505', minHeight: '100vh', color: '#ECECEC', fontFamily: 'Inter, sans-serif', display: 'flex', flexDirection: 'column' as const, position: 'relative' as const, overflowX: 'hidden' as const };
+const topBar = { padding: '20px 25px', position: 'absolute' as const, top: 0, left: 0, right: 0, zIndex: 100, display: 'flex', justifyContent: 'space-between', alignItems: 'center' };
+const logoWrapper = { display: 'flex', alignItems: 'center', gap: '10px', opacity: 0.8, cursor: 'pointer' };
+const miniLogo = { height: '20px', width: 'auto', objectFit: 'contain' as const };
+const backButton = { backgroundColor: 'transparent', color: '#fff', border: '1px solid #333', padding: '8px 16px', borderRadius: '20px', cursor: 'pointer', fontSize: '0.85rem' };
+const contentArea = { minHeight: '100vh', display: 'flex', flexDirection: 'column' as const, alignItems: 'center', justifyContent: 'center', width: '100%', position: 'relative' as const, paddingBottom: '150px' };
+const floatingContainer = { position: 'absolute' as const, top: '70px', left: 0, right: 0, height: '70vh', pointerEvents: 'none' as const, zIndex: 5, overflow: 'hidden' as const };
+const heroSection = { display: 'flex', flexDirection: 'column' as const, alignItems: 'center', textAlign: 'center' as const, zIndex: 10, marginTop: '60vh', width: '100%', gap: '15px', height: 'auto', minHeight: 'min-content', pointerEvents: 'none' as const };
+const logoFrame = { display: 'flex', alignItems: 'center', justifyContent: 'center' };
+const centerLogo = { width: '100%', maxWidth: '180px', height: 'auto', display: 'block', objectFit: 'contain' as const };
+const heroTitle = { fontSize: '2.2rem', fontWeight: '600' as const, color: '#fff', letterSpacing: '-0.5px', margin: 0 };
+const heroSub = { color: '#888', fontSize: '1rem', maxWidth: '550px', padding: '0 20px', lineHeight: '1.5', margin: 0 };
+const resultContainer = { maxWidth: '850px', width: '100%', marginTop: '80px', marginBottom: '160px', zIndex: 10, padding: '0 20px' };
+const userPromptWrapper = { width: '100%', backgroundColor: '#0f0f0f', borderRadius: '12px', border: '1px solid #222', marginBottom: '20px', overflow: 'hidden' as const, transition: 'all 0.3s ease' };
+const userPromptHeader = { padding: '16px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', backgroundColor: '#141414' };
+const userPromptTitle = { fontSize: '0.9rem', color: '#ccc', fontWeight: '500' as const, whiteSpace: 'nowrap' as const, overflow: 'hidden' as const, textOverflow: 'ellipsis' as const, maxWidth: '75%' };
+const editBtn = { background: 'rgba(131, 56, 236, 0.1)', color: '#00E5FF', border: '1px solid rgba(131, 56, 236, 0.4)', padding: '6px 14px', borderRadius: '6px', fontSize: '0.8rem', cursor: 'pointer', fontWeight: '600' as const, transition: 'all 0.2s ease' };
+const userPromptBody = { padding: '20px', borderTop: '1px solid #222', fontSize: '0.95rem', color: '#aaa', lineHeight: '1.6', whiteSpace: 'pre-wrap' as const };
+const aiResponseWrapper = { width: '100%', backgroundColor: '#0a0a0a', padding: '25px', borderRadius: '16px', border: '1px solid rgba(131, 56, 236, 0.3)', boxShadow: '0 0 20px rgba(58, 134, 255, 0.15)' };
+const aiLabel = { fontSize: '0.75rem', fontWeight: '700' as const, color: '#00E5FF', marginBottom: '20px', letterSpacing: '2px' };
+const aiText = { fontSize: '1rem', lineHeight: '1.6', color: '#E0E0E0', whiteSpace: 'pre-wrap' as const, fontFamily: 'monospace', opacity: 0.9 };
+const copyBtn = { display: 'flex', alignItems: 'center', gap: '6px', background: '#fff', color: '#000', border: 'none', padding: '8px 16px', borderRadius: '8px', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 'bold' as const, transition: 'all 0.2s ease' };
+const bottomArea = { position: 'fixed' as const, bottom: 0, left: 0, right: 0, padding: '30px 20px 40px 20px', background: 'transparent', display: 'flex', flexDirection: 'column' as const, alignItems: 'center', zIndex: 50, pointerEvents: 'none' as const };
+const floorGlow = { position: 'absolute' as const, bottom: '-10px', left: '50%', transform: 'translateX(-50%)', width: '50vw', maxWidth: '600px', height: '60px', background: 'linear-gradient(90deg, #3A86FF, #8338EC, #00E5FF, #8338EC, #3A86FF)', backgroundSize: '200% 100%', filter: 'blur(45px)', opacity: 0.25, zIndex: 1, pointerEvents: 'none' as const };
+const glowWrapper = { position: 'relative' as const, width: '100%', maxWidth: '680px', zIndex: 2, pointerEvents: 'auto' as const };
+const inputBoxInner = { backgroundColor: '#0a0a0a', borderRadius: '40px', border: '1px solid rgba(58, 134, 255, 0.2)', animation: 'elegantGlow 8s infinite alternate', display: 'flex', alignItems: 'center', padding: '6px 10px 6px 18px', width: '100%', height: '100%' };
+const inputField = { flex: 1, background: 'transparent', border: 'none', color: '#fff', fontSize: '1rem', outline: 'none', resize: 'none' as const, padding: '8px 0', maxHeight: '150px', fontFamily: 'inherit' };
+const actionButtons = { display: 'flex', alignItems: 'center', gap: '6px' };
+const iconButton = { background: 'none', border: 'none', cursor: 'pointer', padding: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center' };
+const sendButton = { width: '32px', height: '32px', borderRadius: '50%', border: 'none', backgroundColor: '#fff', color: '#000', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' as const, transition: 'transform 0.2s ease', fontSize: '1.2rem' };
+const loadingBox = { width: '100%', maxWidth: '600px', background: 'rgba(10, 10, 10, 0.85)', border: '1px solid rgba(131, 56, 236, 0.3)', borderRadius: '16px', padding: '40px 20px', textAlign: 'center' as const };
+const loadingText = { fontSize: '0.95rem', color: '#ECECEC', fontWeight: '400' as const, marginTop: '20px', letterSpacing: '0.8px', opacity: 0.8, fontFamily: 'monospace' };
 
 // 🔥 DISCOVERY SECTION STYLES 🔥
-const discoverySection = { minHeight: '100vh', backgroundColor: '#080808', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '100px 40px', position: 'relative', borderTop: '1px solid #1a1a1a', zIndex: 10 } as const;
-const discoveryRow = { maxWidth: '1100px', width: '100%', display: 'flex', gap: '80px', alignItems: 'center' } as const;
-const videoFrame = { flex: 1, height: '480px', background: '#000', borderRadius: '24px', border: '1px solid rgba(131, 56, 236, 0.15)', position: 'relative' as const, overflow: 'hidden', cursor: 'pointer' };
-const videoAura = { position: 'absolute', top: '-10%', left: '-10%', width: '120%', height: '120%', background: 'radial-gradient(circle, rgba(131, 56, 236, 0.08) 0%, transparent 70%)', pointerEvents: 'none' } as const;
-const videoOverlay = { position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column' as const, alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.4)' };
-const labelProtocol = { fontSize: '0.7rem', color: '#00E5FF', fontWeight: 'bold', letterSpacing: '4px', marginBottom: '15px', display: 'block' } as const;
-const discoveryTitle = { fontSize: '2.2rem', fontWeight: '700', color: '#fff', marginBottom: '40px', lineHeight: '1.2', letterSpacing: '-1px' } as const;
-const stepCard = { display: 'flex', gap: '20px', marginBottom: '35px', alignItems: 'flex-start' } as const;
-const stepIconBox = { minWidth: '38px', height: '38px', borderRadius: '10px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center' } as const;
-const stepLabel = { fontSize: '1.1rem', fontWeight: '600', color: '#fff', marginBottom: '6px' } as const;
-const stepText = { fontSize: '0.9rem', color: '#777', lineHeight: '1.5' } as const;
-const mobileChevron = { position: 'absolute', bottom: '-40px', right: '0', pointerEvents: 'none' } as const;
+const discoverySection = { minHeight: '100vh', backgroundColor: '#080808', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '100px 40px', position: 'relative' as const, borderTop: '1px solid #1a1a1a', zIndex: 10 };
+const discoveryRow = { maxWidth: '1100px', width: '100%', display: 'flex', gap: '80px', alignItems: 'center' };
+const videoFrame = { flex: 1, height: '480px', background: '#000', borderRadius: '24px', border: '1px solid rgba(131, 56, 236, 0.15)', position: 'relative' as const, overflow: 'hidden' as const, cursor: 'pointer' };
+const videoAura = { position: 'absolute' as const, top: '-10%', left: '-10%', width: '120%', height: '120%', background: 'radial-gradient(circle, rgba(131, 56, 236, 0.08) 0%, transparent 70%)', pointerEvents: 'none' as const };
+const videoOverlay = { position: 'absolute' as const, inset: 0, display: 'flex', flexDirection: 'column' as const, alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.4)' };
+const labelProtocol = { fontSize: '0.7rem', color: '#00E5FF', fontWeight: 'bold' as const, letterSpacing: '4px', marginBottom: '15px', display: 'block' };
+const discoveryTitle = { fontSize: '2.2rem', fontWeight: '700' as const, color: '#fff', marginBottom: '40px', lineHeight: '1.2', letterSpacing: '-1px' };
+const stepCard = { display: 'flex', gap: '20px', marginBottom: '35px', alignItems: 'flex-start' };
+const stepIconBox = { minWidth: '38px', height: '38px', borderRadius: '10px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center' };
+const stepLabel = { fontSize: '1.1rem', fontWeight: '600' as const, color: '#fff', marginBottom: '6px' };
+const stepText = { fontSize: '0.9rem', color: '#777', lineHeight: '1.5' };
+const mobileChevron = { position: 'absolute' as const, bottom: '-40px', right: '0', pointerEvents: 'none' as const };
 
 // 🔥 FULLSCREEN OVERLAY 🔥
-const fullscreenOverlay = { position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.96)', zIndex: 10000, display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(10px)' } as const;
-const closeFullscreenBtn = { position: 'absolute', top: '30px', right: '30px', background: 'rgba(255,255,255,0.1)', border: 'none', color: '#fff', width: '45px', height: '45px', borderRadius: '50%', cursor: 'pointer', fontSize: '1.2rem' } as const;
-const fullscreenVideoContainer = { width: '90%', maxWidth: '1000px', aspectRatio: '16/9', background: '#050505', border: '1px solid rgba(0, 229, 255, 0.2)', borderRadius: '24px', display: 'flex', flexDirection: 'column' as const, alignItems: 'center', justifyContent: 'center', boxShadow: '0 0 100px rgba(0,0,0,0.8)' };
+const fullscreenOverlay = { position: 'fixed' as const, inset: 0, backgroundColor: 'rgba(0,0,0,0.96)', zIndex: 10000, display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(10px)' };
+const closeFullscreenBtn = { position: 'absolute' as const, top: '30px', right: '30px', background: 'rgba(255,255,255,0.1)', border: 'none', color: '#fff', width: '45px', height: '45px', borderRadius: '50%', cursor: 'pointer', fontSize: '1.2rem' };
+const fullscreenVideoContainer = { width: '90%', maxWidth: '1000px', aspectRatio: '16/9' as const, background: '#050505', border: '1px solid rgba(0, 229, 255, 0.2)', borderRadius: '24px', display: 'flex', flexDirection: 'column' as const, alignItems: 'center', justifyContent: 'center', boxShadow: '0 0 100px rgba(0,0,0,0.8)' };
