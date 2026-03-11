@@ -158,6 +158,9 @@ export default function Home() {
   const [typewriterText, setTypewriterText] = useState('');
   const [typewriterIndex, setTypewriterIndex] = useState(0);
   const [isDeleting, setIsDeleting] = useState(false);
+  
+  // 🔥 TAM EKRAN VİDEO STATE'İ 🔥
+  const [isVideoOpen, setIsVideoOpen] = useState(false);
 
   const howItWorksRef = useRef<HTMLDivElement>(null);
 
@@ -306,6 +309,13 @@ export default function Home() {
   };
 
   useEffect(() => {
+    // Escape tuşu ile videoyu kapatma
+    const handleKeyDown = (e: KeyboardEvent) => { if (e.key === 'Escape') setIsVideoOpen(false); };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  useEffect(() => {
     const styleSheet = document.createElement("style");
     styleSheet.innerText = `
       @keyframes elegantGlow {
@@ -331,8 +341,13 @@ export default function Home() {
         100% { opacity: 0.6; text-shadow: 0 0 10px rgba(0, 229, 255, 0.3); transform: translateY(0); }
       }
 
+      /* 🔥 OK ANİMASYONU 🔥 */
+      @keyframes bounceArrow {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(8px); }
+      }
+
       .discovery-trigger { transition: all 0.3s ease; pointer-events: auto; }
-      .discovery-trigger:hover { transform: translate(-50%, -52%) scale(1.05) !important; }
       .discovery-trigger .question-mark { animation: pulseTextOrb 3s infinite ease-in-out; }
 
       .glowing-logo { animation: starPulse 3s infinite alternate ease-in-out; }
@@ -358,16 +373,38 @@ export default function Home() {
       .btn-perplexity:hover { border-color: #20b2aa !important; background: rgba(32, 178, 170, 0.1) !important; box-shadow: 0 0 20px rgba(32, 178, 170, 0.2) !important; }
       .btn-copilot:hover { border-color: #3c78d8 !important; background: rgba(60, 120, 216, 0.1) !important; box-shadow: 0 0 20px rgba(60, 120, 216, 0.2) !important; }
 
+      .hw-container { flex-direction: row; flex-wrap: wrap; }
+      .hw-video { height: 520px; transition: transform 0.3s ease; }
+      .hw-video:hover { transform: scale(1.02); box-shadow: 0 0 40px rgba(0, 229, 255, 0.2); }
+      .hw-scroll-arrow { display: none; }
+
+      /* 🔥 MOBİL OPTİMİZASYONU 🔥 */
       @media (max-width: 768px) {
-        .hero-section { margin-top: 52vh !important; gap: 8px !important; }
-        .hero-title { font-size: 1.35rem !important; line-height: 1.25 !important; padding: 0 15px !important; }
-        .hero-sub { font-size: 0.8rem !important; padding: 0 20px !important; }
+        .hero-section { margin-top: 48vh !important; gap: 8px !important; }
+        .hero-title { font-size: 1.25rem !important; line-height: 1.3 !important; font-weight: 700 !important; letter-spacing: -0.5px !important; padding: 0 15px !important; }
+        .hero-sub { font-size: 0.75rem !important; color: #777 !important; padding: 0 25px !important; }
         .cinematic-text { font-size: 0.8rem !important; text-align: left !important; }
         .slot-1, .slot-2, .slot-3 { display: none !important; }
-        .floor-glow { opacity: 0.2 !important; height: 50px !important; }
         .input-box-inner { padding: 12px 14px 12px 18px !important; border-radius: 28px !important; }
-        .discovery-trigger { top: 46% !important; left: 50%; transform: translate(-50%, -50%); } 
-        .question-mark { font-size: 2.8rem !important; }
+        .discovery-trigger { top: 40% !important; left: 50%; transform: translate(-50%, -50%); } 
+        .question-mark { font-size: 2.5rem !important; }
+        
+        /* Mobil: Metin Üstte, Video Altta Kuralı */
+        .hw-container { flex-direction: column-reverse !important; gap: 40px !important; }
+        
+        /* Mobil: Video Boyutu Küçültüldü */
+        .hw-video { height: 220px !important; min-width: 100% !important; border-radius: 16px !important; }
+        
+        /* Mobil: Yönlendirme Oku Sadece Mobilde Görünür */
+        .hw-scroll-arrow { 
+           display: flex; 
+           justify-content: flex-end; 
+           width: 100%; 
+           padding-right: 20px; 
+           margin-top: -20px; 
+           margin-bottom: 20px;
+        }
+        .bounce-icon { animation: bounceArrow 2s infinite ease-in-out; color: #444; }
       }
     `;
     document.head.appendChild(styleSheet);
@@ -377,208 +414,218 @@ export default function Home() {
   const dynamicPlaceholder = `Ne oluşturmak istiyorsun?\nÖrn: “${typewriterText}${typewriterText.length > 0 ? "”" : ""}`;
 
   return (
-    <main style={container}>
-      <div style={topBar}>
-        <div style={logoWrapper} onClick={handleReset}>
-          <img src="/logo.png" alt="Logo" className="glowing-logo" style={miniLogo} />
-        </div>
-        {(submittedPrompt) && ( <button onClick={handleReset} style={backButton}>← Ana Sayfa</button> )}
-      </div>
-      
-      <div style={contentArea}>
-        {!submittedPrompt ? (
-          <>
-            <div style={floatingContainer}>
-              {slots.map((slot) => {
-                const { category, promptText } = parsePromptData(slot.text);
-                const delayMs = parseFloat(slot.delay || '0') * 1000;
-                return (
-                  <div key={slot.id} className={`cinematic-text slot-${slot.id}`} onClick={() => setInput(promptText)} onAnimationIteration={() => handleAnimationIteration(slot.id)}
-                    style={{ 
-                      top: slot.pos.top || 'auto', 
-                      bottom: slot.pos.bottom || 'auto', 
-                      left: slot.pos.left || 'auto', 
-                      right: slot.pos.right || 'auto', 
-                      transform: slot.pos.transform || 'none',
-                      maxWidth: slot.pos.maxWidth, 
-                      width: slot.pos.width || 'auto',
-                      fontSize: slot.size, 
-                      animationDelay: slot.delay, 
-                      display: slot.pos.display || 'block' 
-                    }}
-                  >
-                    {category && <div className="prompt-category">
-                      <ScrambleText text={category} initialDelayMs={delayMs} />
-                    </div>}
-                    <div className="prompt-body">
-                      <ScrambleText text={promptText} initialDelayMs={delayMs} />
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* 🔥 TEMİZ, KUTUSUZ SORU İŞARETİ 🔥 */}
-            <div 
-              onClick={scrollToHowItWorks} 
-              className="discovery-trigger"
-              style={{ 
-                position: 'absolute', top: '42%', left: '50%', transform: 'translate(-50%, -50%)', 
-                cursor: 'pointer', zIndex: 15, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px'
-              }}
-            >
-              <div className="question-mark" style={{ fontSize: '3.5rem', fontWeight: '300', color: '#fff', lineHeight: '1' }}>
-                ?
-              </div>
-              <div style={{ color: '#00E5FF', fontSize: '0.65rem', letterSpacing: '3px', fontWeight: '600' }}>
-                NASIL ÇALIŞIR?
-              </div>
-            </div>
-
-            <div style={heroSection} className="hero-section">
-              <div style={logoFrame}> 
-                <img src="/logo.png" alt="Logo" className="glowing-logo" style={centerLogo} /> 
-              </div>
-              <h2 style={heroTitle} className="hero-title">Fikirlerini Güçlü Promptlara Dönüştür.</h2>
-              <p style={heroSub} className="hero-sub">Metni yaz. Optimize edilmiş promptu al. Kopyala ve diğer AI araçlarında kullan.</p>
-            </div>
-          </>
-        ) : (
-          <div style={resultContainer}>
-             <div style={userPromptWrapper}>
-               <div style={userPromptHeader} onClick={() => setIsPromptExpanded(!isPromptExpanded)}>
-                 <div style={userPromptTitle}>
-                    <span style={{ color: '#00E5FF', marginRight: '8px' }}>✦</span>
-                    {isPromptExpanded ? "Senin Promptun" : `Senin Promptun: "${submittedPrompt.length > 45 ? submittedPrompt.slice(0, 45) + '...' : submittedPrompt}"`}
-                 </div>
-                 <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
-                   <button className="edit-btn" style={editBtn} onClick={(e) => { e.stopPropagation(); setInput(submittedPrompt); window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }); }} >Düzenle</button>
-                   <span style={{ transform: isPromptExpanded ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease', color: '#888', fontSize: '0.8rem' }}>▼</span>
-                 </div>
-               </div>
-               {isPromptExpanded && ( <div style={userPromptBody}>{submittedPrompt}</div> )}
-             </div>
-             {(!result && loading) ? (
-               <div className="flex flex-col items-center justify-center mt-10">
-                 <div className="loading-box">
-                   <div className="flex justify-center mb-4 transition-all duration-500">
-                     {loadingSteps[loadingStep].icon}
-                   </div>
-                   <div className="loading-text">
-                     {loadingSteps[loadingStep].text}
-                   </div>
-                 </div>
-               </div>
-             ) : (
-               <div style={aiResponseWrapper}>
-                  <div style={aiLabel}>ÜRETİLEN MASTER PROMPT</div>
-                  <div style={aiText} className="prompt-output">
-                    {result}
-                    {loading && <span className="cursor-blink"></span>}
-                  </div>
-                  
-                  {!loading && result && (
-                    <div style={{ marginTop: '35px', paddingTop: '20px', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
-                        <span style={{ fontSize: '0.85rem', color: '#888', letterSpacing: '0.5px' }}>✨ ÜRETİMİ BAŞLAT:</span>
-                        <button onClick={handleCopy} style={copyBtn} className="copy-btn-primary"> {IconCopy} {copyStatus} </button>
-                      </div>
-                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
-                        {!isVisual ? (
-                          <>
-                            <AIPlatformButton url="https://chatgpt.com" icon={IconChatGPT} name="ChatGPT" platformClass="btn-chatgpt" />
-                            <AIPlatformButton url="https://gemini.google.com" icon={IconGemini} name="Gemini" platformClass="btn-gemini" />
-                            <AIPlatformButton url="https://claude.ai" icon={IconClaude} name="Claude" platformClass="btn-claude" />
-                            <AIPlatformButton url="https://www.perplexity.ai" icon={IconPerplexity} name="Perplexity" platformClass="btn-perplexity" />
-                            <AIPlatformButton url="https://copilot.microsoft.com" icon={IconCopilot} name="Copilot" platformClass="btn-copilot" />
-                          </>
-                        ) : (
-                          <>
-                            <AIPlatformButton url="https://discord.com/channels/@me" icon={IconMidjourney} name="Midjourney" platformClass="btn-midjourney" />
-                            <AIPlatformButton url="https://chatgpt.com" icon={IconChatGPT} name="DALL-E 3" platformClass="btn-chatgpt" />
-                            <AIPlatformButton url="https://leonardo.ai" icon={IconLeonardo} name="Leonardo" platformClass="btn-leonardo" />
-                            <AIPlatformButton url="https://firefly.adobe.com" icon={IconAdobe} name="Adobe Firefly" />
-                            <AIPlatformButton url="https://www.canva.com" icon={IconCanva} name="Canva" />
-                          </>
-                        )}
-                      </div>
-                    </div>
-                  )}
-               </div>
-             )}
+    <>
+      <main style={container}>
+        <div style={topBar}>
+          <div style={logoWrapper} onClick={handleReset}>
+            <img src="/logo.png" alt="Logo" className="glowing-logo" style={miniLogo} />
           </div>
-        )}
-      </div>
+          {(submittedPrompt) && ( <button onClick={handleReset} style={backButton}>← Ana Sayfa</button> )}
+        </div>
+        
+        <div style={contentArea}>
+          {!submittedPrompt ? (
+            <>
+              <div style={floatingContainer}>
+                {slots.map((slot) => {
+                  const { category, promptText } = parsePromptData(slot.text);
+                  const delayMs = parseFloat(slot.delay || '0') * 1000;
+                  return (
+                    <div key={slot.id} className={`cinematic-text slot-${slot.id}`} onClick={() => setInput(promptText)} onAnimationIteration={() => handleAnimationIteration(slot.id)}
+                      style={{ 
+                        top: slot.pos.top || 'auto', bottom: slot.pos.bottom || 'auto', left: slot.pos.left || 'auto', right: slot.pos.right || 'auto', 
+                        transform: slot.pos.transform || 'none', maxWidth: slot.pos.maxWidth, width: slot.pos.width || 'auto',
+                        fontSize: slot.size, animationDelay: slot.delay, display: slot.pos.display || 'block' 
+                      }}
+                    >
+                      {category && <div className="prompt-category">
+                        <ScrambleText text={category} initialDelayMs={delayMs} />
+                      </div>}
+                      <div className="prompt-body">
+                        <ScrambleText text={promptText} initialDelayMs={delayMs} />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
 
-      <div style={bottomArea}>
-        <div className="floor-glow" style={floorGlow}></div>
-        <div style={glowWrapper}>
-          <div style={inputBoxInner} className="input-box-inner">
-            <textarea 
-                className="main-input" style={inputField} placeholder={dynamicPlaceholder} rows={2} 
-                value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => { if(e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleGenerate(); }}}
-            />
-            <div style={actionButtons}>
-              <button onClick={handleVoiceTyping} style={iconButton} className={isListening ? "pulse-mic" : ""} title="Sesle Yaz">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#888" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
-              </button>
-              <button onClick={handleGenerate} disabled={loading || !input.trim()} style={sendButton}> {loading ? '⏳' : '↑'} </button>
+              {/* 🔥 TEMİZ, KUTUSUZ SORU İŞARETİ 🔥 */}
+              <div 
+                onClick={scrollToHowItWorks} 
+                className="discovery-trigger"
+                style={{ position: 'absolute', top: '42%', left: '50%', transform: 'translate(-50%, -50%)', cursor: 'pointer', zIndex: 15, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px' }}
+              >
+                <div className="question-mark" style={{ fontSize: '3.5rem', fontWeight: '300', color: '#fff', lineHeight: '1' }}>?</div>
+                <div style={{ color: '#00E5FF', fontSize: '0.65rem', letterSpacing: '3px', fontWeight: '600', textShadow: '0 0 10px rgba(0, 229, 255, 0.4)' }}>
+                  NASIL ÇALIŞIR?
+                </div>
+              </div>
+
+              <div style={heroSection} className="hero-section">
+                <div style={logoFrame}> 
+                  <img src="/logo.png" alt="Logo" className="glowing-logo" style={centerLogo} /> 
+                </div>
+                <h2 style={heroTitle} className="hero-title">Fikirlerini Güçlü Promptlara Dönüştür.</h2>
+                <p style={heroSub} className="hero-sub">Metni yaz. Optimize edilmiş promptu al. Kopyala ve diğer AI araçlarında kullan.</p>
+              </div>
+            </>
+          ) : (
+            <div style={resultContainer}>
+               <div style={userPromptWrapper}>
+                 <div style={userPromptHeader} onClick={() => setIsPromptExpanded(!isPromptExpanded)}>
+                   <div style={userPromptTitle}>
+                      <span style={{ color: '#00E5FF', marginRight: '8px' }}>✦</span>
+                      {isPromptExpanded ? "Senin Promptun" : `Senin Promptun: "${submittedPrompt.length > 45 ? submittedPrompt.slice(0, 45) + '...' : submittedPrompt}"`}
+                   </div>
+                   <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
+                     <button className="edit-btn" style={editBtn} onClick={(e) => { e.stopPropagation(); setInput(submittedPrompt); window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }); }} >Düzenle</button>
+                     <span style={{ transform: isPromptExpanded ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease', color: '#888', fontSize: '0.8rem' }}>▼</span>
+                   </div>
+                 </div>
+                 {isPromptExpanded && ( <div style={userPromptBody}>{submittedPrompt}</div> )}
+               </div>
+               {(!result && loading) ? (
+                 <div className="flex flex-col items-center justify-center mt-10">
+                   <div className="loading-box">
+                     <div className="flex justify-center mb-4 transition-all duration-500">
+                       {loadingSteps[loadingStep].icon}
+                     </div>
+                     <div className="loading-text">
+                       {loadingSteps[loadingStep].text}
+                     </div>
+                   </div>
+                 </div>
+               ) : (
+                 <div style={aiResponseWrapper}>
+                    <div style={aiLabel}>ÜRETİLEN MASTER PROMPT</div>
+                    <div style={aiText} className="prompt-output">
+                      {result}
+                      {loading && <span className="cursor-blink"></span>}
+                    </div>
+                    
+                    {!loading && result && (
+                      <div style={{ marginTop: '35px', paddingTop: '20px', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
+                          <span style={{ fontSize: '0.85rem', color: '#888', letterSpacing: '0.5px' }}>✨ ÜRETİMİ BAŞLAT:</span>
+                          <button onClick={handleCopy} style={copyBtn} className="copy-btn-primary"> {IconCopy} {copyStatus} </button>
+                        </div>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+                          {!isVisual ? (
+                            <>
+                              <AIPlatformButton url="https://chatgpt.com" icon={IconChatGPT} name="ChatGPT" platformClass="btn-chatgpt" />
+                              <AIPlatformButton url="https://gemini.google.com" icon={IconGemini} name="Gemini" platformClass="btn-gemini" />
+                              <AIPlatformButton url="https://claude.ai" icon={IconClaude} name="Claude" platformClass="btn-claude" />
+                              <AIPlatformButton url="https://www.perplexity.ai" icon={IconPerplexity} name="Perplexity" platformClass="btn-perplexity" />
+                              <AIPlatformButton url="https://copilot.microsoft.com" icon={IconCopilot} name="Copilot" platformClass="btn-copilot" />
+                            </>
+                          ) : (
+                            <>
+                              <AIPlatformButton url="https://discord.com/channels/@me" icon={IconMidjourney} name="Midjourney" platformClass="btn-midjourney" />
+                              <AIPlatformButton url="https://chatgpt.com" icon={IconChatGPT} name="DALL-E 3" platformClass="btn-chatgpt" />
+                              <AIPlatformButton url="https://leonardo.ai" icon={IconLeonardo} name="Leonardo" platformClass="btn-leonardo" />
+                              <AIPlatformButton url="https://firefly.adobe.com" icon={IconAdobe} name="Adobe Firefly" />
+                              <AIPlatformButton url="https://www.canva.com" icon={IconCanva} name="Canva" />
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                 </div>
+               )}
+            </div>
+          )}
+        </div>
+
+        <div style={bottomArea}>
+          <div className="floor-glow" style={floorGlow}></div>
+          <div style={glowWrapper}>
+            <div style={inputBoxInner} className="input-box-inner">
+              <textarea 
+                  className="main-input" style={inputField} placeholder={dynamicPlaceholder} rows={2} 
+                  value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => { if(e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleGenerate(); }}}
+              />
+              <div style={actionButtons}>
+                <button onClick={handleVoiceTyping} style={iconButton} className={isListening ? "pulse-mic" : ""} title="Sesle Yaz">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#888" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+                </button>
+                <button onClick={handleGenerate} disabled={loading || !input.trim()} style={sendButton}> {loading ? '⏳' : '↑'} </button>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* 🔥 DISCOVERY SECTION (NASIL ÇALIŞIR) 🔥 */}
-      <div ref={howItWorksRef} style={howItWorksSection}>
-         <div style={{ maxWidth: '1100px', width: '100%', display: 'flex', gap: '80px', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
-            
-            {/* PURE VIDEO FRAME */}
-            <div style={videoContainer}>
-               <div style={videoPlaceholder}>
-                  <div style={{ color: '#00E5FF', fontSize: '3.5rem', opacity: 0.8 }}>▶</div>
-                  <div style={{ color: '#fff', fontSize: '1rem', fontWeight: '500', marginTop: '15px' }}>PROMPTLAB REHBERİ</div>
-                  <div style={{ color: '#444', fontSize: '0.7rem', marginTop: '5px' }}>(Yakında Burada)</div>
-               </div>
-            </div>
+        {/* 🔥 DISCOVERY SECTION (NASIL ÇALIŞIR) 🔥 */}
+        <div ref={howItWorksRef} style={howItWorksSection}>
+           <div className="hw-container" style={{ maxWidth: '1100px', width: '100%', display: 'flex', gap: '80px', alignItems: 'center', justifyContent: 'center' }}>
+              
+              {/* PURE VIDEO FRAME (TAM EKRAN AÇILIR) */}
+              <div className="hw-video" style={videoContainer} onClick={() => setIsVideoOpen(true)}>
+                 <div style={videoPlaceholder}>
+                    <div style={{ color: '#00E5FF', fontSize: '3.5rem', opacity: 0.8, marginBottom: '10px' }}>▶</div>
+                    <div style={{ color: '#fff', fontSize: '1rem', fontWeight: '500' }}>PROMPTLAB REHBERİ</div>
+                    <div style={{ color: '#00E5FF', fontSize: '0.7rem', marginTop: '8px', opacity: 0.7, letterSpacing: '1px' }}>TAM EKRAN İÇİN TIKLA</div>
+                 </div>
+              </div>
 
-            {/* DESCRIPTION AND STEPS */}
-            <div style={{ flex: 1, minWidth: '350px' }}>
-               <img src="/logo.png" alt="Logo" style={{ height: '28px', marginBottom: '20px' }} />
-               <h3 style={refinedTitle}>Promptlab Sizin İçin Ne Yapar?</h3>
-               
-               <div style={stepItem}>
-                  <div style={stepIconArea}>
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#00E5FF" strokeWidth="1.5"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-                  </div>
-                  <div>
-                    <h4 style={stepTitle}>01 - Fikrini Özgürce Yaz</h4>
-                    <p style={stepDesc}>Aklındaki düşünceyi, bir arkadaşına anlatır gibi doğal bir dille yaz. Teknik terimlere veya karmaşık cümle yapılarına takılma.</p>
-                  </div>
-               </div>
+              {/* DESCRIPTION AND STEPS */}
+              <div style={{ flex: 1, minWidth: '350px' }}>
+                 <img src="/logo.png" alt="Logo" style={{ height: '28px', marginBottom: '20px' }} />
+                 <h3 style={refinedTitle}>Promptlab Sizin İçin Ne Yapar?</h3>
+                 
+                 <div style={stepItem}>
+                    <div style={stepIconArea}>
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#00E5FF" strokeWidth="1.5"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                    </div>
+                    <div>
+                      <h4 style={stepTitle}>01 - Fikrini Özgürce Yaz</h4>
+                      <p style={stepDesc}>Aklındaki düşünceyi, bir arkadaşına anlatır gibi doğal bir dille yaz. Teknik terimlere veya karmaşık cümle yapılarına takılma.</p>
+                    </div>
+                 </div>
 
-               <div style={stepItem}>
-                  <div style={stepIconArea}>
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#8338EC" strokeWidth="1.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                  </div>
-                  <div>
-                    <h4 style={stepTitle}>02 - Akıllı Dönüşümü İzle</h4>
-                    <p style={stepDesc}>Yazdığın metin saniyeler içinde analiz edilir. Yapay zekanın en verimli sonuçları vereceği, profesyonel parametrelerle donatılmış "Master Prompt" yapısına dönüştürür.</p>
-                  </div>
-               </div>
+                 <div style={stepItem}>
+                    <div style={stepIconArea}>
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#8338EC" strokeWidth="1.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    </div>
+                    <div>
+                      <h4 style={stepTitle}>02 - Akıllı Dönüşümü İzle</h4>
+                      <p style={stepDesc}>Yazdığın metin saniyeler içinde analiz edilir. Yapay zekanın en verimli sonuçları vereceği, profesyonel parametrelerle donatılmış "Master Prompt" yapısına dönüştürür.</p>
+                    </div>
+                 </div>
 
-               <div style={stepItem}>
-                  <div style={stepIconArea}>
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#00E5FF" strokeWidth="1.5"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
-                  </div>
-                  <div>
-                    <h4 style={stepTitle}>03 - AI Aracını Seç ve Başla</h4>
-                    <p style={stepDesc}>Favori yapay zekanı seçtiğin an Master Prompt otomatik olarak kopyalanır ve sistem seni doğrudan o platforma ulaştırır.</p>
-                  </div>
-               </div>
-            </div>
-         </div>
-      </div>
-    </main>
+                 <div style={stepItem}>
+                    <div style={stepIconArea}>
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#00E5FF" strokeWidth="1.5"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+                    </div>
+                    <div>
+                      <h4 style={stepTitle}>03 - AI Aracını Seç ve Başla</h4>
+                      <p style={stepDesc}>Favori yapay zekanı seçtiğin an Master Prompt otomatik olarak kopyalanır ve sistem seni doğrudan o platforma ulaştırır.</p>
+                    </div>
+                 </div>
+                 
+                 {/* SADECE MOBİLDE GÖRÜNEN AŞAĞI YÖNLENDİRME OKU */}
+                 <div className="hw-scroll-arrow">
+                    <svg className="bounce-icon" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                 </div>
+              </div>
+           </div>
+        </div>
+      </main>
+
+      {/* 🔥 TAM EKRAN VİDEO MODALI (OVERLAY) 🔥 */}
+      {isVideoOpen && (
+        <div style={fullscreenOverlay} onClick={() => setIsVideoOpen(false)}>
+          <button style={closeBtn} onClick={(e) => { e.stopPropagation(); setIsVideoOpen(false); }}>✕</button>
+          <div style={fullscreenVideoContainer} onClick={(e) => e.stopPropagation()}>
+             {/* Buraya gerçek <video> veya <iframe> gelecek. Şimdilik Placeholder: */}
+             <div style={{ color: '#00E5FF', fontSize: '5rem', opacity: 0.8 }}>▶</div>
+             <div style={{ color: '#fff', fontSize: '1.5rem', fontWeight: '500', marginTop: '20px' }}>PROMPTLAB REHBERİ</div>
+             <div style={{ color: '#888', fontSize: '0.9rem', marginTop: '10px' }}>(Burada Tam Ekran Video Oynayacak)</div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
 
@@ -618,10 +665,15 @@ const sendButton = { width: '32px', height: '32px', borderRadius: '50%', border:
 
 // 🔥 HOW IT WORKS SECTION STYLES 🔥
 const howItWorksSection = { minHeight: '100vh', backgroundColor: '#080808', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '100px 40px', position: 'relative', borderTop: '1px solid #1a1a1a', zIndex: 10 } as const;
-const videoContainer = { flex: 1, minWidth: '380px', height: '520px', background: '#000', borderRadius: '24px', border: '1px solid rgba(131, 56, 236, 0.15)', boxShadow: '0 0 60px rgba(131, 56, 236, 0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' } as const;
+const videoContainer = { flex: 1, minWidth: '380px', background: '#000', borderRadius: '24px', border: '1px solid rgba(131, 56, 236, 0.15)', boxShadow: '0 0 60px rgba(131, 56, 236, 0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', cursor: 'pointer' } as const;
 const videoPlaceholder = { textAlign: 'center' as const };
-const refinedTitle = { fontSize: '2.4rem', fontWeight: '700', color: '#fff', marginBottom: '40px', lineHeight: '1.2', letterSpacing: '-1px' } as const;
+const refinedTitle = { fontSize: '2.2rem', fontWeight: '700', color: '#fff', marginBottom: '40px', lineHeight: '1.2', letterSpacing: '-0.5px' } as const;
 const stepItem = { display: 'flex', gap: '20px', marginBottom: '35px', alignItems: 'flex-start' } as const;
 const stepIconArea = { minWidth: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.03)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)' } as const;
 const stepTitle = { fontSize: '1.15rem', fontWeight: '600', color: '#fff', marginBottom: '8px' } as const;
 const stepDesc = { fontSize: '0.92rem', color: '#777', lineHeight: '1.6' } as const;
+
+// 🔥 FULLSCREEN VIDEO OVERLAY STYLES 🔥
+const fullscreenOverlay = { position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0, 0, 0, 0.95)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(10px)' } as const;
+const closeBtn = { position: 'absolute', top: '30px', right: '40px', background: 'rgba(255,255,255,0.1)', border: 'none', color: '#fff', fontSize: '1.5rem', width: '40px', height: '40px', borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s ease' } as const;
+const fullscreenVideoContainer = { width: '90%', maxWidth: '1200px', aspectRatio: '16/9', backgroundColor: '#050505', borderRadius: '24px', border: '1px solid rgba(131, 56, 236, 0.3)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', boxShadow: '0 0 100px rgba(0, 0, 0, 0.8)' } as const;
