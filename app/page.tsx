@@ -335,23 +335,23 @@ export default function Home() {
         0%, 100% { transform: translateY(0); opacity: 0.3; }
         50% { transform: translateY(10px); opacity: 0.8; }
       }
-      @keyframes starPulse { 
-        0% { filter: drop-shadow(0 0 2px rgba(0, 229, 255, 0.2)); } 
-        100% { filter: drop-shadow(0 0 8px rgba(0, 229, 255, 0.6)); } 
-      }
       @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 
       .discovery-trigger { transition: all 0.3s ease; pointer-events: auto; }
-      .discovery-trigger:hover { transform: translate(-50%, -52%) scale(1.05); }
+      .discovery-trigger:hover { transform: translate(-50%, -52%) scale(1.05) !important; }
       .discovery-trigger .question-mark { animation: pulseTextOrb 3s infinite ease-in-out; }
-      .glowing-logo { animation: starPulse 3s infinite alternate ease-in-out; }
+
+      .glowing-logo { filter: drop-shadow(0 0 2px rgba(0, 229, 255, 0.2)); transition: filter 0.3s ease; }
       .cursor-blink { display: inline-block; width: 8px; height: 1.2em; background-color: #00E5FF; vertical-align: middle; margin-left: 4px; animation: blink 1s step-end infinite; }
+      
       .cinematic-text { position: absolute; color: #888888; cursor: pointer; animation: perfectBreathing 24s infinite linear both; text-align: left; line-height: 1.5; font-weight: 300; transition: transform 0.3s ease, filter 0.3s ease; pointer-events: auto; opacity: 0; }
       .cinematic-text:hover { animation-play-state: paused; z-index: 50; }
       .cinematic-text:hover .prompt-category { color: #00E5FF; text-shadow: 0 0 10px rgba(0, 229, 255, 0.5); }
       .cinematic-text:hover .prompt-body { color: #ffffff; opacity: 1; text-shadow: 0 0 10px rgba(255, 255, 255, 0.4); }
+      
       .prompt-category { font-family: "Times New Roman", Times, serif; font-size: 1.35em; font-style: italic; color: #ffffff; margin-bottom: 6px; letter-spacing: 0.5px; opacity: 0.95; transition: color 0.3s ease, text-shadow 0.3s ease; }
       .prompt-body { font-family: inherit; font-size: 0.95em; opacity: 0.75; transition: color 0.3s ease, opacity 0.3s ease, text-shadow 0.3s ease; }
+      
       .ai-brand-btn { transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1); }
       .ai-brand-btn:hover { color: #fff; transform: translateY(-3px) scale(1.02); }
       .chevron-scroll { animation: bounceChevron 2s infinite ease-in-out; }
@@ -364,8 +364,10 @@ export default function Home() {
         .slot-1, .slot-2, .slot-3 { display: none !important; }
         .discovery-trigger { top: 46% !important; left: 50%; transform: translate(-50%, -50%); } 
         .question-mark { font-size: 2.8rem !important; }
+        
+        /* 🔥 MOBİL: METİN ÜSTTE, VİDEO ALTTA 🔥 */
         .discovery-row { flex-direction: column-reverse !important; gap: 40px !important; }
-        .discovery-video-frame { height: 240px !important; width: 100% !important; }
+        .discovery-video-frame { height: 240px !important; width: 100% !important; border-radius: 16px !important; }
       }
     `;
     document.head.appendChild(styleSheet);
@@ -446,11 +448,11 @@ export default function Home() {
                </div>
                {(!result && loading) ? (
                  <div className="flex flex-col items-center justify-center mt-10">
-                   <div className="loading-box" style={loadingBox}>
+                   <div style={loadingBox}>
                      <div className="flex justify-center mb-4 transition-all duration-500">
                        {loadingSteps[loadingStep].icon}
                      </div>
-                     <div className="loading-text" style={loadingText}>
+                     <div style={loadingText}>
                        {loadingSteps[loadingStep].text}
                      </div>
                    </div>
@@ -514,17 +516,20 @@ export default function Home() {
           </div>
         </div>
 
+        {/* 🔥 DISCOVERY SECTION 🔥 */}
         <div ref={howItWorksRef} style={discoverySection}>
            <div className="discovery-row" style={discoveryRow}>
               
+              {/* VIDEO FRAME */}
               <div className="discovery-video-frame" style={videoFrame} onClick={() => setIsVideoFullscreen(true)}>
                  <div style={videoAura}></div>
                  <div style={videoOverlay}>
-                    <div style={{ color: '#8338EC', fontSize: '3rem', filter: 'drop-shadow(0 0 15px rgba(131, 56, 236, 0.6))' }}>▶</div>
+                    <div style={{ color: '#8338EC', fontSize: '3.5rem', filter: 'drop-shadow(0 0 15px rgba(131, 56, 236, 0.6))' }}>▶</div>
                     <div style={{ color: '#fff', fontSize: '0.85rem', marginTop: '12px', letterSpacing: '1px' }}>REHBERİ İZLE</div>
                  </div>
               </div>
 
+              {/* TEXT CONTENT */}
               <div style={{ flex: 1, minWidth: '320px', position: 'relative' as const }}>
                  <div style={labelProtocol}>PROTOCOL_01</div>
                  <h3 style={discoveryTitle}>Promptlab Sizin İçin Ne Yapar?</h3>
@@ -565,7 +570,7 @@ export default function Home() {
              <button style={closeFullscreenBtn} onClick={() => setIsVideoFullscreen(false)}>✕</button>
              <div style={fullscreenVideoContainer} onClick={(e) => e.stopPropagation()}>
                 <div style={{ color: '#00E5FF', fontSize: '4rem', opacity: 0.8 }}>▶</div>
-                <div style={{ color: '#fff', fontSize: '1.2rem', marginTop: '20px', fontFamily: 'monospace' }}>PROMPTLAB_DEMO_STREAMING.EXE</div>
+                <div style={{ color: '#fff', fontSize: '1.5rem', fontWeight: '500' as const, marginTop: '20px' }}>PROMPTLAB REHBERİ</div>
                 <div style={{ color: '#444', fontSize: '0.8rem', marginTop: '10px' }}>(Yakında Burada)</div>
              </div>
           </div>
@@ -575,7 +580,7 @@ export default function Home() {
   );
 }
 
-// 🔥 KUSURSUZ STİLLER 🔥
+// 🔥 KUSURSUZ STİLLER (TS-SAFE) 🔥
 const container = { backgroundColor: '#050505', minHeight: '100vh', color: '#ECECEC', fontFamily: 'Inter, sans-serif', display: 'flex', flexDirection: 'column' as const, position: 'relative' as const, overflowX: 'hidden' as const };
 const topBar = { padding: '20px 25px', position: 'absolute' as const, top: 0, left: 0, right: 0, zIndex: 100, display: 'flex', justifyContent: 'space-between', alignItems: 'center' };
 const logoWrapper = { display: 'flex', alignItems: 'center', gap: '10px', opacity: 0.8, cursor: 'pointer' };
