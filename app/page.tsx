@@ -335,6 +335,10 @@ export default function Home() {
         0%, 100% { transform: translateY(0); opacity: 0.3; }
         50% { transform: translateY(10px); opacity: 0.8; }
       }
+      @keyframes starPulse { 
+        0% { filter: drop-shadow(0 0 2px rgba(0, 229, 255, 0.2)); } 
+        100% { filter: drop-shadow(0 0 8px rgba(0, 229, 255, 0.6)); } 
+      }
       @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 
       .discovery-trigger { transition: all 0.3s ease; pointer-events: auto; }
@@ -354,7 +358,7 @@ export default function Home() {
       
       .ai-brand-btn { transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1); }
       .ai-brand-btn:hover { color: #fff; transform: translateY(-3px) scale(1.02); }
-      .chevron-scroll { animation: bounceChevron 2s infinite ease-in-out; }
+      .chevron-scroll { animation: bounceChevron 2s infinite ease-in-out; display: none; }
 
       @media (max-width: 768px) {
         .hero-section { margin-top: 52vh !important; gap: 8px !important; }
@@ -365,9 +369,17 @@ export default function Home() {
         .discovery-trigger { top: 46% !important; left: 50%; transform: translate(-50%, -50%); } 
         .question-mark { font-size: 2.8rem !important; }
         
-        /* 🔥 MOBİL: METİN ÜSTTE, VİDEO ALTTA 🔥 */
+        /* 🔥 MOBİL: METİN ÜSTTE, VİDEO ALTTA VE KESİN GÖRÜNÜR 🔥 */
         .discovery-row { flex-direction: column-reverse !important; gap: 40px !important; }
-        .discovery-video-frame { height: 240px !important; width: 100% !important; border-radius: 16px !important; }
+        .discovery-video-frame { 
+          height: 240px !important; 
+          min-height: 240px !important; 
+          width: 100% !important; 
+          border-radius: 16px !important; 
+          flex: none !important; 
+          display: block !important; 
+        }
+        .chevron-scroll { display: block !important; }
       }
     `;
     document.head.appendChild(styleSheet);
@@ -520,7 +532,7 @@ export default function Home() {
         <div ref={howItWorksRef} style={discoverySection}>
            <div className="discovery-row" style={discoveryRow}>
               
-              {/* VIDEO FRAME */}
+              {/* VIDEO FRAME (Artık mobilde kesinlikle görünecek) */}
               <div className="discovery-video-frame" style={videoFrame} onClick={() => setIsVideoFullscreen(true)}>
                  <div style={videoAura}></div>
                  <div style={videoOverlay}>
@@ -531,7 +543,6 @@ export default function Home() {
 
               {/* TEXT CONTENT */}
               <div style={{ flex: 1, minWidth: '320px', position: 'relative' as const }}>
-                 <div style={labelProtocol}>PROTOCOL_01</div>
                  <h3 style={discoveryTitle}>Promptlab Sizin İçin Ne Yapar?</h3>
                  
                  <div style={stepCard}>
@@ -620,7 +631,6 @@ const discoveryRow = { maxWidth: '1100px', width: '100%', display: 'flex', gap: 
 const videoFrame = { flex: 1, height: '480px', background: '#000', borderRadius: '24px', border: '1px solid rgba(131, 56, 236, 0.15)', position: 'relative' as const, overflow: 'hidden' as const, cursor: 'pointer' };
 const videoAura = { position: 'absolute' as const, top: '-10%', left: '-10%', width: '120%', height: '120%', background: 'radial-gradient(circle, rgba(131, 56, 236, 0.08) 0%, transparent 70%)', pointerEvents: 'none' as const };
 const videoOverlay = { position: 'absolute' as const, inset: 0, display: 'flex', flexDirection: 'column' as const, alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.4)' };
-const labelProtocol = { fontSize: '0.7rem', color: '#00E5FF', fontWeight: 'bold' as const, letterSpacing: '4px', marginBottom: '15px', display: 'block' };
 const discoveryTitle = { fontSize: '2.2rem', fontWeight: '700' as const, color: '#fff', marginBottom: '40px', lineHeight: '1.2', letterSpacing: '-1px' };
 const stepCard = { display: 'flex', gap: '20px', marginBottom: '35px', alignItems: 'flex-start' };
 const stepIconBox = { minWidth: '38px', height: '38px', borderRadius: '10px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center' };
