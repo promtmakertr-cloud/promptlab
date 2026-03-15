@@ -6,6 +6,14 @@ export const metadata = {
   description: 'Fikirlerini güçlü promptlara dönüştür.',
 }
 
+// 🔥 IPHONE ZOOM SORUNUNU ÇÖZEN KISIM BURASI 🔥
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+}
+
 export default function RootLayout({ children }) {
   return (
     <html lang="tr">
