@@ -12,35 +12,35 @@ const client = new OpenAI({
 })
 
 
-
 function buildStructure(framework) {
 
   if (framework === "agent") {
     return `
-ROL
-AMAÇ
+ROLE
+GOAL
 TOOLS
 STEPS
 RULES
-OUTPUT
-`
-  }
-
-  if (framework === "chain") {
-    return `
-ROL
-STEP 1
-STEP 2
-STEP 3
-OUTPUT
+OUTPUT FORMAT
 `
   }
 
   if (framework === "system") {
     return `
 SYSTEM ROLE
-RULES
+CAPABILITIES
 LIMITS
+RULES
+OUTPUT FORMAT
+`
+  }
+
+  if (framework === "chain") {
+    return `
+ROLE
+STEP 1
+STEP 2
+STEP 3
 OUTPUT
 `
   }
@@ -49,17 +49,18 @@ OUTPUT
     return `
 ROLE
 GOAL
-JSON FORMAT
+JSON SCHEMA
+RULES
 OUTPUT JSON
 `
   }
 
   return `
-ROL
-AMAÇ
-KURALLAR
-FORMAT
-ÇIKTI
+ROLE
+CONTEXT
+TASK
+RULES
+OUTPUT FORMAT
 `
 }
 
@@ -81,26 +82,31 @@ function masterPromptBuilder(
 
     return `
 
-SEN BİR PROMPT ENGINE'SİN.
+YOU ARE A PROMPT ENGINE.
 
-ÖNEMLİ KURALLAR:
+IMPORTANT RULES:
 
-- ASLA görevi yapma
-- ASLA içerik üretme
-- ASLA açıklama yapma
-- SADECE PROMPT üret
-- Kullanıcının istediğini yapma
-- Kullanıcının isteği için PROMPT yaz
+- DO NOT EXECUTE THE TASK
+- DO NOT ANSWER THE USER
+- DO NOT GENERATE CONTENT
+- ONLY CREATE A PROMPT
+- THE PROMPT WILL BE USED BY ANOTHER AI
+- YOU ARE NOT THE FINAL MODEL
+
+Your job:
+
+Convert user request into a MASTER PROMPT.
 
 Domain: ${domain}
 Framework: ${framework}
 Output: ${output}
 
-KULLANILACAK YAPI:
+Use this structure:
 
 ${structure}
 
-Sadece PROMPT döndür.
+The result must be a prompt,
+not the answer.
 
 `
 
@@ -112,10 +118,10 @@ Sadece PROMPT döndür.
 
     return `
 
-Sen bir PROMPT ENGINE'sin.
+You are a prompt builder.
 
-İçerik üretme.
-Prompt üret.
+Do not execute task.
+Only create prompt.
 
 Domain: ${domain}
 Framework: ${framework}
@@ -123,7 +129,7 @@ Output: ${output}
 
 ${structure}
 
-Sadece prompt döndür.
+Return prompt only.
 
 `
 
@@ -134,10 +140,8 @@ Sadece prompt döndür.
   if (mode === "FAST") {
 
     return `
-
-Prompt yaz.
-İçerik yazma.
-
+Write prompt only.
+Do not answer.
 `
 
   }
@@ -145,10 +149,8 @@ Prompt yaz.
 
 
   return `
-
-Prompt üret.
-İçerik üretme.
-
+Create prompt.
+Do not execute.
 `
 
 }
@@ -209,8 +211,9 @@ export async function POST(req) {
         {
           role: "user",
           content:
-            "KULLANICI İSTEĞİ:\n" + input +
-            "\n\nSADECE BUNUN İÇİN PROMPT YAZ.",
+            "USER REQUEST:\n" +
+            input +
+            "\n\nCREATE PROMPT FOR THIS.",
         },
       ],
 
