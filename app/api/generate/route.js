@@ -18,28 +18,25 @@ function systemBase(language, tone) {
   const lang =
     language === "en"
       ? `
-CRITICAL:
-Write ONLY in English.
-Do not use Turkish.
+Write ONLY in English
 `
       : `
 KRİTİK:
-Tüm çıktıyı SADECE Türkçe yaz.
-İngilizce kelime kullanma.
-Başlıklar dahil Türkçe olacak.
+Sadece Türkçe yaz
 `;
 
   return `
-Sen MASTER PROMPT ENGINE v6 sistemisin.
+Sen MASTER PROMPT ENGINE v7 sistemisin.
 
 Görev:
 
-Kullanıcı girdisini analiz et
+Kullanıcı isteğini analiz et
 niyeti bul
 alanı belirle
+uzman rol seç
 framework seç
-eksikleri tamamla
-en güçlü master prompt üret
+eksik parametre ekle
+en doğru prompt üret
 
 ${lang}
 
@@ -48,13 +45,21 @@ ${toneText}
 
 Kurallar:
 
-- Her isteğe aynı format verme
-- Gereksiz karmaşıklık ekleme
-- Domain'e göre prompt üret
-- Framework gerekiyorsa ekle
-- Psikoloji gerekiyorsa ekle
-- Teknik gerekiyorsa ekle
-- AI'dan maksimum verim alacak prompt yaz
+- Domain'e göre rol seç
+- Domain'e göre format seç
+- Domain'e göre teknik detay ekle
+- Gerekirse tablo iste
+- Gerekirse liste iste
+- Gerekirse analiz iste
+- Gerekirse itiraz üret
+- Eksik parametreleri tamamla
+
+Master prompt:
+
+✔ rol içermeli
+✔ bağlam içermeli
+✔ teknik detay içermeli
+✔ çıktı formatı içermeli
 `;
 }
 
@@ -86,12 +91,45 @@ function frameworkPrompt() {
   return `
 Intent'e göre framework seç
 
-marketing → AIDA PAS StoryBrand
-sales → objection persuasion closing
-software → clean code architecture
-image → camera light render
-academic → citation analysis
-business → strategy ROI
+sales →
+objection handling
+persuasion
+closing
+AIDA
+PAS
+
+business →
+financial analysis
+cashflow
+budgeting
+ROI
+cost optimization
+table output
+
+software →
+clean code
+architecture
+design patterns
+api structure
+
+image →
+camera
+lighting
+lens
+render engine
+
+writing →
+story structure
+tone control
+
+academic →
+analysis
+citation
+
+marketing →
+AIDA
+PAS
+StoryBrand
 
 JSON ver
 
@@ -102,15 +140,11 @@ frameworks:[]
 }
 
 function masterPromptBuilder(language) {
+
   const lang =
     language === "en"
-      ? `
-Write in English only
-`
-      : `
-KRİTİK:
-Sadece Türkçe yaz
-`;
+      ? "Write only English"
+      : "Sadece Türkçe yaz";
 
   return `
 Master prompt üret
@@ -119,11 +153,12 @@ ${lang}
 
 Kurallar:
 
-- Gereksiz başlık ekleme
-- Gerekirse başlık ekle
+- Rol tanımla
+- Bağlam yaz
+- Teknik detay ekle
 - Framework kullan
-- Eksikleri tamamla
-- AI için optimize et
+- Çıktı formatı yaz
+- Eksik parametreleri değişken olarak ekle
 - Açıklama yazma
 - Direkt prompt üret
 `;
