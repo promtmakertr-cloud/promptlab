@@ -4,6 +4,7 @@ import { autoModeEngine } from "@/lib/engine/autoMode"
 import { detectDomain } from "@/lib/engine/domain"
 import { detectFramework } from "@/lib/engine/framework"
 import { detectOutputType } from "@/lib/engine/output"
+import { refinePromptInstruction } from "@/lib/engine/refine"
 
 
 const client = new OpenAI({
@@ -120,7 +121,9 @@ export async function POST(req) {
 
 
 
-  const completion =
+  // FIRST CALL
+
+  const first =
     await client.chat.completions.create({
 
       model: "gpt-4o",
@@ -140,8 +143,42 @@ export async function POST(req) {
 
 
 
+  let result =
+    first.choices[0].message.content
+
+
+
+  // REFINE (only for PRO)
+
+  if (mode === "PRO") {
+
+    const refine =
+      await client.chat.completions.create({
+
+        model: "gpt-4o",
+
+        messages: [
+          {
+            role: "system",
+            content: refinePromptInstruction(),
+          },
+          {
+            role: "user",
+            content: result,
+          },
+        ],
+
+      })
+
+    result =
+      refine.choices[0].message.content
+
+  }
+
+
+
   return new Response(
-    completion.choices[0].message.content,
+    result,
     {
       headers: {
         "Content-Type": "text/plain",
