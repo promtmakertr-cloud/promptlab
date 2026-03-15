@@ -3,6 +3,7 @@ import OpenAI from "openai"
 import { autoModeEngine } from "@/lib/engine/autoMode"
 import { detectDomain } from "@/lib/engine/domain"
 import { detectFramework } from "@/lib/engine/framework"
+import { detectOutputType } from "@/lib/engine/output"
 
 
 const client = new OpenAI({
@@ -14,7 +15,8 @@ const client = new OpenAI({
 function masterPromptBuilder(
   mode,
   domain,
-  framework
+  framework,
+  output
 ) {
 
   if (!mode) mode = "BALANCED"
@@ -28,6 +30,7 @@ Sen bir prompt builder'sın.
 
 Domain: ${domain}
 Framework: ${framework}
+Output: ${output}
 
 Kısa prompt üret.
 İçerik üretme.
@@ -44,6 +47,7 @@ Sen bir MASTER PROMPT ENGINE'sin.
 
 Domain: ${domain}
 Framework: ${framework}
+Output: ${output}
 
 Profesyonel prompt üret.
 
@@ -51,12 +55,13 @@ ROL
 BAĞLAM
 AMAÇ
 FRAMEWORK
+OUTPUT
 KURALLAR
 FORMAT
 
-Framework kullan:
+Output tipi:
 
-${framework}
+${output}
 
 Sadece prompt döndür.
 `
@@ -70,6 +75,7 @@ Sen bir prompt builder'sın.
 
 Domain: ${domain}
 Framework: ${framework}
+Output: ${output}
 
 Prompt üret.
 
@@ -99,6 +105,9 @@ export async function POST(req) {
   const framework =
     detectFramework(input)
 
+  const output =
+    detectOutputType(input)
+
 
 
   mode = autoModeEngine({
@@ -112,7 +121,8 @@ export async function POST(req) {
     masterPromptBuilder(
       mode,
       domain,
-      framework
+      framework,
+      output
     )
 
 
