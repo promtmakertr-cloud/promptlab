@@ -3,10 +3,10 @@ import OpenAI from 'openai';
 import { goldenExamples } from './examples';
 
 const TONE_INSTRUCTIONS = {
-  professional: 'Profesyonel, resmi ve iş odaklı bir ton kullan.',
-  creative: 'Yaratıcı, özgün ve ilham verici bir ton kullan. Sıra dışı benzetmeler ve ifadeler kullanabilirsin.',
-  technical: 'Teknik, detaylı ve metodoloji odaklı bir ton kullan. Spesifik araçları, metrikleri ve süreçleri ön plana çıkar.',
-  concise: 'Kısa, öz ve doğrudan bir ton kullan. Her maddeyi 1-2 cümleyle sınırla, gereksiz açıklama yapma.',
+  professional: 'Otoriter, stratejik ve sonuç odaklı bir profesyonel ton kullan.',
+  creative: 'Sınırları zorlayan, metaforik ve ilham verici bir sanatçı tonu kullan.',
+  technical: 'Mühendislik disipliniyle, metrik odaklı ve jargon kullanımı yüksek bir ton kullan.',
+  concise: 'Sadece hayati bilgiyi veren, minimal ve vurucu bir ton kullan.',
 };
 
 export async function POST(req) {
@@ -22,75 +22,71 @@ export async function POST(req) {
       previousPrompt,
     } = await req.json();
 
-    // Input validation
     if (!userInput || typeof userInput !== 'string' || !userInput.trim()) {
       return NextResponse.json({ error: "Geçerli bir girdi gerekli." }, { status: 400 });
-    }
-    if (userInput.length > 4000) {
-      return NextResponse.json({ error: "Girdi çok uzun (maks. 4000 karakter)." }, { status: 400 });
     }
 
     const toneInstruction = TONE_INSTRUCTIONS[tone] || TONE_INSTRUCTIONS.professional;
 
     const languageInstruction = language === 'en'
-      ? 'CRITICAL: Write ALL section headers and their content in ENGLISH. The 5 headers must be: **Expertise Role:**, **Task & Context:**, **Technical Details:**, **Style & Tone:**, **Desired Output Format:**'
+      ? 'CRITICAL: Write ALL headers and content in ENGLISH. Headers: **Expertise Role:**, **Task & Context:**, **Technical Details:**, **Style & Tone:**, **Desired Output Format:**'
       : 'Tüm başlıkları ve içeriği Türkçe olarak yaz.';
 
     const systemPrompt = `
-      Sen dünyanın en sert ve disiplinli "Master Prompt Mühendisi"sin. 
-      GÖREVİN: Kullanıcının girdisini kütüphanedeki kaliteye yükseltmek ama SADECE belirtilen formatta sunmaktır.
+      Sen dünyanın en gelişmiş "Master Prompt Mühendisi" ve Yapay Zeka Stratejistisin. 
+      GÖREVİN: Kullanıcının basit girdisini, başka bir yapay zekadan (ChatGPT, Claude, Midjourney vb.) %100 verim alacak "Master" seviyesinde bir komut setine dönüştürmektir.
 
-      [TON TALİMATI]
+      [PROSES ALGORİTMASI]
+      1. Niyet Analizi: Kullanıcı ne istiyor? (Pazarlama, Yazılım, Sanat, Akademi vb.)
+      2. Eksik Veri Tespiti: Kullanıcının belirtmediği ama sonucun mükemmel olması için gereken parametreleri (Hedef kitle, teknik stack, ışık açısı vb.) Master Prompt içine "Değişken" olarak ekle.
+      3. Metodoloji Enjeksiyonu: 
+         - Pazarlamaysa: AIDA, PAS veya StoryBrand çerçevelerini kullan.
+         - Yazılımsa: Clean Code, SOLID ve Design Patterns prensiplerini ekle.
+         - Akademikse: Eleştirel düşünce ve kaynakça standartlarını göm.
+
+      [TON VE DİL]
       ${toneInstruction}
-
-      [DİL TALİMATI]
       ${languageInstruction}
 
-      [ALTIN ÖRNEKLER - KALİTE STANDARDI]
-      ${goldenExamples}
+      [FORMAT KURALLARI]
+      - SADECE aşağıdaki 5 ana başlığı kullan.
+      - **Teknik Detaylar** bölümünde en az 4 madde olmalı ve her biri sektörel derinlik içermeli.
+      - Görsel işlerde mutlaka sonuna İngilizce kod bloğunu ekle.
 
-      !!! HAYATİ KURAL (GÖRSEL VS. METİN AYRIMI) !!!
-      Kullanıcının isteğini analiz et. 
-      - İstek "Metin, Senaryo, Strateji, Kariyer, Yazılım, İş Planı, Sunum, SEO, E-posta vb." gibi GÖRSEL OLMAYAN bir konudaysa SADECE 5 başlığı ver ve DUR. Kesinlikle İngilizce kod bloğu EKLEME.
-      - Eğer istek "Fotoğrafçılık, 3D Render, Çizim, Logo, Karikatür, Görsel Tasarım, Sinematik Sahne vb." gibi GÖRSEL ÜRETİMİ gerektiriyorsa, 5 başlığın altına mutlaka İngilizce kod bloğunu ekle.
+      [GÖRSEL VS METİN AYRIMI]
+      - İstek görsel üretimiyle ilgili değilse sadece 5 başlık ver.
+      - İstek görsel üretimiyle (Fotoğraf, Logo, 3D vb.) ilgiliyse 5 başlığın altına Midjourney/DALL-E teknik promptunu ekle.
 
-      [FORMAT 1: GÖRSEL OLMAYAN İŞLER İÇİN (Sadece 5 Başlık)]
-      **Uzmanlık Rolü:** [Buraya uygun uzmanlık rolü]
-      **Görev ve Bağlam:** [Buraya görev tanımı]
-      **Teknik Detaylar:** - [Buraya teknik madde 1] - [Buraya teknik madde 2] - [Buraya teknik madde 3]
-      **Üslup ve Ton:** [Buraya uygun ton]
-      **İstenen Çıktı Formatı:** [Buraya format tanımı]
+      **Expertise Role:** (Buraya dünya çapında bir uzmanlık tanımla)
+      **Task & Context:** (Görevi ve neden yapıldığını derinleştirerek açıkla)
+      **Technical Details:** (Buraya sektörel frameworkleri, parametreleri ve kısıtlamaları madde madde yaz)
+      **Style & Tone:** (İletişim dilinin psikolojik derinliğini tanımla)
+      **Desired Output Format:** (Çıktının yapısını, uzunluğunu ve sunum şeklini netleştir)
 
-      [FORMAT 2: GÖRSEL İŞLER İÇİN (5 Başlık + İngilizce Kod Kutusu)]
-      **Uzmanlık Rolü:** ...
-      **Görev ve Bağlam:** ...
-      **Teknik Detaylar:** ...
-      **Üslup ve Ton:** ...
-      **İstenen Çıktı Formatı:** ...
-
+      [Eğer Görselse Ek Bölüm:]
       ---
       [Görsel Motorlar İçin Optimize Edilmiş İngilizce Prompt:]
       \`\`\`text
-      (Buraya Midjourney/DALL-E için teknik İngilizce kodunu yaz. Eğer görselde bir kişi varsa KESİNLİKLE "--cref", "identical face" ve "high-fidelity likeness" parametrelerini ekleyerek yüz hatlarını koru.)
+      (Ultra-detaylı, ışık, kamera açısı ve render motoru parametrelerini içeren teknik İngilizce prompt. Görselde insan varsa '--cref' ve 'consistent features' parametrelerini dahil et.)
       \`\`\`
 
-      KRİTİK UYARI: Kendi kendine yeni başlık uydurma. Gevezelik yapma, isteğin TÜRÜNE UYGUN (Görsel veya Metin) doğrudan formata geç.
+      Kritik: Açıklama yapma, giriş cümlesi kurma. Doğrudan Master Prompt'u üretmeye baş.
     `;
 
     let userMessage;
     if (previousPrompt) {
-      userMessage = `Mevcut prompt:\n${previousPrompt}\n\nKullanıcının iyileştirme isteği: "${userInput}"\n\nBu promptu kullanıcının isteğine göre geliştir. Orijinal formatı ve yapıyı koru, sadece istenen değişiklikleri uygula.`;
+      userMessage = `MEVCUT MASTER PROMPT:\n${previousPrompt}\n\nİSTEK: "${userInput}"\n\nBu Master Prompt'u kullanıcının yeni niyetine göre yeniden yapılandır. Zekasını ve derinliğini artır.`;
     } else {
-      userMessage = `Kullanıcı İsteği: "${userInput}" \n\nFORMATI ASLA BOZMADAN, İSTEĞİN TÜRÜNE UYGUN (Görselse İngilizce kodlu, değilse sadece 5 başlık) MASTER PROMPT ÜRET.`;
+      userMessage = `KULLANICI GİRDİSİ: "${userInput}"\n\nBu girdiyi analiz et ve profesyonel bir Master Prompt setine dönüştür.`;
     }
 
     const response = await openai.chat.completions.create({
-      model: "gpt-4o",
+      model: "gpt-4o", // Master Prompt için her zaman en zeki modeli kullanıyoruz
       messages: [
         { role: "system", content: systemPrompt },
         { role: "user", content: userMessage },
       ],
-      temperature: 0.2,
+      temperature: 0.4, // Mantıksal tutarlılık ve yaratıcılık dengesi için 0.4
       stream: true,
     });
 
@@ -104,8 +100,8 @@ export async function POST(req) {
             }
           }
           controller.close();
-        } catch (streamErr) {
-          controller.error(streamErr);
+        } catch (err) {
+          controller.error(err);
         }
       }
     });
@@ -118,6 +114,7 @@ export async function POST(req) {
     });
 
   } catch (error) {
-    return NextResponse.json({ error: "Hata oluştu." }, { status: 500 });
+    console.error("Generate Error:", error);
+    return NextResponse.json({ error: "Sistemde bir aksaklık oluştu." }, { status: 500 });
   }
 }
