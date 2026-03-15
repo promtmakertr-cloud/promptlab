@@ -210,13 +210,15 @@ export default function Home() {
               {slots.map((slot) => {
                 const { category, promptText } = parsePromptData(slot.text);
                 return (
-                  <div key={slot.id} className={`cinematic-text slot-${slot.id}`} style={{ ...slot.pos, position: 'absolute' as const, fontSize: slot.size, animation: 'perfectBreathing 24s infinite linear' }} onClick={() => setInput(promptText)} onAnimationIteration={() => handleAnimationIteration(slot.id)}>
-                    {category && <div className="prompt-category" style={pCat}><ScrambleText text={category} initialDelayMs={0} /></div>}
-                    <div className="prompt-body" style={pBody}><ScrambleText text={promptText} initialDelayMs={0} /></div>
+                  {/* 🔥 ANİMASYON DELAY (GECİKME) BURADA ONAYLANDI VE GERİ GETİRİLDİ 🔥 */}
+                  <div key={slot.id} className={`cinematic-text slot-${slot.id}`} style={{ ...slot.pos, position: 'absolute' as const, fontSize: slot.size, animationDelay: slot.delay, display: slot.pos.display || 'block' }} onClick={() => setInput(promptText)} onAnimationIteration={() => handleAnimationIteration(slot.id)}>
+                    {category && <div className="prompt-category" style={pCat}><ScrambleText text={category} initialDelayMs={parseFloat(slot.delay || '0') * 1000} /></div>}
+                    <div className="prompt-body" style={pBody}><ScrambleText text={promptText} initialDelayMs={parseFloat(slot.delay || '0') * 1000} /></div>
                   </div>
                 );
               })}
             </div>
+            
             <div style={heroSection} className="hero-section">
               <h2 style={heroTitle} className="hero-title">Fikirlerini Güçlü Promptlara Dönüştür.</h2>
               <p style={heroSub} className="hero-sub">Metni yaz. Optimize edilmiş promptu al. Kopyala ve AI araçlarında kullan.</p>
@@ -274,12 +276,21 @@ export default function Home() {
       </div>
 
       <style jsx global>{`
+        /* 🔥 ORİJİNAL IŞIKLI ÇERÇEVE VE ANİMASYONLAR BURADA 🔥 */
+        @keyframes elegantGlow {
+          0%   { box-shadow: 0 0 8px rgba(58, 134, 255, 0.15), inset 0 0 4px rgba(58, 134, 255, 0.05); border-color: rgba(58, 134, 255, 0.2); }
+          50%  { box-shadow: 0 0 20px rgba(131, 56, 236, 0.35), inset 0 0 8px rgba(131, 56, 236, 0.15); border-color: rgba(131, 56, 236, 0.45); }
+          100% { box-shadow: 0 0 8px rgba(58, 134, 255, 0.15), inset 0 0 4px rgba(58, 134, 255, 0.05); border-color: rgba(58, 134, 255, 0.2); }
+        }
         @keyframes perfectBreathing { 0%, 100% { opacity: 0; transform: translateY(10px); } 5%, 30% { opacity: 1; transform: translateY(0); } 40% { opacity: 0; transform: translateY(-10px); } }
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
-        .cursor-blink { display: inline-block; width: 8px; height: 1.2em; background-color: #00E5FF; vertical-align: middle; margin-left: 4px; animation: blink 1s step-end infinite; }
+
+        .cinematic-text { position: absolute; color: #888888; cursor: pointer; animation: perfectBreathing 24s infinite linear both; text-align: left; line-height: 1.5; font-weight: 300; transition: transform 0.3s ease, filter 0.3s ease; pointer-events: auto; opacity: 0; }
         .cinematic-text:hover { animation-play-state: paused; z-index: 50; }
         .cinematic-text:hover .prompt-category { color: #00E5FF; text-shadow: 0 0 10px rgba(0, 229, 255, 0.5); }
         .cinematic-text:hover .prompt-body { color: #ffffff; opacity: 1; text-shadow: 0 0 10px rgba(255, 255, 255, 0.4); }
+        
+        .cursor-blink { display: inline-block; width: 8px; height: 1.2em; background-color: #00E5FF; vertical-align: middle; margin-left: 4px; animation: blink 1s step-end infinite; }
         .ai-module-btn { display: flex; align-items: center; gap: 8px; background: rgba(255, 255, 255, 0.04); color: rgba(255, 255, 255, 0.7); border: 1px solid rgba(255, 255, 255, 0.1); padding: 10px 16px; border-radius: 12px; cursor: pointer; font-size: 0.85rem; transition: all 0.3s ease; }
         .ai-module-btn:hover { background: rgba(255, 255, 255, 0.08); color: #fff; transform: translateY(-2px); border-color: rgba(255, 255, 255, 0.3); }
         .btn-chatgpt:hover { border-color: #10a37f !important; color: #10a37f !important; }
@@ -287,7 +298,13 @@ export default function Home() {
         .btn-claude:hover { border-color: #d97757 !important; color: #d97757 !important; }
         .btn-perplexity:hover { border-color: #20b2aa !important; color: #20b2aa !important; }
         .btn-copilot:hover { border-color: #3c78d8 !important; color: #3c78d8 !important; }
-        @media (max-width: 768px) { .hero-section { marginTop: 40vh !important; } .hero-title { font-size: 1.15rem !important; } .hero-sub { font-size: 0.75rem !important; } .main-input { font-size: 0.85rem !important; } }
+        
+        @media (max-width: 768px) { 
+          .hero-section { marginTop: 40vh !important; } 
+          .hero-title { font-size: 1.15rem !important; } 
+          .hero-sub { font-size: 0.75rem !important; } 
+          .main-input { font-size: 0.85rem !important; } 
+        }
       `}</style>
     </main>
   );
@@ -317,7 +334,7 @@ const btnGrid = { display: 'flex', flexWrap: 'wrap' as const, gap: '10px' };
 const labelStart = { fontSize: '0.65rem', color: '#444', marginBottom: '12px', fontWeight: 'bold' as const, letterSpacing: '1px' };
 const copyBtnPrimary = { background: '#fff', color: '#000', border: 'none', padding: '12px 24px', borderRadius: '12px', fontWeight: 'bold' as const, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' };
 const bottomArea = { position: 'fixed' as const, bottom: 0, left: 0, right: 0, padding: '30px 20px', display: 'flex', justifyContent: 'center', zIndex: 100, pointerEvents: 'none' as const };
-const inputBoxInner = { backgroundColor: '#0a0a0a', borderRadius: '30px', border: '1px solid rgba(255,255,255,0.1)', padding: '10px 15px 10px 25px', width: '100%', maxWidth: '680px', pointerEvents: 'auto' as const, display: 'flex', alignItems: 'center' };
+const inputBoxInner = { backgroundColor: '#0a0a0a', borderRadius: '30px', border: '1px solid rgba(255,255,255,0.1)', animation: 'elegantGlow 8s infinite alternate', padding: '10px 15px 10px 25px', width: '100%', maxWidth: '680px', pointerEvents: 'auto' as const, display: 'flex', alignItems: 'center' };
 const inputField = { flex: 1, background: 'transparent', border: 'none', color: '#fff', fontSize: '1rem', outline: 'none', resize: 'none' as const };
 const actionButtons = { display: 'flex', alignItems: 'center', gap: '8px' };
 const iconButton = { background: 'none', border: 'none', cursor: 'pointer' };
