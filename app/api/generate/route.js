@@ -103,6 +103,29 @@ frameworks:[]
 
 
 
+// ✅ ROLE GENERATOR
+
+function rolePrompt() {
+  return `
+Generate expert role based on intent and domain.
+
+marketing → Senior marketing strategist
+software → Senior software architect
+ai → AI researcher
+business → Business consultant
+psychology → Behavior analyst
+prompt-engineering → Prompt engineer
+
+Return JSON
+
+{
+role:""
+}
+`;
+}
+
+
+
 // ✅ MASTER BUILDER
 
 function masterPromptBuilder() {
@@ -196,6 +219,28 @@ export async function POST(req) {
 
 
 
+    // ✅ ROLE
+
+    const roleRes =
+      await openai.chat.completions.create({
+        model: "gpt-4o",
+        messages: [
+          {
+            role: "system",
+            content: rolePrompt(),
+          },
+          {
+            role: "user",
+            content: intent + domain,
+          },
+        ],
+      });
+
+    const role =
+      roleRes.choices[0].message.content;
+
+
+
     // ✅ MASTER
 
     const master =
@@ -212,7 +257,8 @@ export async function POST(req) {
               userInput +
               intent +
               domain +
-              frameworks,
+              frameworks +
+              role,
           },
         ],
       });
