@@ -6,93 +6,75 @@ const openai = new OpenAI({
 });
 
 
-// ✅ INTENT V2
+// ✅ INTENT
 
 function intentPrompt() {
   return `
-You are an AI intent analyzer for a master prompt engine.
+You are an intent analyzer.
 
-Analyze user input and return JSON.
+Detect intent type.
 
-Detect:
-
-- intent
-- domain
-- outputType
-- complexity
-- tags
-
-Intent types:
+Types:
 
 analysis
 strategy
 content
 prompt
-system
 code
 business
 marketing
-psychology
 ai
 education
 story
-research
 
-Domain types:
-
-marketing
-startup
-software
-ai
-finance
-psychology
-design
-education
-content
-story
-general
-prompt-engineering
-system-design
-
-Output types:
-
-prompt
-analysis
-table
-json
-plan
-steps
-strategy
-report
-code
-system-prompt
-
-Complexity:
-
-low
-medium
-high
-expert
-
-Return JSON only:
+Return JSON
 
 {
-intent:"",
-domain:"",
-outputType:"",
-complexity:"",
-tags:[]
+intent:""
 }
 `;
 }
 
 
 
-// eski framework aynı
+// ✅ DOMAIN
+
+function domainPrompt() {
+  return `
+Detect domain.
+
+Domains:
+
+marketing
+startup
+business
+software
+ai
+finance
+psychology
+education
+design
+content
+story
+prompt-engineering
+system-design
+general
+
+Return JSON
+
+{
+domain:""
+}
+`;
+}
+
+
+
+// ✅ FRAMEWORK
 
 function frameworkPrompt() {
   return `
-Intent'e göre framework seç
+Select frameworks based on intent + domain.
 
 marketing →
 AIDA
@@ -104,20 +86,14 @@ StoryBrand
 business →
 SWOT
 ROI
-Financial analysis
-Cashflow
-Budgeting
-
-sales →
-Objection
-Closing
-Persuasion
+Financial
+Budget
 
 software →
 Architecture
 Clean code
 
-JSON ver
+Return JSON
 
 {
 frameworks:[]
@@ -127,27 +103,34 @@ frameworks:[]
 
 
 
-// eski builder aynı
+// ✅ MASTER BUILDER
 
 function masterPromptBuilder() {
   return `
-Master prompt üret
+Create master prompt.
 
-Rol yaz
-Bağlam yaz
-Teknik detay yaz
-Framework kullan
-Format ver
+Write:
+
+Role
+Context
+Technical details
+Use frameworks
+Give format
+
+Return prompt text
 `;
 }
 
 
 
 export async function POST(req) {
+
   try {
+
     const { userInput } = await req.json();
 
-    // ✅ NEW INTENT
+
+    // ✅ INTENT
 
     const intentRes =
       await openai.chat.completions.create({
@@ -169,6 +152,30 @@ export async function POST(req) {
 
 
 
+    // ✅ DOMAIN
+
+    const domainRes =
+      await openai.chat.completions.create({
+        model: "gpt-4o",
+        messages: [
+          {
+            role: "system",
+            content: domainPrompt(),
+          },
+          {
+            role: "user",
+            content: userInput,
+          },
+        ],
+      });
+
+    const domain =
+      domainRes.choices[0].message.content;
+
+
+
+    // ✅ FRAMEWORK
+
     const frameRes =
       await openai.chat.completions.create({
         model: "gpt-4o",
@@ -179,12 +186,17 @@ export async function POST(req) {
           },
           {
             role: "user",
-            content: intent,
+            content: intent + domain,
           },
         ],
       });
 
+    const frameworks =
+      frameRes.choices[0].message.content;
 
+
+
+    // ✅ MASTER
 
     const master =
       await openai.chat.completions.create({
@@ -196,11 +208,14 @@ export async function POST(req) {
           },
           {
             role: "user",
-            content: userInput,
+            content:
+              userInput +
+              intent +
+              domain +
+              frameworks,
           },
         ],
       });
-
 
 
     const refined =
@@ -208,14 +223,21 @@ export async function POST(req) {
 
 
 
-    const stream = new ReadableStream({
-      async start(controller) {
-        controller.enqueue(
-          new TextEncoder().encode(refined)
-        );
-        controller.close();
-      },
-    });
+    // ✅ STREAM
+
+    const stream =
+      new ReadableStream({
+        async start(controller) {
+
+          controller.enqueue(
+            new TextEncoder().encode(
+              refined
+            )
+          );
+
+          controller.close();
+        },
+      });
 
 
 
@@ -225,6 +247,7 @@ export async function POST(req) {
       },
     });
 
+
   } catch (e) {
 
     return NextResponse.json({
@@ -232,4 +255,5 @@ export async function POST(req) {
     });
 
   }
+
 }
