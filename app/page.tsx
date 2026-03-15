@@ -366,13 +366,15 @@ export default function Home() {
 
       @media (max-width: 768px) {
         .hero-section { margin-top: 48vh !important; }
-        .hero-title { font-size: 1.25rem !important; }
+        
+        /* 🔥 MOBİL BAŞLIK VE INPUT OPTİMİZASYONU 🔥 */
+        .hero-title { font-size: 1.15rem !important; line-height: 1.4 !important; font-weight: 700 !important; letter-spacing: -0.2px !important; margin-bottom: 10px !important; }
+        .hero-sub { font-size: 0.75rem !important; color: #777 !important; padding: 0 25px !important; margin-top: 0 !important; }
+        
+        .main-input { font-size: 0.85rem !important; line-height: 1.4 !important; }
+        .main-input::placeholder { font-size: 0.82rem !important; opacity: 0.6; }
+        
         .discovery-trigger { top: 40% !important; } 
-        
-        /* 🔥 MOBİL INPUT OPTİMİZASYONU 🔥 */
-        .main-input { font-size: 0.88rem !important; line-height: 1.4 !important; }
-        .main-input::placeholder { font-size: 0.85rem !important; opacity: 0.6; }
-        
         .discovery-row { flex-direction: column-reverse !important; gap: 40px !important; }
         .discovery-video-frame { height: 220px !important; min-height: 220px !important; width: 100% !important; border-radius: 16px !important; flex: none !important; }
       }
@@ -426,8 +428,8 @@ export default function Home() {
 
               <div style={heroSection} className="hero-section">
                 <img src="/logo.png" alt="Logo" style={centerLogo} /> 
-                <h2 style={heroTitle}>Fikirlerini Güçlü Promptlara Dönüştür.</h2>
-                <p style={heroSub}>Metni yaz. Optimize edilmiş promptu al. Kopyala ve diğer AI araçlarında kullan.</p>
+                <h2 style={heroTitle} className="hero-title">Fikirlerini Güçlü Promptlara Dönüştür.</h2>
+                <p style={heroSub} className="hero-sub">Metni yaz. Optimize edilmiş promptu al. Kopyala ve diğer AI araçlarında kullan.</p>
               </div>
             </>
           ) : (
@@ -521,7 +523,7 @@ const miniLogo = { height: '20px', width: 'auto' };
 const backButton = { backgroundColor: 'transparent', color: '#fff', border: '1px solid #333', padding: '8px 16px', borderRadius: '20px', cursor: 'pointer', fontSize: '0.85rem' };
 const contentArea = { minHeight: '100vh', display: 'flex', flexDirection: 'column' as const, alignItems: 'center', justifyContent: 'center', width: '100%', position: 'relative' as const, paddingBottom: '150px' };
 const floatingContainer = { position: 'absolute' as const, top: '70px', left: 0, right: 0, height: '70vh', pointerEvents: 'none' as const, zIndex: 5, overflow: 'hidden' as const };
-const heroSection = { display: 'flex', flexDirection: 'column' as const, alignItems: 'center', textAlign: 'center' as const, zIndex: 10, marginTop: '60vh', width: '100%', gap: '15px' };
+const heroSection = { display: 'flex', flexDirection: 'column' as const, alignItems: 'center', textAlign: 'center' as const, zIndex: 10, marginTop: '60vh', width: '100%', gap: '10px' };
 const centerLogo = { width: '100%', maxWidth: '180px', height: 'auto' };
 const heroTitle = { fontSize: '2.2rem', fontWeight: '600' as const, color: '#fff', letterSpacing: '-0.5px', margin: 0 };
 const heroSub = { color: '#888', fontSize: '1rem', maxWidth: '550px', padding: '0 20px', lineHeight: '1.5', margin: 0 };
