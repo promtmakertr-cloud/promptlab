@@ -33,7 +33,6 @@ Framework: ${framework}
 Output: ${output}
 
 Kısa prompt üret.
-İçerik üretme.
 `
 
   }
@@ -59,10 +58,6 @@ OUTPUT
 KURALLAR
 FORMAT
 
-Output tipi:
-
-${output}
-
 Sadece prompt döndür.
 `
 
@@ -78,11 +73,6 @@ Framework: ${framework}
 Output: ${output}
 
 Prompt üret.
-
-Rol yaz
-Amaç yaz
-Kurallar yaz
-Format yaz
 `
 
 }
@@ -113,6 +103,9 @@ export async function POST(req) {
   mode = autoModeEngine({
     input,
     mode,
+    domain,
+    framework,
+    output,
   })
 
 
