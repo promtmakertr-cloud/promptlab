@@ -1,32 +1,42 @@
 import OpenAI from "openai"
+
 import { autoModeEngine } from "@/lib/engine/autoMode"
+import { detectDomain } from "@/lib/engine/domain"
+
 
 const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 })
 
 
-function masterPromptBuilder(mode) {
 
-  if (!mode) {
-    mode = "BALANCED"
-  }
+function masterPromptBuilder(mode, domain) {
+
+  if (!mode) mode = "BALANCED"
+
+
 
   if (mode === "FAST") {
-    return `
-Sen bir PROMPT mühendisisin.
 
-Prompt üret.
+    return `
+Sen bir prompt builder'sın.
+
+Domain: ${domain}
+
+Kısa prompt üret.
 İçerik üretme.
-Türkçe yaz.
-Kısa yaz.
-`;
+`
+
   }
+
 
 
   if (mode === "PRO") {
+
     return `
 Sen bir MASTER PROMPT ENGINE'sin.
+
+Domain: ${domain}
 
 Profesyonel prompt üret.
 
@@ -38,21 +48,25 @@ KURALLAR
 FORMAT
 
 Sadece prompt döndür.
-`;
+`
+
   }
+
 
 
   return `
 Sen bir prompt builder'sın.
 
+Domain: ${domain}
+
 Prompt üret.
-İçerik üretme.
 
 Rol yaz
 Amaç yaz
 Kurallar yaz
 Format yaz
-`;
+`
+
 }
 
 
@@ -66,28 +80,40 @@ export async function POST(req) {
   let mode = body.mode
 
 
+
+  const domain = detectDomain(input)
+
+
   mode = autoModeEngine({
     input,
     mode,
   })
 
 
-  const systemPrompt = masterPromptBuilder(mode)
+
+  const systemPrompt =
+    masterPromptBuilder(mode, domain)
 
 
-  const completion = await client.chat.completions.create({
-    model: "gpt-4o",
-    messages: [
-      {
-        role: "system",
-        content: systemPrompt,
-      },
-      {
-        role: "user",
-        content: input,
-      },
-    ],
-  })
+
+  const completion =
+    await client.chat.completions.create({
+
+      model: "gpt-4o",
+
+      messages: [
+        {
+          role: "system",
+          content: systemPrompt,
+        },
+        {
+          role: "user",
+          content: input,
+        },
+      ],
+
+    })
+
 
 
   return new Response(
