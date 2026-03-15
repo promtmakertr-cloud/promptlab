@@ -12,21 +12,38 @@ const TONES = {
   concise: "Minimal, net, kısa",
 };
 
-function systemBase(language, tone) {
+const ROLES = {
+  sales:    "Sales Strategist",
+  business: "Business Consultant / CFO",
+  marketing:"Marketing Strategist",
+  software: "Software Architect",
+  image:    "Creative Director",
+  writing:  "Storyteller",
+  academic: "Researcher",
+  video:    "Creative Director",
+  general:  "Expert Consultant",
+};
+
+function systemBase(language, tone, intent) {
   const toneText = TONES[tone] || TONES.professional;
+  const role = ROLES[intent] || ROLES.general;
 
   const lang =
     language === "en"
       ? `
-Write ONLY in English
+CRITICAL:
+Write ONLY in English.
+Do not use Turkish.
 `
       : `
 KRİTİK:
-Sadece Türkçe yaz
+Tüm çıktıyı SADECE Türkçe yaz.
+İngilizce kelime kullanma.
+Başlıklar dahil Türkçe olacak.
 `;
 
   return `
-Sen MASTER PROMPT ENGINE v7 sistemisin.
+Sen MASTER PROMPT ENGINE v8 sistemisin.
 
 Görev:
 
@@ -40,8 +57,26 @@ en doğru prompt üret
 
 ${lang}
 
+Uzman Rol:
+${role}
+
 Ton:
 ${toneText}
+
+Rol Seçim Kuralları:
+
+- sales → Sales Strategist
+- business → Business Consultant / CFO
+- marketing → Marketing Strategist
+- software → Software Architect
+- image → Creative Director
+- writing → Storyteller
+- academic → Researcher
+- video → Creative Director
+- general → Expert Consultant
+
+Üretilen master prompt bu rolün bakış açısıyla yazılmalı.
+Rol, promptun içinde açıkça belirtilmeli.
 
 Kurallar:
 
@@ -139,21 +174,26 @@ frameworks:[]
 `;
 }
 
-function masterPromptBuilder(language) {
+function masterPromptBuilder(language, intent) {
 
   const lang =
     language === "en"
       ? "Write only English"
       : "Sadece Türkçe yaz";
 
+  const role = ROLES[intent] || ROLES.general;
+
   return `
 Master prompt üret
 
 ${lang}
 
+Sen bir ${role} olarak yazıyorsun.
+Promptun başında bu rolü açıkça belirt.
+
 Kurallar:
 
-- Rol tanımla
+- Rolü promptun ilk satırında tanımla
 - Bağlam yaz
 - Teknik detay ekle
 - Framework kullan
@@ -290,7 +330,8 @@ export async function POST(req) {
             role: "system",
             content: systemBase(
               language,
-              tone
+              tone,
+              intent.intent
             ),
           },
           {
@@ -311,7 +352,7 @@ ${previousPrompt || ""}
           {
             role: "system",
             content:
-              masterPromptBuilder(language),
+              masterPromptBuilder(language, intent.intent),
           },
         ],
       });
