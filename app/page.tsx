@@ -70,7 +70,6 @@ const parsePromptData = (fullText: string) => {
   return { category: '', promptText: fullText };
 };
 
-// 🔥 HATA VEREN ANİMASYON DÜZELTİLDİ (useRef GERİ GELDİ) 🔥
 const ScrambleText = ({ text, initialDelayMs }: { text: string; initialDelayMs: number }) => {
   const [items, setItems] = useState<{char: string, isScrambled: boolean}[]>([]);
   const isFirstRender = useRef(true);
@@ -121,8 +120,8 @@ export default function Home() {
   const [typewriterIndex, setTypewriterIndex] = useState(0);
   const [isDeleting, setIsDeleting] = useState(false);
   
-  // 🔥 YENİ EKLENEN MODE STATE 🔥
-  const [mode, setMode] = useState("BALANCED");
+  // 🔥 YENİ MODLAR (AUTO VE ULTRA EKLENDİ) 🔥
+  const [mode, setMode] = useState("AUTO");
 
   const getMobileRandomPos = () => {
     const r = Math.random();
@@ -200,11 +199,11 @@ export default function Home() {
     setLoading(true); setSubmittedPrompt(input); setIsPromptExpanded(false); setResult(''); 
     const currentInput = input; setInput(''); 
     try {
-      // 🔥 YENİ EKLENEN "MODE" PARAMETRESİ API'YE GÖNDERİLİYOR 🔥
+      // API'ye input ve mode değerlerini iletiyoruz
       const res = await fetch('/api/generate', { 
         method: 'POST', 
         headers: { 'Content-Type': 'application/json' }, 
-        body: JSON.stringify({ userInput: currentInput, mode: mode }) 
+        body: JSON.stringify({ userInput: currentInput, input: currentInput, mode: mode }) 
       });
       if (!res.body) return;
       const reader = res.body.getReader(); const decoder = new TextDecoder();
@@ -249,7 +248,6 @@ export default function Home() {
               })}
             </div>
             
-            {/* 🔥 ORİJİNAL LOGO VE BOŞLUK (60vh) GERİ GELDİ 🔥 */}
             <div style={heroSection} className="hero-section">
               <div style={logoFrame}> 
                 <img src="/logo.png" alt="Logo" className="glowing-logo" style={centerLogo} /> 
@@ -299,23 +297,24 @@ export default function Home() {
         )}
       </div>
 
-      {/* 🔥 ALT IŞIK VE INPUT YAPISI 🔥 */}
       <div style={bottomArea}>
         <div className="floor-glow" style={floorGlow}></div>
         <div style={glowWrapper}>
           
-          {/* 🔥 YENİ: ŞIK MODE SEÇİCİ (PILL TASARIM) 🔥 */}
+          {/* 🔥 GÜNCELLENEN 5'Lİ MOD SEÇİCİ (AUTO VE ULTRA EKLENDİ) 🔥 */}
           {!submittedPrompt && (
             <div style={modeSelectorWrapper}>
-              {['FAST', 'BALANCED', 'PRO'].map((m) => (
+              {['AUTO', 'FAST', 'BALANCED', 'PRO', 'ULTRA'].map((m) => (
                 <button 
                   key={m} 
                   onClick={() => setMode(m)} 
                   style={mode === m ? modeBtnActive : modeBtn}
                 >
+                  {m === 'AUTO' && '🪄 '}
                   {m === 'FAST' && '⚡ '}
                   {m === 'BALANCED' && '⚖️ '}
                   {m === 'PRO' && '🧠 '}
+                  {m === 'ULTRA' && '🚀 '}
                   {m}
                 </button>
               ))}
@@ -403,8 +402,8 @@ const bottomArea = { position: 'fixed' as const, bottom: 0, left: 0, right: 0, p
 const floorGlow = { position: 'absolute' as const, bottom: '-10px', left: '50%', transform: 'translateX(-50%)', width: '50vw', maxWidth: '600px', height: '60px', background: 'linear-gradient(90deg, #3A86FF, #8338EC, #00E5FF, #8338EC, #3A86FF)', backgroundSize: '200% 100%', filter: 'blur(45px)', opacity: 0.25, zIndex: 1, pointerEvents: 'none' as const };
 const glowWrapper = { position: 'relative' as const, width: '100%', maxWidth: '680px', zIndex: 2, pointerEvents: 'auto' as const };
 
-// 🔥 YENİ: MODE SEÇİCİ STİLLERİ 🔥
-const modeSelectorWrapper = { display: 'flex', gap: '10px', marginBottom: '12px', justifyContent: 'center' };
+// 🔥 GÜNCELLENEN: MODE SEÇİCİ STİLLERİ 🔥
+const modeSelectorWrapper = { display: 'flex', gap: '10px', marginBottom: '12px', justifyContent: 'center', flexWrap: 'wrap' as const };
 const modeBtn = { background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', color: '#888', padding: '6px 14px', borderRadius: '20px', fontSize: '0.75rem', fontWeight: '600' as const, cursor: 'pointer', transition: 'all 0.2s ease', letterSpacing: '0.5px' };
 const modeBtnActive = { ...modeBtn, background: 'rgba(0, 229, 255, 0.1)', borderColor: 'rgba(0, 229, 255, 0.4)', color: '#00E5FF', boxShadow: '0 0 10px rgba(0, 229, 255, 0.2)' };
 
