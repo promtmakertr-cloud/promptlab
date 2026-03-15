@@ -10,22 +10,7 @@ const openai = new OpenAI({
 
 function intentPrompt() {
   return `
-You are an intent analyzer.
-
-Detect intent type.
-
-Types:
-
-analysis
-strategy
-content
-prompt
-code
-business
-marketing
-ai
-education
-story
+Detect intent
 
 Return JSON
 
@@ -36,29 +21,11 @@ intent:""
 }
 
 
-
 // ✅ DOMAIN
 
 function domainPrompt() {
   return `
-Detect domain.
-
-Domains:
-
-marketing
-startup
-business
-software
-ai
-finance
-psychology
-education
-design
-content
-story
-prompt-engineering
-system-design
-general
+Detect domain
 
 Return JSON
 
@@ -69,29 +36,11 @@ domain:""
 }
 
 
-
 // ✅ FRAMEWORK
 
 function frameworkPrompt() {
   return `
-Select frameworks based on intent + domain.
-
-marketing →
-AIDA
-PAS
-SWOT
-STP
-StoryBrand
-
-business →
-SWOT
-ROI
-Financial
-Budget
-
-software →
-Architecture
-Clean code
+Select frameworks
 
 Return JSON
 
@@ -102,19 +51,11 @@ frameworks:[]
 }
 
 
-
-// ✅ ROLE GENERATOR
+// ✅ ROLE
 
 function rolePrompt() {
   return `
-Generate expert role based on intent and domain.
-
-marketing → Senior marketing strategist
-software → Senior software architect
-ai → AI researcher
-business → Business consultant
-psychology → Behavior analyst
-prompt-engineering → Prompt engineer
+Generate expert role
 
 Return JSON
 
@@ -125,22 +66,49 @@ role:""
 }
 
 
+// ✅ OUTPUT TYPE
 
-// ✅ MASTER BUILDER
+function outputPrompt() {
+  return `
+Detect output type
+
+Types:
+
+prompt
+analysis
+table
+plan
+json
+strategy
+report
+steps
+code
+
+Return JSON
+
+{
+output:""
+}
+`;
+}
+
+
+// ✅ MASTER
 
 function masterPromptBuilder() {
   return `
 Create master prompt.
 
-Write:
+Include:
 
 Role
 Context
-Technical details
-Use frameworks
-Give format
+Framework
+Format
+Technical detail
+Output type
 
-Return prompt text
+Return prompt
 `;
 }
 
@@ -153,20 +121,14 @@ export async function POST(req) {
     const { userInput } = await req.json();
 
 
-    // ✅ INTENT
+    // INTENT
 
     const intentRes =
       await openai.chat.completions.create({
         model: "gpt-4o",
         messages: [
-          {
-            role: "system",
-            content: intentPrompt(),
-          },
-          {
-            role: "user",
-            content: userInput,
-          },
+          { role: "system", content: intentPrompt() },
+          { role: "user", content: userInput },
         ],
       });
 
@@ -174,21 +136,14 @@ export async function POST(req) {
       intentRes.choices[0].message.content;
 
 
-
-    // ✅ DOMAIN
+    // DOMAIN
 
     const domainRes =
       await openai.chat.completions.create({
         model: "gpt-4o",
         messages: [
-          {
-            role: "system",
-            content: domainPrompt(),
-          },
-          {
-            role: "user",
-            content: userInput,
-          },
+          { role: "system", content: domainPrompt() },
+          { role: "user", content: userInput },
         ],
       });
 
@@ -196,21 +151,14 @@ export async function POST(req) {
       domainRes.choices[0].message.content;
 
 
-
-    // ✅ FRAMEWORK
+    // FRAMEWORK
 
     const frameRes =
       await openai.chat.completions.create({
         model: "gpt-4o",
         messages: [
-          {
-            role: "system",
-            content: frameworkPrompt(),
-          },
-          {
-            role: "user",
-            content: intent + domain,
-          },
+          { role: "system", content: frameworkPrompt() },
+          { role: "user", content: intent + domain },
         ],
       });
 
@@ -218,21 +166,14 @@ export async function POST(req) {
       frameRes.choices[0].message.content;
 
 
-
-    // ✅ ROLE
+    // ROLE
 
     const roleRes =
       await openai.chat.completions.create({
         model: "gpt-4o",
         messages: [
-          {
-            role: "system",
-            content: rolePrompt(),
-          },
-          {
-            role: "user",
-            content: intent + domain,
-          },
+          { role: "system", content: rolePrompt() },
+          { role: "user", content: intent + domain },
         ],
       });
 
@@ -240,8 +181,22 @@ export async function POST(req) {
       roleRes.choices[0].message.content;
 
 
+    // OUTPUT
 
-    // ✅ MASTER
+    const outputRes =
+      await openai.chat.completions.create({
+        model: "gpt-4o",
+        messages: [
+          { role: "system", content: outputPrompt() },
+          { role: "user", content: userInput },
+        ],
+      });
+
+    const output =
+      outputRes.choices[0].message.content;
+
+
+    // MASTER
 
     const master =
       await openai.chat.completions.create({
@@ -258,7 +213,8 @@ export async function POST(req) {
               intent +
               domain +
               frameworks +
-              role,
+              role +
+              output,
           },
         ],
       });
@@ -268,23 +224,15 @@ export async function POST(req) {
       master.choices[0].message.content;
 
 
-
-    // ✅ STREAM
-
     const stream =
       new ReadableStream({
         async start(controller) {
-
           controller.enqueue(
-            new TextEncoder().encode(
-              refined
-            )
+            new TextEncoder().encode(refined)
           );
-
           controller.close();
         },
       });
-
 
 
     return new Response(stream, {
@@ -292,7 +240,6 @@ export async function POST(req) {
         "Content-Type": "text/plain",
       },
     });
-
 
   } catch (e) {
 
