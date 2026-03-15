@@ -70,14 +70,20 @@ const parsePromptData = (fullText: string) => {
   return { category: '', promptText: fullText };
 };
 
+// 🔥 HATA VEREN ANİMASYON DÜZELTİLDİ (useRef GERİ GELDİ) 🔥
 const ScrambleText = ({ text, initialDelayMs }: { text: string; initialDelayMs: number }) => {
   const [items, setItems] = useState<{char: string, isScrambled: boolean}[]>([]);
-  
+  const isFirstRender = useRef(true);
+
   useEffect(() => {
     let iteration = 0;
     const chars = "01@#$ΣλΠ⌘xX>_";
     let interval: any;
+    const delay = isFirstRender.current ? initialDelayMs + 200 : 200;
+    isFirstRender.current = false;
+    
     setItems(text.split("").map(() => ({ char: chars[Math.floor(Math.random() * chars.length)], isScrambled: true })));
+
     const timeout = setTimeout(() => {
       interval = setInterval(() => {
         setItems(text.split("").map((letter, index) => {
@@ -88,11 +94,17 @@ const ScrambleText = ({ text, initialDelayMs }: { text: string; initialDelayMs: 
         if (iteration >= text.length) clearInterval(interval);
         iteration += Math.max(0.6, text.length / 25);
       }, 50);
-    }, initialDelayMs + 200);
+    }, delay);
     return () => { clearTimeout(timeout); clearInterval(interval); };
   }, [text, initialDelayMs]);
-  
-  return <>{items.map((item, i) => (<span key={i} style={{ color: item.isScrambled ? '#00E5FF' : 'inherit', transition: 'color 0.2s ease' }}>{item.char}</span>))}</>;
+
+  return (
+    <>
+      {items.map((item, i) => (
+        <span key={i} style={{ color: item.isScrambled ? '#00E5FF' : 'inherit', textShadow: item.isScrambled ? '0 0 8px rgba(0, 229, 255, 0.6)' : 'none', transition: 'color 0.2s ease' }}>{item.char}</span>
+      ))}
+    </>
+  );
 };
 
 export default function Home() {
@@ -111,27 +123,37 @@ export default function Home() {
 
   const getMobileRandomPos = () => {
     const r = Math.random();
-    if (r < 0.33) return { top: '10%', left: '10%', transform: 'none' };
-    if (r < 0.66) return { top: '25%', right: '10%', transform: 'none' };
+    if (r < 0.33) return { top: '10%', left: '10%', right: 'auto', transform: 'none' };
+    if (r < 0.66) return { top: '25%', right: '10%', left: 'auto', transform: 'none' };
     return { top: '18%', left: '50%', transform: 'translateX(-50%)' };
   };
 
   const getRandomPos = (slotId: number) => {
     const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
+    const r1 = Math.random();
+    const r2 = Math.random();
+    
     if (isMobile) {
-      if (slotId === 0) { return { ...getMobileRandomPos(), maxWidth: '80vw', width: 'fit-content' }; }
-      return { display: 'none' }; 
+      if (slotId === 0) {
+        const mPos = getMobileRandomPos();
+        return { ...mPos, maxWidth: '80vw', width: 'fit-content' };
+      }
+      return { top: '-100%', left: '-100%', display: 'none' }; 
     }
-    const r1 = Math.random(); const r2 = Math.random();
-    if (slotId === 0) return { top: `${15 + (r1 * 6)}%`, left: `${2 + (r2 * 12)}%`, maxWidth: '340px' };
-    if (slotId === 1) return { top: `${20 + (r1 * 6)}%`, right: `${2 + (r2 * 12)}%`, maxWidth: '340px' };
-    if (slotId === 2) return { top: `${45 + (r1 * 5)}%`, left: `${2 + (r2 * 12)}%`, maxWidth: '340px' };
-    return { top: `${50 + (r1 * 5)}%`, right: `${2 + (r2 * 12)}%`, maxWidth: '340px' };
+
+    let top, left, right;
+    const maxWidth = '340px'; 
+    if (slotId === 0) { top = `${6 + (r1 * 6)}%`; left = `${2 + (r2 * 12)}%`; right = 'auto'; } 
+    else if (slotId === 1) { top = `${10 + (r1 * 6)}%`; left = 'auto'; right = `${2 + (r2 * 12)}%`; } 
+    else if (slotId === 2) { top = `${38 + (r1 * 5)}%`; left = `${2 + (r2 * 12)}%`; right = 'auto'; } 
+    else { top = `${42 + (r1 * 5)}%`; left = 'auto'; right = `${2 + (r2 * 12)}%`; }
+    return { top, left, right, maxWidth };
   };
 
   useEffect(() => {
     let interval: any;
     if (loading && !result) {
+      setLoadingStep(0);
       interval = setInterval(() => { setLoadingStep((prev) => (prev + 1) % loadingSteps.length); }, 1800);
     }
     return () => clearInterval(interval);
@@ -209,18 +231,23 @@ export default function Home() {
             <div style={floatingContainer}>
               {slots.map((slot) => {
                 const { category, promptText } = parsePromptData(slot.text);
+                const delayMs = parseFloat(slot.delay || '0') * 1000;
                 return (
                   <div key={slot.id} className={`cinematic-text slot-${slot.id}`} style={{ ...slot.pos, position: 'absolute' as const, fontSize: slot.size, animationDelay: slot.delay, display: slot.pos.display || 'block' }} onClick={() => setInput(promptText)} onAnimationIteration={() => handleAnimationIteration(slot.id)}>
-                    {category && <div className="prompt-category" style={pCat}><ScrambleText text={category} initialDelayMs={parseFloat(slot.delay || '0') * 1000} /></div>}
-                    <div className="prompt-body" style={pBody}><ScrambleText text={promptText} initialDelayMs={parseFloat(slot.delay || '0') * 1000} /></div>
+                    {category && <div className="prompt-category" style={pCat}><ScrambleText text={category} initialDelayMs={delayMs} /></div>}
+                    <div className="prompt-body" style={pBody}><ScrambleText text={promptText} initialDelayMs={delayMs} /></div>
                   </div>
                 );
               })}
             </div>
             
+            {/* 🔥 ORİJİNAL LOGO VE BOŞLUK (60vh) GERİ GELDİ 🔥 */}
             <div style={heroSection} className="hero-section">
+              <div style={logoFrame}> 
+                <img src="/logo.png" alt="Logo" className="glowing-logo" style={centerLogo} /> 
+              </div>
               <h2 style={heroTitle} className="hero-title">Fikirlerini Güçlü Promptlara Dönüştür.</h2>
-              <p style={heroSub} className="hero-sub">Metni yaz. Optimize edilmiş promptu al. Kopyala ve AI araçlarında kullan.</p>
+              <p style={heroSub} className="hero-sub">Metni yaz. Optimize edilmiş promptu al. Kopyala ve diğer AI araçlarında kullan.</p>
             </div>
           </>
         ) : (
@@ -264,7 +291,9 @@ export default function Home() {
         )}
       </div>
 
+      {/* 🔥 ORİJİNAL ALT IŞIK (floorGlow) VE INPUT YAPISI GERİ GELDİ 🔥 */}
       <div style={bottomArea}>
+        <div className="floor-glow" style={floorGlow}></div>
         <div style={glowWrapper}>
           <div className="input-box-inner" style={inputBoxInner}>
             <textarea className="main-input" style={inputField} placeholder={`Ne oluşturmak istiyorsun?\nÖrn: “${typewriterText}”`} rows={2} value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => { if(e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleGenerate(); }}} />
@@ -277,15 +306,21 @@ export default function Home() {
       </div>
 
       <style jsx global>{`
-        /* 🔥 ORİJİNAL IŞIKLI ÇERÇEVE VE ANİMASYONLAR BURADA 🔥 */
         @keyframes elegantGlow {
           0%   { box-shadow: 0 0 8px rgba(58, 134, 255, 0.15), inset 0 0 4px rgba(58, 134, 255, 0.05); border-color: rgba(58, 134, 255, 0.2); }
           50%  { box-shadow: 0 0 20px rgba(131, 56, 236, 0.35), inset 0 0 8px rgba(131, 56, 236, 0.15); border-color: rgba(131, 56, 236, 0.45); }
           100% { box-shadow: 0 0 8px rgba(58, 134, 255, 0.15), inset 0 0 4px rgba(58, 134, 255, 0.05); border-color: rgba(58, 134, 255, 0.2); }
         }
-        @keyframes perfectBreathing { 0%, 100% { opacity: 0; transform: translateY(10px); } 5%, 30% { opacity: 1; transform: translateY(0); } 40% { opacity: 0; transform: translateY(-10px); } }
+        @keyframes perfectBreathing { 
+          0% { opacity: 0; filter: blur(5px); transform: translateY(10px); } 
+          5% { opacity: 1; filter: blur(0px); transform: translateY(0px); } 
+          25% { opacity: 1; filter: blur(0px); transform: translateY(0px); } 
+          35% { opacity: 0; filter: blur(10px); transform: translateY(-10px); } 
+          100% { opacity: 0; filter: blur(10px); transform: translateY(-10px); } 
+        }
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 
+        .glowing-logo { filter: drop-shadow(0 0 2px rgba(0, 229, 255, 0.2)); transition: filter 0.3s ease; }
         .cinematic-text { position: absolute; color: #888888; cursor: pointer; animation: perfectBreathing 24s infinite linear both; text-align: left; line-height: 1.5; font-weight: 300; transition: transform 0.3s ease, filter 0.3s ease; pointer-events: auto; opacity: 0; }
         .cinematic-text:hover { animation-play-state: paused; z-index: 50; }
         .cinematic-text:hover .prompt-category { color: #00E5FF; text-shadow: 0 0 10px rgba(0, 229, 255, 0.5); }
@@ -293,7 +328,6 @@ export default function Home() {
         
         .cursor-blink { display: inline-block; width: 8px; height: 1.2em; background-color: #00E5FF; vertical-align: middle; margin-left: 4px; animation: blink 1s step-end infinite; }
         
-        /* 🔥 ORİJİNAL, SADE AI BUTONLARI 🔥 */
         .ai-brand-btn { background: transparent; color: #888; border: 1px solid transparent; padding: 8px 12px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 0.85rem; transition: all 0.3s ease; }
         .ai-brand-btn:hover { color: #fff; transform: translateY(-3px) scale(1.02); background: rgba(255,255,255,0.05); }
         .btn-chatgpt:hover { border-color: #10a37f !important; background: rgba(16, 163, 127, 0.1) !important; box-shadow: 0 0 20px rgba(16, 163, 127, 0.2) !important; }
@@ -303,9 +337,9 @@ export default function Home() {
         .btn-copilot:hover { border-color: #3c78d8 !important; background: rgba(60, 120, 216, 0.1) !important; box-shadow: 0 0 20px rgba(60, 120, 216, 0.2) !important; }
         
         @media (max-width: 768px) { 
-          .hero-section { marginTop: 40vh !important; } 
-          .hero-title { font-size: 1.15rem !important; } 
-          .hero-sub { font-size: 0.75rem !important; } 
+          .hero-section { margin-top: 52vh !important; } 
+          .hero-title { font-size: 1.25rem !important; } 
+          .hero-sub { font-size: 0.8rem !important; } 
           .main-input { font-size: 0.85rem !important; } 
         }
       `}</style>
@@ -313,38 +347,43 @@ export default function Home() {
   );
 }
 
-// 🔥 ANA SAYFA STİLLERİ 🔥
+// 🔥 ANA SAYFA STİLLERİ (ORİJİNAL) 🔥
 const container = { backgroundColor: '#050505', minHeight: '100vh', color: '#ECECEC', fontFamily: 'Inter, sans-serif', position: 'relative' as const, overflowX: 'hidden' as const };
 const contentArea = { minHeight: '100vh', display: 'flex', flexDirection: 'column' as const, alignItems: 'center', justifyContent: 'center', paddingBottom: '150px' };
 const floatingContainer = { position: 'absolute' as const, inset: 0, pointerEvents: 'none' as const };
-const heroSection = { display: 'flex', flexDirection: 'column' as const, alignItems: 'center', textAlign: 'center' as const, zIndex: 10, marginTop: '45vh', gap: '10px' };
-const heroTitle = { fontSize: '2.2rem', fontWeight: '600' as const, color: '#fff', margin: 0, marginTop: '40px', letterSpacing: '-0.5px' }; // increase margin-top
+
+// 🔥 60VH BOŞLUK VE LOGO FRAME GERİ GELDİ 🔥
+const heroSection = { display: 'flex', flexDirection: 'column' as const, alignItems: 'center', textAlign: 'center' as const, zIndex: 10, marginTop: '60vh', width: '100%', gap: '15px', height: 'auto', minHeight: 'min-content', pointerEvents: 'none' as const };
+const logoFrame = { display: 'flex', alignItems: 'center', justifyContent: 'center' };
+const centerLogo = { width: '100%', maxWidth: '180px', height: 'auto', display: 'block', objectFit: 'contain' as const };
+
+const heroTitle = { fontSize: '2.2rem', fontWeight: '600' as const, color: '#fff', margin: 0, letterSpacing: '-0.5px' };
 const heroSub = { color: '#888', fontSize: '1rem', maxWidth: '500px', padding: '0 20px', lineHeight: '1.5' };
-const pCat = { fontFamily: 'Times New Roman, serif', fontStyle: 'italic', fontSize: '1.3em', color: '#fff', marginBottom: '6px', transition: 'all 0.3s ease' };
-const pBody = { opacity: 0.75, fontSize: '0.95em', transition: 'all 0.3s ease' };
+const pCat = { fontFamily: 'Times New Roman, serif', fontStyle: 'italic', fontSize: '1.35em', color: '#fff', marginBottom: '6px', opacity: 0.95 };
+const pBody = { opacity: 0.75, fontSize: '0.95em' };
 const resultContainer = { maxWidth: '900px', width: '100%', marginTop: '120px', padding: '0 20px', zIndex: 20 };
 const userPromptWrapper = { backgroundColor: '#0f0f0f', borderRadius: '12px', border: '1px solid #222', marginBottom: '20px', overflow: 'hidden' as const };
-const userPromptHeader = { padding: '15px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' };
-const userPromptTitle = { fontSize: '0.85rem', color: '#888' };
-const editBtn = { background: 'rgba(131,56,236,0.1)', color: '#00E5FF', border: 'none', padding: '6px 14px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.75rem', fontWeight: 'bold' as const };
-const newBtn = { background: 'rgba(255,255,255,0.1)', color: '#fff', border: 'none', padding: '6px 14px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.75rem', fontWeight: 'bold' as const };
-const userPromptBody = { padding: '20px', borderTop: '1px solid #222', color: '#aaa', fontSize: '0.9rem', lineHeight: '1.6' };
+const userPromptHeader = { padding: '16px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' };
+const userPromptTitle = { fontSize: '0.9rem', color: '#ccc', fontWeight: '500' as const };
+const editBtn = { background: 'rgba(131,56,236,0.1)', color: '#00E5FF', border: 'none', padding: '6px 14px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.8rem', fontWeight: '600' as const };
+const newBtn = { background: 'rgba(255,255,255,0.1)', color: '#fff', border: 'none', padding: '6px 14px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.8rem', fontWeight: '600' as const };
+const userPromptBody = { padding: '20px', borderTop: '1px solid #222', color: '#aaa', fontSize: '0.95rem', lineHeight: '1.6' };
 const aiResponseWrapper = { backgroundColor: '#0a0a0a', padding: '30px', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.08)' };
-const aiLabel = { fontSize: '0.7rem', fontWeight: '800' as const, color: '#00E5FF', marginBottom: '20px', letterSpacing: '3px' };
-const aiText = { fontSize: '1.05rem', lineHeight: '1.7', whiteSpace: 'pre-wrap' as const, fontFamily: 'monospace' };
+const aiLabel = { fontSize: '0.75rem', fontWeight: '700' as const, color: '#00E5FF', marginBottom: '20px', letterSpacing: '2px' };
+const aiText = { fontSize: '1rem', lineHeight: '1.6', whiteSpace: 'pre-wrap' as const, fontFamily: 'monospace' };
 const actionRow = { marginTop: '30px', paddingTop: '20px', borderTop: '1px solid rgba(255,255,255,0.05)', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap' as const, gap: '20px' };
 const btnGrid = { display: 'flex', flexWrap: 'wrap' as const, gap: '10px' };
-const labelStart = { fontSize: '0.65rem', color: '#444', marginBottom: '12px', fontWeight: 'bold' as const, letterSpacing: '1px' };
-const copyBtnPrimary = { background: '#fff', color: '#000', border: 'none', padding: '12px 24px', borderRadius: '12px', fontWeight: 'bold' as const, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' };
-const bottomArea = { position: 'fixed' as const, bottom: 0, left: 0, right: 0, padding: '30px 20px', display: 'flex', justifyContent: 'center', zIndex: 100, pointerEvents: 'none' as const };
+const labelStart = { fontSize: '0.85rem', color: '#888', marginBottom: '12px', fontWeight: 'bold' as const, letterSpacing: '0.5px' };
+const copyBtnPrimary = { background: '#fff', color: '#000', border: 'none', padding: '8px 16px', borderRadius: '8px', fontWeight: 'bold' as const, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' };
+
+// 🔥 ALT IŞIK (floorGlow) VE INPUT YAPISI GERİ GELDİ 🔥
+const bottomArea = { position: 'fixed' as const, bottom: 0, left: 0, right: 0, padding: '30px 20px 40px 20px', display: 'flex', flexDirection: 'column' as const, alignItems: 'center', zIndex: 100, pointerEvents: 'none' as const };
+const floorGlow = { position: 'absolute' as const, bottom: '-10px', left: '50%', transform: 'translateX(-50%)', width: '50vw', maxWidth: '600px', height: '60px', background: 'linear-gradient(90deg, #3A86FF, #8338EC, #00E5FF, #8338EC, #3A86FF)', backgroundSize: '200% 100%', filter: 'blur(45px)', opacity: 0.25, zIndex: 1, pointerEvents: 'none' as const };
 const glowWrapper = { position: 'relative' as const, width: '100%', maxWidth: '680px', zIndex: 2, pointerEvents: 'auto' as const };
-
-// 🔥 IŞIKLI ÇERÇEVE GERİ GELDİ 🔥
-const inputBoxInner = { backgroundColor: '#0a0a0a', borderRadius: '30px', border: '1px solid rgba(58, 134, 255, 0.2)', animation: 'elegantGlow 8s infinite alternate', padding: '10px 15px 10px 25px', width: '100%', height: '100%', display: 'flex', alignItems: 'center' };
-
-const inputField = { flex: 1, background: 'transparent', border: 'none', color: '#fff', fontSize: '1rem', outline: 'none', resize: 'none' as const };
-const actionButtons = { display: 'flex', alignItems: 'center', gap: '8px' };
-const iconButton = { background: 'none', border: 'none', cursor: 'pointer' };
-const sendButton = { width: '35px', height: '35px', borderRadius: '50%', border: 'none', background: '#fff', color: '#000', fontWeight: 'bold' as const, cursor: 'pointer' };
-const loadingBox = { padding: '40px', textAlign: 'center' as const };
-const loadingText = { color: '#888', fontSize: '0.9rem', fontFamily: 'monospace' };
+const inputBoxInner = { backgroundColor: '#0a0a0a', borderRadius: '40px', border: '1px solid rgba(58, 134, 255, 0.2)', animation: 'elegantGlow 8s infinite alternate', padding: '6px 10px 6px 18px', width: '100%', display: 'flex', alignItems: 'center' };
+const inputField = { flex: 1, background: 'transparent', border: 'none', color: '#fff', fontSize: '1rem', outline: 'none', resize: 'none' as const, padding: '8px 0', maxHeight: '150px' };
+const actionButtons = { display: 'flex', alignItems: 'center', gap: '6px' };
+const iconButton = { background: 'none', border: 'none', cursor: 'pointer', padding: '4px' };
+const sendButton = { width: '32px', height: '32px', borderRadius: '50%', border: 'none', background: '#fff', color: '#000', fontWeight: 'bold' as const, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem' };
+const loadingBox = { width: '100%', maxWidth: '600px', background: 'rgba(10, 10, 10, 0.85)', padding: '40px 20px', textAlign: 'center' as const };
+const loadingText = { color: '#888', fontSize: '0.95rem', fontFamily: 'monospace', opacity: 0.8 };
