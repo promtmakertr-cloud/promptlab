@@ -4,7 +4,6 @@ export default function HowItWorks() {
   return (
     <main style={container}>
       <div style={heroArea}>
-        <div style={badge}>PROTOCOL_01</div>
         <h1 style={title}>Promptlab Sizin İçin Ne Yapar?</h1>
         <p style={sub}>Karmaşık fikirlerinizi saniyeler içinde mükemmel promptlara dönüştüren nöral bir köprü.</p>
       </div>
@@ -41,7 +40,6 @@ export default function HowItWorks() {
 // 🔥 NASIL ÇALIŞIR STİLLERİ 🔥
 const container = { backgroundColor: '#050505', minHeight: '100vh', color: '#fff', padding: '140px 40px 100px 40px', display: 'flex', flexDirection: 'column' as const, alignItems: 'center' };
 const heroArea = { textAlign: 'center' as const, marginBottom: '60px', maxWidth: '800px' };
-const badge = { display: 'inline-block', color: '#00E5FF', fontSize: '0.7rem', fontWeight: 'bold' as const, letterSpacing: '4px', marginBottom: '20px', padding: '6px 12px', border: '1px solid rgba(0,229,255,0.3)', borderRadius: '20px', backgroundColor: 'rgba(0,229,255,0.05)' };
 const title = { fontSize: '2.8rem', fontWeight: '800' as const, marginBottom: '20px', letterSpacing: '-1px' };
 const sub = { color: '#888', fontSize: '1.15rem', lineHeight: '1.6' };
 const videoSection = { width: '100%', maxWidth: '1000px', margin: '0 auto 80px auto', borderRadius: '30px', border: '1px solid rgba(131,56,236,0.3)', overflow: 'hidden', height: '450px', background: '#0a0a0a', position: 'relative' as const, boxShadow: '0 20px 50px rgba(0,0,0,0.5)' };
