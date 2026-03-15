@@ -86,15 +86,11 @@ const loadingSteps = [
   }
 ];
 
-const IconChatGPT = <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M22.2819 9.8211a5.9847 5.9847 0 0 0-.5157-4.9108 6.0462 6.0462 0 0 0-6.5098-2.9A6.0651 6.0651 0 0 0 4.9" /></svg>;
-const IconGemini = <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 0C12 6.62742 6.62742 12 0 12C6.62742 12 12 17.3726 12 24C12 17.3726 17.3726 12 24 12C17.3726 12 12 6" /></svg>;
-const IconClaude = <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><rect width="24" height="24" rx="4" fill="none" stroke="currentColor" strokeWidth="2"/><text x="50%" y="50%" textAnchor="middle" dy=".35em" fontFamily="Georgia, serif" fontSize="14" fontWeight="bold">C</text></svg>;
-const IconPerplexity = <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><polygon points="12 2 2 7 2 17 12 22 22 17 22 7" fill="none" stroke="currentColor" strokeWidth="2" /></svg>;
-const IconCopilot = <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M11 2H2v9h9V2zm11 0h-9v9h9V2zm-11 11H2v9h9v-9zm11 0h-9v9h9v-9z" /></svg>;
-const IconMidjourney = <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M2 20h20v2H2v-2zm10-18l8 16H4l8-16z" fill="none" stroke="currentColor" strokeWidth="2" /></svg>;
-const IconLeonardo = <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M6 2v16h12v4H2V2h4z" /><circle cx="16" cy="8" r="3" /></svg>;
-const IconAdobe = <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><polygon points="14.5 2 22 22 18 22 14.5 12 11 22 7 22" /><polygon points="9.5 2 2 22 6 22 9.5 12" /></svg>;
-const IconCanva = <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M15 8a4 4 0 0 0-6 0 4 4 0 0 0 0 6 4 4 0 0 0 6 0"/></svg>;
+const IconChatGPT = <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M22.2819 9.8211a5.9847 5.9847 0 0 0-.5157-4.9108 6.0462 6.0462 0 0 0-6.5098-2.9A6.0651 6.0651 0 0 0 4.9" /></svg>;
+const IconGemini = <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M12 0C12 6.62742 6.62742 12 0 12C6.62742 12 12 17.3726 12 24C12 17.3726 17.3726 12 24 12C17.3726 12 12 6" /></svg>;
+const IconClaude = <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><rect width="24" height="24" rx="4" fill="none" stroke="currentColor" strokeWidth="2"/><text x="50%" y="50%" textAnchor="middle" dy=".35em" fontFamily="Georgia, serif" fontSize="14" fontWeight="bold">C</text></svg>;
+const IconPerplexity = <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><polygon points="12 2 2 7 2 17 12 22 22 17 22 7" fill="none" stroke="currentColor" strokeWidth="2" /></svg>;
+const IconCopilot = <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M11 2H2v9h9V2zm11 0h-9v9h9V2zm-11 11H2v9h9v-9zm11 0h-9v9h9v-9z" /></svg>;
 const IconCopy = <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>;
 
 type SpeechWindow = Window & { SpeechRecognition?: new () => any; webkitSpeechRecognition?: new () => any };
@@ -293,19 +289,13 @@ export default function Home() {
         navigator.clipboard.writeText(result);
         setCopyStatus(name + ' Açılıyor!');
         setTimeout(() => setCopyStatus('Metni Kopyala'), 2000);
-      } catch (err) {
-        console.error('Kopyalama hatası:', err);
-      }
+      } catch (err) { console.error('Kopyalama hatası:', err); }
       const link = document.createElement('a');
-      link.href = url;
-      link.target = '_blank';
-      link.rel = 'noopener noreferrer';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      link.href = url; link.target = '_blank'; link.rel = 'noopener noreferrer';
+      document.body.appendChild(link); link.click(); document.body.removeChild(link);
     };
     return (
-      <button className={`ai-brand-btn ${platformClass}`} onClick={handleRedirect}>
+      <button className={`ai-module-btn ${platformClass}`} onClick={handleRedirect}>
         {icon} <span>{name}</span>
       </button>
     );
@@ -327,25 +317,17 @@ export default function Home() {
         100% { opacity: 0; filter: blur(10px); transform: translateY(-10px); } 
       }
       @keyframes pulseTextOrb {
-        0% { opacity: 0.6; text-shadow: 0 0 10px rgba(0, 229, 255, 0.3); transform: translateY(0); }
-        50% { opacity: 1; text-shadow: 0 0 25px rgba(0, 229, 255, 0.8), 0 0 40px rgba(131, 56, 236, 0.6); transform: translateY(-3px); }
-        100% { opacity: 0.6; text-shadow: 0 0 10px rgba(0, 229, 255, 0.3); transform: translateY(0); }
+        0% { opacity: 0.6; text-shadow: 0 0 10px rgba(0, 229, 255, 0.3); }
+        50% { opacity: 1; text-shadow: 0 0 25px rgba(0, 229, 255, 0.8), 0 0 40px rgba(131, 56, 236, 0.6); }
+        100% { opacity: 0.6; text-shadow: 0 0 10px rgba(0, 229, 255, 0.3); }
       }
-      @keyframes bounceChevron {
-        0%, 100% { transform: translateY(0); opacity: 0.3; }
-        50% { transform: translateY(10px); opacity: 0.8; }
-      }
-      @keyframes starPulse { 
-        0% { filter: drop-shadow(0 0 2px rgba(0, 229, 255, 0.2)); } 
-        100% { filter: drop-shadow(0 0 8px rgba(0, 229, 255, 0.6)); } 
-      }
+      @keyframes bounceChevron { 0%, 100% { transform: translateY(0); opacity: 0.3; } 50% { transform: translateY(10px); opacity: 0.8; } }
       @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 
       .discovery-trigger { transition: all 0.3s ease; pointer-events: auto; }
       .discovery-trigger:hover { transform: translate(-50%, -52%) scale(1.05) !important; }
       .discovery-trigger .question-mark { animation: pulseTextOrb 3s infinite ease-in-out; }
 
-      .glowing-logo { filter: drop-shadow(0 0 2px rgba(0, 229, 255, 0.2)); transition: filter 0.3s ease; }
       .cursor-blink { display: inline-block; width: 8px; height: 1.2em; background-color: #00E5FF; vertical-align: middle; margin-left: 4px; animation: blink 1s step-end infinite; }
       
       .cinematic-text { position: absolute; color: #888888; cursor: pointer; animation: perfectBreathing 24s infinite linear both; text-align: left; line-height: 1.5; font-weight: 300; transition: transform 0.3s ease, filter 0.3s ease; pointer-events: auto; opacity: 0; }
@@ -353,33 +335,46 @@ export default function Home() {
       .cinematic-text:hover .prompt-category { color: #00E5FF; text-shadow: 0 0 10px rgba(0, 229, 255, 0.5); }
       .cinematic-text:hover .prompt-body { color: #ffffff; opacity: 1; text-shadow: 0 0 10px rgba(255, 255, 255, 0.4); }
       
-      .prompt-category { font-family: "Times New Roman", Times, serif; font-size: 1.35em; font-style: italic; color: #ffffff; margin-bottom: 6px; letter-spacing: 0.5px; opacity: 0.95; transition: color 0.3s ease, text-shadow 0.3s ease; }
-      .prompt-body { font-family: inherit; font-size: 0.95em; opacity: 0.75; transition: color 0.3s ease, opacity 0.3s ease, text-shadow 0.3s ease; }
+      .prompt-category { font-family: "Times New Roman", Times, serif; font-size: 1.35em; font-style: italic; color: #ffffff; margin-bottom: 6px; opacity: 0.95; transition: all 0.3s ease; }
+      .prompt-body { font-family: inherit; font-size: 0.95em; opacity: 0.75; transition: all 0.3s ease; }
       
-      .ai-brand-btn { transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1); }
-      .ai-brand-btn:hover { color: #fff; transform: translateY(-3px) scale(1.02); }
-      .chevron-scroll { animation: bounceChevron 2s infinite ease-in-out; display: none; }
+      .ai-module-btn { 
+        display: flex; align-items: center; gap: 8px; 
+        background: rgba(255, 255, 255, 0.04); color: rgba(255, 255, 255, 0.7); 
+        border: 1px solid rgba(255, 255, 255, 0.1); padding: 10px 16px; border-radius: 12px; 
+        cursor: pointer; font-size: 0.85rem; font-weight: 500; 
+        transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1); 
+      }
+      .ai-module-btn:hover { 
+        background: rgba(255, 255, 255, 0.08); color: #fff; transform: translateY(-2px); 
+        border-color: rgba(255, 255, 255, 0.3); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+      }
+      .btn-chatgpt:hover { border-color: #10a37f !important; color: #10a37f !important; }
+      .btn-gemini:hover { border-color: #4285f4 !important; color: #4285f4 !important; }
+      .btn-claude:hover { border-color: #d97757 !important; color: #d97757 !important; }
+      .btn-perplexity:hover { border-color: #20b2aa !important; color: #20b2aa !important; }
+      .btn-copilot:hover { border-color: #3c78d8 !important; color: #3c78d8 !important; }
+
+      .copy-btn-primary { 
+        background: #ffffff; color: #000; border: none; padding: 12px 24px; 
+        border-radius: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s ease;
+        display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 20px rgba(255, 255, 255, 0.1);
+      }
+      .copy-btn-primary:hover { transform: scale(1.02); background: #f0f0f0; }
+
+      .chevron-scroll { animation: bounceChevron 2s infinite ease-in-out; }
 
       @media (max-width: 768px) {
-        .hero-section { margin-top: 52vh !important; gap: 8px !important; }
-        .hero-title { font-size: 1.35rem !important; line-height: 1.25 !important; padding: 0 15px !important; }
-        .hero-sub { font-size: 0.8rem !important; padding: 0 20px !important; }
-        .cinematic-text { font-size: 0.8rem !important; text-align: left !important; }
-        .slot-1, .slot-2, .slot-3 { display: none !important; }
-        .discovery-trigger { top: 46% !important; left: 50%; transform: translate(-50%, -50%); } 
-        .question-mark { font-size: 2.8rem !important; }
+        .hero-section { margin-top: 48vh !important; }
+        .hero-title { font-size: 1.25rem !important; }
+        .discovery-trigger { top: 40% !important; } 
         
-        /* 🔥 MOBİL: METİN ÜSTTE, VİDEO ALTTA VE KESİN GÖRÜNÜR 🔥 */
+        /* 🔥 MOBİL INPUT OPTİMİZASYONU 🔥 */
+        .main-input { font-size: 0.88rem !important; line-height: 1.4 !important; }
+        .main-input::placeholder { font-size: 0.85rem !important; opacity: 0.6; }
+        
         .discovery-row { flex-direction: column-reverse !important; gap: 40px !important; }
-        .discovery-video-frame { 
-          height: 240px !important; 
-          min-height: 240px !important; 
-          width: 100% !important; 
-          border-radius: 16px !important; 
-          flex: none !important; 
-          display: block !important; 
-        }
-        .chevron-scroll { display: block !important; }
+        .discovery-video-frame { height: 220px !important; min-height: 220px !important; width: 100% !important; border-radius: 16px !important; flex: none !important; }
       }
     `;
     document.head.appendChild(styleSheet);
@@ -393,7 +388,7 @@ export default function Home() {
       <main style={container}>
         <div style={topBar}>
           <div style={logoWrapper} onClick={handleReset}>
-            <img src="/logo.png" alt="Logo" className="glowing-logo" style={miniLogo} />
+            <img src="/logo.png" alt="Logo" style={miniLogo} />
           </div>
           {(submittedPrompt) && ( <button onClick={handleReset} style={backButton}>← Ana Sayfa</button> )}
         </div>
@@ -424,23 +419,15 @@ export default function Home() {
                 })}
               </div>
 
-              <div 
-                onClick={scrollToHowItWorks} 
-                className="discovery-trigger"
-                style={{ position: 'absolute', top: '42%', left: '50%', transform: 'translate(-50%, -50%)' as const, cursor: 'pointer', zIndex: 15, display: 'flex', flexDirection: 'column' as const, alignItems: 'center', gap: '5px' }}
-              >
+              <div onClick={scrollToHowItWorks} className="discovery-trigger" style={{ position: 'absolute', top: '42%', left: '50%', transform: 'translate(-50%, -50%)' as const, cursor: 'pointer', zIndex: 15, display: 'flex', flexDirection: 'column' as const, alignItems: 'center', gap: '5px' }}>
                 <div className="question-mark" style={{ fontSize: '3.5rem', fontWeight: '300', color: '#fff', lineHeight: '1' }}>?</div>
-                <div style={{ color: '#00E5FF', fontSize: '0.65rem', letterSpacing: '3px', fontWeight: '600' as const, textShadow: '0 0 10px rgba(0, 229, 255, 0.4)' }}>
-                  NASIL ÇALIŞIR?
-                </div>
+                <div style={{ color: '#00E5FF', fontSize: '0.65rem', letterSpacing: '3px', fontWeight: '600' as const, textShadow: '0 0 10px rgba(0, 229, 255, 0.4)' }}>NASIL ÇALIŞIR?</div>
               </div>
 
               <div style={heroSection} className="hero-section">
-                <div style={logoFrame}> 
-                  <img src="/logo.png" alt="Logo" className="glowing-logo" style={centerLogo} /> 
-                </div>
-                <h2 style={heroTitle} className="hero-title">Fikirlerini Güçlü Promptlara Dönüştür.</h2>
-                <p style={heroSub} className="hero-sub">Metni yaz. Optimize edilmiş promptu al. Kopyala ve diğer AI araçlarında kullan.</p>
+                <img src="/logo.png" alt="Logo" style={centerLogo} /> 
+                <h2 style={heroTitle}>Fikirlerini Güçlü Promptlara Dönüştür.</h2>
+                <p style={heroSub}>Metni yaz. Optimize edilmiş promptu al. Kopyala ve diğer AI araçlarında kullan.</p>
               </div>
             </>
           ) : (
@@ -459,48 +446,26 @@ export default function Home() {
                  {isPromptExpanded && ( <div style={userPromptBody}>{submittedPrompt}</div> )}
                </div>
                {(!result && loading) ? (
-                 <div className="flex flex-col items-center justify-center mt-10">
-                   <div style={loadingBox}>
-                     <div className="flex justify-center mb-4 transition-all duration-500">
-                       {loadingSteps[loadingStep].icon}
-                     </div>
-                     <div style={loadingText}>
-                       {loadingSteps[loadingStep].text}
-                     </div>
-                   </div>
-                 </div>
+                 <div style={loadingBox}><div style={loadingText}>{loadingSteps[loadingStep].text}</div></div>
                ) : (
                  <div style={aiResponseWrapper}>
                     <div style={aiLabel}>ÜRETİLEN MASTER PROMPT</div>
-                    <div style={aiText}>
-                      {result}
-                      {loading && <span className="cursor-blink"></span>}
-                    </div>
+                    <div style={aiText}>{result}{loading && <span className="cursor-blink"></span>}</div>
                     
                     {!loading && result && (
-                      <div style={{ marginTop: '35px', paddingTop: '20px', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
-                          <span style={{ fontSize: '0.85rem', color: '#888', letterSpacing: '0.5px' }}>✨ ÜRETİMİ BAŞLAT:</span>
-                          <button onClick={handleCopy} style={copyBtn} className="copy-btn-primary"> {IconCopy} {copyStatus} </button>
-                        </div>
-                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
-                          {!isVisual ? (
-                            <>
+                      <div style={{ marginTop: '40px', paddingTop: '25px', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '20px' }}>
+                          <div style={{ flex: 1, minWidth: '300px' }}>
+                            <div style={{ fontSize: '0.7rem', color: '#555', letterSpacing: '2px', marginBottom: '15px', fontWeight: 'bold' }}>ÜRETİMİ BAŞLAT:</div>
+                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
                               <AIPlatformButton url="https://chatgpt.com" icon={IconChatGPT} name="ChatGPT" platformClass="btn-chatgpt" />
                               <AIPlatformButton url="https://gemini.google.com" icon={IconGemini} name="Gemini" platformClass="btn-gemini" />
                               <AIPlatformButton url="https://claude.ai" icon={IconClaude} name="Claude" platformClass="btn-claude" />
                               <AIPlatformButton url="https://www.perplexity.ai" icon={IconPerplexity} name="Perplexity" platformClass="btn-perplexity" />
                               <AIPlatformButton url="https://copilot.microsoft.com" icon={IconCopilot} name="Copilot" platformClass="btn-copilot" />
-                            </>
-                          ) : (
-                            <>
-                              <AIPlatformButton url="https://discord.com/channels/@me" icon={IconMidjourney} name="Midjourney" platformClass="btn-midjourney" />
-                              <AIPlatformButton url="https://chatgpt.com" icon={IconChatGPT} name="DALL-E 3" platformClass="btn-chatgpt" />
-                              <AIPlatformButton url="https://leonardo.ai" icon={IconLeonardo} name="Leonardo" platformClass="btn-leonardo" />
-                              <AIPlatformButton url="https://firefly.adobe.com" icon={IconAdobe} name="Adobe Firefly" />
-                              <AIPlatformButton url="https://www.canva.com" icon={IconCanva} name="Canva" />
-                            </>
-                          )}
+                            </div>
+                          </div>
+                          <button onClick={handleCopy} className="copy-btn-primary"> {IconCopy} {copyStatus} </button>
                         </div>
                       </div>
                     )}
@@ -511,67 +476,28 @@ export default function Home() {
         </div>
 
         <div style={bottomArea}>
-          <div className="floor-glow" style={floorGlow}></div>
           <div style={glowWrapper}>
-            <div style={inputBoxInner} className="input-box-inner">
-              <textarea 
-                  className="main-input" style={inputField} placeholder={dynamicPlaceholder} rows={2} 
-                  value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => { if(e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleGenerate(); }}}
-              />
+            <div style={inputBoxInner}>
+              <textarea className="main-input" style={inputField} placeholder={dynamicPlaceholder} rows={2} value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => { if(e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleGenerate(); }}} />
               <div style={actionButtons}>
-                <button onClick={handleVoiceTyping} style={iconButton} className={isListening ? "pulse-mic" : ""} title="Sesle Yaz">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#888" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
-                </button>
+                <button onClick={handleVoiceTyping} style={iconButton} className={isListening ? "pulse-mic" : ""}><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#888" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg></button>
                 <button onClick={handleGenerate} disabled={loading || !input.trim()} style={sendButton}> {loading ? '⏳' : '↑'} </button>
               </div>
             </div>
           </div>
         </div>
 
-        {/* 🔥 DISCOVERY SECTION 🔥 */}
         <div ref={howItWorksRef} style={discoverySection}>
            <div className="discovery-row" style={discoveryRow}>
-              
-              {/* VIDEO FRAME (Artık mobilde kesinlikle görünecek) */}
               <div className="discovery-video-frame" style={videoFrame} onClick={() => setIsVideoFullscreen(true)}>
-                 <div style={videoAura}></div>
-                 <div style={videoOverlay}>
-                    <div style={{ color: '#8338EC', fontSize: '3.5rem', filter: 'drop-shadow(0 0 15px rgba(131, 56, 236, 0.6))' }}>▶</div>
-                    <div style={{ color: '#fff', fontSize: '0.85rem', marginTop: '12px', letterSpacing: '1px' }}>REHBERİ İZLE</div>
-                 </div>
+                 <div style={videoOverlay}><div style={{ color: '#8338EC', fontSize: '3rem' }}>▶</div></div>
               </div>
-
-              {/* TEXT CONTENT */}
               <div style={{ flex: 1, minWidth: '320px', position: 'relative' as const }}>
                  <h3 style={discoveryTitle}>Promptlab Sizin İçin Ne Yapar?</h3>
-                 
-                 <div style={stepCard}>
-                    <div style={stepIconBox}><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00E5FF" strokeWidth="2"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div>
-                    <div>
-                      <h4 style={stepLabel}>01 - Fikrini Özgürce Yaz</h4>
-                      <p style={stepText}>Teknik terimlerle boğuşma. Sadece ne istediğini doğal bir dille anlat.</p>
-                    </div>
-                 </div>
-
-                 <div style={stepCard}>
-                    <div style={stepIconBox}><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8338EC" strokeWidth="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
-                    <div>
-                      <h4 style={stepLabel}>02 - Akıllı Dönüşümü İzle</h4>
-                      <p style={stepText}>Motorumuz saniyeler içinde cümleni analiz eder ve onu "Master Prompt" yapısına büründürür.</p>
-                    </div>
-                 </div>
-
-                 <div style={stepCard}>
-                    <div style={stepIconBox}><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00E5FF" strokeWidth="2"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg></div>
-                    <div>
-                      <h4 style={stepLabel}>03 - AI Aracını Seç ve Başla</h4>
-                      <p style={stepText}>Dilediğin AI aracını seçtiğin an metnin otomatik kopyalanır ve platforma yönlendirilirsin.</p>
-                    </div>
-                 </div>
-
-                 <div className="chevron-scroll" style={mobileChevron}>
-                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#444" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                 </div>
+                 <div style={stepCard}><div style={stepIconBox}><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00E5FF" strokeWidth="2"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div><div><h4 style={stepLabel}>01 - Fikrini Özgürce Yaz</h4><p style={stepText}>Sadece ne istediğini doğal bir dille anlat.</p></div></div>
+                 <div style={stepCard}><div style={stepIconBox}><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8338EC" strokeWidth="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div><div><h4 style={stepLabel}>02 - Akıllı Dönüşümü İzle</h4><p style={stepText}>Motorumuz saniyeler içinde cümleni analiz eder.</p></div></div>
+                 <div style={stepCard}><div style={stepIconBox}><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00E5FF" strokeWidth="2"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg></div><div><h4 style={stepLabel}>03 - AI Aracını Seç ve Başla</h4><p style={stepText}>Dilediğin AI aracını seçtiğin an metnin kopyalanır.</p></div></div>
+                 <div className="chevron-scroll" style={mobileChevron}><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#444" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></div>
               </div>
            </div>
         </div>
@@ -579,11 +505,7 @@ export default function Home() {
         {isVideoFullscreen && (
           <div style={fullscreenOverlay} onClick={() => setIsVideoFullscreen(false)}>
              <button style={closeFullscreenBtn} onClick={() => setIsVideoFullscreen(false)}>✕</button>
-             <div style={fullscreenVideoContainer} onClick={(e) => e.stopPropagation()}>
-                <div style={{ color: '#00E5FF', fontSize: '4rem', opacity: 0.8 }}>▶</div>
-                <div style={{ color: '#fff', fontSize: '1.5rem', fontWeight: '500' as const, marginTop: '20px' }}>PROMPTLAB REHBERİ</div>
-                <div style={{ color: '#444', fontSize: '0.8rem', marginTop: '10px' }}>(Yakında Burada)</div>
-             </div>
+             <div style={fullscreenVideoContainer} onClick={(e) => e.stopPropagation()}><div style={{ color: '#fff' }}>REHBER VİDEOSU</div></div>
           </div>
         )}
       </main>
@@ -591,54 +513,50 @@ export default function Home() {
   );
 }
 
-// 🔥 KUSURSUZ STİLLER (TS-SAFE) 🔥
+// 🔥 STİLLER (TS-SAFE) 🔥
 const container = { backgroundColor: '#050505', minHeight: '100vh', color: '#ECECEC', fontFamily: 'Inter, sans-serif', display: 'flex', flexDirection: 'column' as const, position: 'relative' as const, overflowX: 'hidden' as const };
 const topBar = { padding: '20px 25px', position: 'absolute' as const, top: 0, left: 0, right: 0, zIndex: 100, display: 'flex', justifyContent: 'space-between', alignItems: 'center' };
-const logoWrapper = { display: 'flex', alignItems: 'center', gap: '10px', opacity: 0.8, cursor: 'pointer' };
-const miniLogo = { height: '20px', width: 'auto', objectFit: 'contain' as const };
+const logoWrapper = { opacity: 0.8, cursor: 'pointer' };
+const miniLogo = { height: '20px', width: 'auto' };
 const backButton = { backgroundColor: 'transparent', color: '#fff', border: '1px solid #333', padding: '8px 16px', borderRadius: '20px', cursor: 'pointer', fontSize: '0.85rem' };
 const contentArea = { minHeight: '100vh', display: 'flex', flexDirection: 'column' as const, alignItems: 'center', justifyContent: 'center', width: '100%', position: 'relative' as const, paddingBottom: '150px' };
 const floatingContainer = { position: 'absolute' as const, top: '70px', left: 0, right: 0, height: '70vh', pointerEvents: 'none' as const, zIndex: 5, overflow: 'hidden' as const };
-const heroSection = { display: 'flex', flexDirection: 'column' as const, alignItems: 'center', textAlign: 'center' as const, zIndex: 10, marginTop: '60vh', width: '100%', gap: '15px', height: 'auto', minHeight: 'min-content', pointerEvents: 'none' as const };
-const logoFrame = { display: 'flex', alignItems: 'center', justifyContent: 'center' };
-const centerLogo = { width: '100%', maxWidth: '180px', height: 'auto', display: 'block', objectFit: 'contain' as const };
+const heroSection = { display: 'flex', flexDirection: 'column' as const, alignItems: 'center', textAlign: 'center' as const, zIndex: 10, marginTop: '60vh', width: '100%', gap: '15px' };
+const centerLogo = { width: '100%', maxWidth: '180px', height: 'auto' };
 const heroTitle = { fontSize: '2.2rem', fontWeight: '600' as const, color: '#fff', letterSpacing: '-0.5px', margin: 0 };
 const heroSub = { color: '#888', fontSize: '1rem', maxWidth: '550px', padding: '0 20px', lineHeight: '1.5', margin: 0 };
-const resultContainer = { maxWidth: '850px', width: '100%', marginTop: '80px', marginBottom: '160px', zIndex: 10, padding: '0 20px' };
-const userPromptWrapper = { width: '100%', backgroundColor: '#0f0f0f', borderRadius: '12px', border: '1px solid #222', marginBottom: '20px', overflow: 'hidden' as const, transition: 'all 0.3s ease' };
+const resultContainer = { maxWidth: '900px', width: '100%', marginTop: '80px', marginBottom: '160px', zIndex: 10, padding: '0 20px' };
+const userPromptWrapper = { width: '100%', backgroundColor: '#0f0f0f', borderRadius: '12px', border: '1px solid #222', marginBottom: '20px', overflow: 'hidden' as const };
 const userPromptHeader = { padding: '16px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', backgroundColor: '#141414' };
 const userPromptTitle = { fontSize: '0.9rem', color: '#ccc', fontWeight: '500' as const, whiteSpace: 'nowrap' as const, overflow: 'hidden' as const, textOverflow: 'ellipsis' as const, maxWidth: '75%' };
-const editBtn = { background: 'rgba(131, 56, 236, 0.1)', color: '#00E5FF', border: '1px solid rgba(131, 56, 236, 0.4)', padding: '6px 14px', borderRadius: '6px', fontSize: '0.8rem', cursor: 'pointer', fontWeight: '600' as const, transition: 'all 0.2s ease' };
+const editBtn = { background: 'rgba(131, 56, 236, 0.1)', color: '#00E5FF', border: '1px solid rgba(131, 56, 236, 0.4)', padding: '6px 14px', borderRadius: '6px', fontSize: '0.8rem', cursor: 'pointer', fontWeight: '600' as const };
 const userPromptBody = { padding: '20px', borderTop: '1px solid #222', fontSize: '0.95rem', color: '#aaa', lineHeight: '1.6', whiteSpace: 'pre-wrap' as const };
-const aiResponseWrapper = { width: '100%', backgroundColor: '#0a0a0a', padding: '25px', borderRadius: '16px', border: '1px solid rgba(131, 56, 236, 0.3)', boxShadow: '0 0 20px rgba(58, 134, 255, 0.15)' };
-const aiLabel = { fontSize: '0.75rem', fontWeight: '700' as const, color: '#00E5FF', marginBottom: '20px', letterSpacing: '2px' };
-const aiText = { fontSize: '1rem', lineHeight: '1.6', color: '#E0E0E0', whiteSpace: 'pre-wrap' as const, fontFamily: 'monospace', opacity: 0.9 };
-const copyBtn = { display: 'flex', alignItems: 'center', gap: '6px', background: '#fff', color: '#000', border: 'none', padding: '8px 16px', borderRadius: '8px', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 'bold' as const, transition: 'all 0.2s ease' };
-const bottomArea = { position: 'fixed' as const, bottom: 0, left: 0, right: 0, padding: '30px 20px 40px 20px', background: 'transparent', display: 'flex', flexDirection: 'column' as const, alignItems: 'center', zIndex: 50, pointerEvents: 'none' as const };
-const floorGlow = { position: 'absolute' as const, bottom: '-10px', left: '50%', transform: 'translateX(-50%)', width: '50vw', maxWidth: '600px', height: '60px', background: 'linear-gradient(90deg, #3A86FF, #8338EC, #00E5FF, #8338EC, #3A86FF)', backgroundSize: '200% 100%', filter: 'blur(45px)', opacity: 0.25, zIndex: 1, pointerEvents: 'none' as const };
+const aiResponseWrapper = { width: '100%', backgroundColor: '#0a0a0a', padding: '30px', borderRadius: '20px', border: '1px solid rgba(255, 255, 255, 0.08)', boxShadow: '0 0 30px rgba(0,0,0,0.5)' };
+const aiLabel = { fontSize: '0.7rem', fontWeight: '800' as const, color: '#00E5FF', marginBottom: '25px', letterSpacing: '3px' };
+const aiText = { fontSize: '1.05rem', lineHeight: '1.7', color: '#E0E0E0', whiteSpace: 'pre-wrap' as const, fontFamily: 'monospace' };
+const bottomArea = { position: 'fixed' as const, bottom: 0, left: 0, right: 0, padding: '30px 20px 40px 20px', display: 'flex', flexDirection: 'column' as const, alignItems: 'center', zIndex: 50, pointerEvents: 'none' as const };
 const glowWrapper = { position: 'relative' as const, width: '100%', maxWidth: '680px', zIndex: 2, pointerEvents: 'auto' as const };
-const inputBoxInner = { backgroundColor: '#0a0a0a', borderRadius: '40px', border: '1px solid rgba(58, 134, 255, 0.2)', animation: 'elegantGlow 8s infinite alternate', display: 'flex', alignItems: 'center', padding: '6px 10px 6px 18px', width: '100%', height: '100%' };
-const inputField = { flex: 1, background: 'transparent', border: 'none', color: '#fff', fontSize: '1rem', outline: 'none', resize: 'none' as const, padding: '8px 0', maxHeight: '150px', fontFamily: 'inherit' };
+const inputBoxInner = { backgroundColor: '#0a0a0a', borderRadius: '40px', border: '1px solid rgba(58, 134, 255, 0.2)', animation: 'elegantGlow 8s infinite alternate', display: 'flex', alignItems: 'center', padding: '6px 10px 6px 18px' };
+const inputField = { flex: 1, background: 'transparent', border: 'none', color: '#fff', fontSize: '1rem', outline: 'none', resize: 'none' as const, padding: '8px 0', maxHeight: '150px' };
 const actionButtons = { display: 'flex', alignItems: 'center', gap: '6px' };
-const iconButton = { background: 'none', border: 'none', cursor: 'pointer', padding: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center' };
-const sendButton = { width: '32px', height: '32px', borderRadius: '50%', border: 'none', backgroundColor: '#fff', color: '#000', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' as const, transition: 'transform 0.2s ease', fontSize: '1.2rem' };
-const loadingBox = { width: '100%', maxWidth: '600px', background: 'rgba(10, 10, 10, 0.85)', border: '1px solid rgba(131, 56, 236, 0.3)', borderRadius: '16px', padding: '40px 20px', textAlign: 'center' as const };
-const loadingText = { fontSize: '0.95rem', color: '#ECECEC', fontWeight: '400' as const, marginTop: '20px', letterSpacing: '0.8px', opacity: 0.8, fontFamily: 'monospace' };
+const iconButton = { background: 'none', border: 'none', cursor: 'pointer' };
+const sendButton = { width: '32px', height: '32px', borderRadius: '50%', border: 'none', backgroundColor: '#fff', color: '#000', fontWeight: 'bold' as const, cursor: 'pointer' };
+const loadingBox = { width: '100%', maxWidth: '600px', background: 'rgba(10, 10, 10, 0.85)', padding: '40px 20px', textAlign: 'center' as const };
+const loadingText = { fontSize: '0.95rem', color: '#ECECEC', fontFamily: 'monospace' };
 
 // 🔥 DISCOVERY SECTION STYLES 🔥
 const discoverySection = { minHeight: '100vh', backgroundColor: '#080808', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '100px 40px', position: 'relative' as const, borderTop: '1px solid #1a1a1a', zIndex: 10 };
 const discoveryRow = { maxWidth: '1100px', width: '100%', display: 'flex', gap: '80px', alignItems: 'center' };
-const videoFrame = { flex: 1, height: '480px', background: '#000', borderRadius: '24px', border: '1px solid rgba(131, 56, 236, 0.15)', position: 'relative' as const, overflow: 'hidden' as const, cursor: 'pointer' };
-const videoAura = { position: 'absolute' as const, top: '-10%', left: '-10%', width: '120%', height: '120%', background: 'radial-gradient(circle, rgba(131, 56, 236, 0.08) 0%, transparent 70%)', pointerEvents: 'none' as const };
-const videoOverlay = { position: 'absolute' as const, inset: 0, display: 'flex', flexDirection: 'column' as const, alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.4)' };
-const discoveryTitle = { fontSize: '2.2rem', fontWeight: '700' as const, color: '#fff', marginBottom: '40px', lineHeight: '1.2', letterSpacing: '-1px' };
-const stepCard = { display: 'flex', gap: '20px', marginBottom: '35px', alignItems: 'flex-start' };
+const videoFrame = { flex: 1, height: '400px', background: '#000', borderRadius: '24px', border: '1px solid rgba(131, 56, 236, 0.15)', position: 'relative' as const, overflow: 'hidden' as const, cursor: 'pointer' };
+const videoOverlay = { position: 'absolute' as const, inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.4)' };
+const discoveryTitle = { fontSize: '2.2rem', fontWeight: '700' as const, color: '#fff', marginBottom: '40px', lineHeight: '1.2' };
+const stepCard = { display: 'flex', gap: '20px', marginBottom: '35px' };
 const stepIconBox = { minWidth: '38px', height: '38px', borderRadius: '10px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center' };
 const stepLabel = { fontSize: '1.1rem', fontWeight: '600' as const, color: '#fff', marginBottom: '6px' };
-const stepText = { fontSize: '0.9rem', color: '#777', lineHeight: '1.5' };
+const stepText = { fontSize: '0.9rem', color: '#777' };
 const mobileChevron = { position: 'absolute' as const, bottom: '-40px', right: '0', pointerEvents: 'none' as const };
 
 // 🔥 FULLSCREEN OVERLAY 🔥
 const fullscreenOverlay = { position: 'fixed' as const, inset: 0, backgroundColor: 'rgba(0,0,0,0.96)', zIndex: 10000, display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(10px)' };
-const closeFullscreenBtn = { position: 'absolute' as const, top: '30px', right: '30px', background: 'rgba(255,255,255,0.1)', border: 'none', color: '#fff', width: '45px', height: '45px', borderRadius: '50%', cursor: 'pointer', fontSize: '1.2rem' };
-const fullscreenVideoContainer = { width: '90%', maxWidth: '1000px', aspectRatio: '16/9' as const, background: '#050505', border: '1px solid rgba(0, 229, 255, 0.2)', borderRadius: '24px', display: 'flex', flexDirection: 'column' as const, alignItems: 'center', justifyContent: 'center', boxShadow: '0 0 100px rgba(0,0,0,0.8)' };
+const closeFullscreenBtn = { position: 'absolute' as const, top: '30px', right: '30px', background: 'rgba(255,255,255,0.1)', border: 'none', color: '#fff', width: '45px', height: '45px', borderRadius: '50%', cursor: 'pointer' };
+const fullscreenVideoContainer = { width: '90%', maxWidth: '1000px', aspectRatio: '16/9' as const, background: '#050505', border: '1px solid rgba(0, 229, 255, 0.2)', borderRadius: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center' };
