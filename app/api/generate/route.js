@@ -1,8 +1,13 @@
+import { NextResponse } from "next/server";
+import OpenAI from "openai";
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+
 function frameworkPrompt() {
   return `
 Intent'e göre framework seç
-
-Birden fazla framework seçebilirsin.
 
 marketing →
 AIDA
@@ -17,43 +22,15 @@ ROI
 Financial analysis
 Cashflow
 Budgeting
-Cost optimization
-Table output
 
 sales →
-Objection handling
+Objection
 Closing
 Persuasion
-AIDA
-PAS
 
 software →
 Architecture
-Design patterns
 Clean code
-API structure
-
-image →
-Camera
-Lighting
-Lens
-Render engine
-
-writing →
-Story structure
-Tone control
-
-academic →
-Analysis
-Citation
-
-video →
-Story structure
-Shot list
-Tone control
-
-general →
-Depends on context
 
 JSON ver
 
@@ -61,4 +38,91 @@ JSON ver
 frameworks:[]
 }
 `;
+}
+
+function masterPromptBuilder() {
+  return `
+Master prompt üret
+
+Rol yaz
+Bağlam yaz
+Teknik detay yaz
+Framework kullan
+Format ver
+`;
+}
+
+export async function POST(req) {
+  try {
+    const { userInput } = await req.json();
+
+    const intentRes = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [
+        {
+          role: "system",
+          content: "Intent belirle",
+        },
+        {
+          role: "user",
+          content: userInput,
+        },
+      ],
+    });
+
+    const intent =
+      intentRes.choices[0].message.content;
+
+    const frameRes =
+      await openai.chat.completions.create({
+        model: "gpt-4o",
+        messages: [
+          {
+            role: "system",
+            content: frameworkPrompt(),
+          },
+          {
+            role: "user",
+            content: intent,
+          },
+        ],
+      });
+
+    const master =
+      await openai.chat.completions.create({
+        model: "gpt-4o",
+        messages: [
+          {
+            role: "system",
+            content: masterPromptBuilder(),
+          },
+          {
+            role: "user",
+            content: userInput,
+          },
+        ],
+      });
+
+    const refined =
+      master.choices[0].message.content;
+
+    const stream = new ReadableStream({
+      async start(controller) {
+        controller.enqueue(
+          new TextEncoder().encode(refined)
+        );
+        controller.close();
+      },
+    });
+
+    return new Response(stream, {
+      headers: {
+        "Content-Type": "text/plain",
+      },
+    });
+  } catch (e) {
+    return NextResponse.json({
+      error: "fail",
+    });
+  }
 }
