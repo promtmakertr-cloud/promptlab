@@ -277,6 +277,7 @@ export default function Home() {
       </div>
 
       <style jsx global>{`
+        /* 🔥 ORİJİNAL IŞIKLI ÇERÇEVE VE ANİMASYONLAR BURADA 🔥 */
         @keyframes elegantGlow {
           0%   { box-shadow: 0 0 8px rgba(58, 134, 255, 0.15), inset 0 0 4px rgba(58, 134, 255, 0.05); border-color: rgba(58, 134, 255, 0.2); }
           50%  { box-shadow: 0 0 20px rgba(131, 56, 236, 0.35), inset 0 0 8px rgba(131, 56, 236, 0.15); border-color: rgba(131, 56, 236, 0.45); }
@@ -317,7 +318,7 @@ const container = { backgroundColor: '#050505', minHeight: '100vh', color: '#ECE
 const contentArea = { minHeight: '100vh', display: 'flex', flexDirection: 'column' as const, alignItems: 'center', justifyContent: 'center', paddingBottom: '150px' };
 const floatingContainer = { position: 'absolute' as const, inset: 0, pointerEvents: 'none' as const };
 const heroSection = { display: 'flex', flexDirection: 'column' as const, alignItems: 'center', textAlign: 'center' as const, zIndex: 10, marginTop: '45vh', gap: '10px' };
-const heroTitle = { fontSize: '2.2rem', fontWeight: '600' as const, color: '#fff', margin: 0, letterSpacing: '-0.5px' };
+const heroTitle = { fontSize: '2.2rem', fontWeight: '600' as const, color: '#fff', margin: 0, marginTop: '40px', letterSpacing: '-0.5px' }; // increase margin-top
 const heroSub = { color: '#888', fontSize: '1rem', maxWidth: '500px', padding: '0 20px', lineHeight: '1.5' };
 const pCat = { fontFamily: 'Times New Roman, serif', fontStyle: 'italic', fontSize: '1.3em', color: '#fff', marginBottom: '6px', transition: 'all 0.3s ease' };
 const pBody = { opacity: 0.75, fontSize: '0.95em', transition: 'all 0.3s ease' };
