@@ -123,7 +123,7 @@ story structure
 tone control
 
 academic →
-analysis
+analyse
 citation
 
 marketing →
@@ -365,12 +365,20 @@ ${previousPrompt || ""}
         score.choices[0].message.content
       );
 
-    return NextResponse.json({
-      prompt: refined,
-      intent: intent.intent,
-      frameworks: frameworks.frameworks,
-      score: scoreData.score,
-      reason: scoreData.reason,
+    // Stream only the refined prompt text back to the UI
+    const encoder = new TextEncoder();
+    const stream = new ReadableStream({
+      start(controller) {
+        controller.enqueue(encoder.encode(refined));
+        controller.close();
+      },
+    });
+
+    return new Response(stream, {
+      headers: {
+        "Content-Type": "text/plain; charset=utf-8",
+        "Transfer-Encoding": "chunked",
+      },
     });
   } catch (e) {
     console.log(e);
