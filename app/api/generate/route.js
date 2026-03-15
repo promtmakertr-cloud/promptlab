@@ -1,4 +1,20 @@
+import OpenAI from "openai"
+
+const client = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+})
+
+
 function masterPromptBuilder(mode) {
+
+  if (!mode) {
+    mode = "BALANCED"
+  }
+
+  if (mode === "AUTO") {
+    mode = "BALANCED"
+  }
+
 
   if (mode === "FAST") {
     return `
@@ -23,6 +39,7 @@ KURALLAR:
 ÇIKTI:
 `;
   }
+
 
   if (mode === "PRO") {
     return `
@@ -53,6 +70,7 @@ Sadece PROMPT döndür.
 `;
   }
 
+
   return `
 Sen bir prompt builder'sın.
 
@@ -67,4 +85,47 @@ Format yaz
 
 Sadece prompt döndür.
 `;
+}
+
+
+
+export async function POST(req) {
+
+  const body = await req.json()
+
+  const input = body.input || ""
+
+  let mode = body.mode
+
+  if (!mode) {
+    mode = "BALANCED"
+  }
+
+  const systemPrompt = masterPromptBuilder(mode)
+
+
+  const completion = await client.chat.completions.create({
+    model: "gpt-4o",
+    messages: [
+      {
+        role: "system",
+        content: systemPrompt,
+      },
+      {
+        role: "user",
+        content: input,
+      },
+    ],
+  })
+
+
+  return new Response(
+    completion.choices[0].message.content,
+    {
+      headers: {
+        "Content-Type": "text/plain",
+      },
+    }
+  )
+
 }
