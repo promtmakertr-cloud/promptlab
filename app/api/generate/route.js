@@ -9,7 +9,7 @@ function intentPrompt() {
   return `
 Intent belirle.
 
-JSON ver
+JSON:
 
 {intent:""}
 `;
@@ -27,7 +27,7 @@ SCAMPER
 Lean
 StoryBrand
 
-JSON ver
+JSON:
 
 {frameworks:[]}
 `;
@@ -45,6 +45,24 @@ JSON
 `;
 }
 
+function variablePrompt() {
+  return `
+Değişken çıkar.
+
+goal
+format
+tone
+
+JSON
+
+{
+goal:"",
+format:"",
+tone:""
+}
+`;
+}
+
 function masterPromptBuilder() {
   return `
 Türkçe MASTER PROMPT üret.
@@ -52,18 +70,20 @@ Türkçe MASTER PROMPT üret.
 Kurallar:
 
 - Türkçe yaz
+- Çok kısa yazma
+- Çok uzun yazma
 - Rol yaz
 - Framework kullan
 - Açık yaz
-- Kısa yaz
-- Gereksiz uzatma
+- Kullanılabilir olsun
 
 Format:
 
 ROL:
 AMAÇ:
-KURALLAR:
+DETAY:
 FRAMEWORK:
+KURALLAR:
 ÇIKTI:
 
 Sadece prompt döndür.
@@ -102,6 +122,15 @@ export async function POST(req) {
         ],
       })).choices[0].message.content;
 
+    const variables =
+      (await openai.chat.completions.create({
+        model: "gpt-4o",
+        messages: [
+          { role: "system", content: variablePrompt() },
+          { role: "user", content: userInput },
+        ],
+      })).choices[0].message.content;
+
     const master =
       await openai.chat.completions.create({
         model: "gpt-4o",
@@ -116,7 +145,8 @@ export async function POST(req) {
               userInput +
               intent +
               frameworks +
-              role,
+              role +
+              variables,
           },
         ],
       });
@@ -128,8 +158,7 @@ export async function POST(req) {
       new ReadableStream({
         async start(controller) {
           controller.enqueue(
-            new TextEncoder().encode(text)
-          );
+            new TextEncoder().encode(text));
           controller.close();
         },
       });
