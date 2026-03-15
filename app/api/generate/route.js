@@ -7,21 +7,18 @@ const openai = new OpenAI({
 
 
 // INTENT
-
 function intentPrompt() {
   return `Detect intent JSON {intent:""}`;
 }
 
 
 // DOMAIN
-
 function domainPrompt() {
   return `Detect domain JSON {domain:""}`;
 }
 
 
 // FRAMEWORK
-
 function frameworkPrompt() {
   return `
 Select MULTIPLE frameworks.
@@ -55,21 +52,18 @@ frameworks:[]
 
 
 // ROLE
-
 function rolePrompt() {
   return `Generate expert role JSON {role:""}`;
 }
 
 
 // OUTPUT
-
 function outputPrompt() {
   return `Detect output JSON {output:""}`;
 }
 
 
 // VARIABLES
-
 function variablePrompt() {
   return `
 Extract variables
@@ -93,41 +87,47 @@ constraints:""
 }
 
 
-// ✅ SMART MASTER BUILDER
-
+// MASTER BUILDER
 function masterPromptBuilder() {
   return `
 You are a master prompt builder.
 
-Create a HIGH QUALITY MASTER PROMPT.
+Create structured master prompt.
 
-Rules:
+ROLE
+CONTEXT
+GOAL
+VARIABLES
+FRAMEWORKS
+INSTRUCTIONS
+OUTPUT FORMAT
 
-- Always write expert role
-- Always include context
-- Always use frameworks
-- Always include variables
-- Always include output format
-- Always include instructions
-- Always structured
+Return prompt
+`;
+}
 
-Structure:
 
-ROLE:
+// ✅ SCORE PROMPT
 
-CONTEXT:
+function scorePrompt() {
+  return `
+Score this prompt from 1 to 10.
 
-GOAL:
+Check:
 
-VARIABLES:
+clarity
+structure
+role usage
+framework usage
+variables usage
+output format
 
-FRAMEWORKS:
+Return JSON
 
-INSTRUCTIONS:
-
-OUTPUT FORMAT:
-
-Return only prompt
+{
+score:0,
+feedback:""
+}
 `;
 }
 
@@ -235,15 +235,46 @@ export async function POST(req) {
       });
 
 
-    const refined =
+    const promptText =
       master.choices[0].message.content;
+
+
+
+    // ✅ SCORE
+
+    const scoreRes =
+      await openai.chat.completions.create({
+        model: "gpt-4o",
+        messages: [
+          {
+            role: "system",
+            content: scorePrompt(),
+          },
+          {
+            role: "user",
+            content: promptText,
+          },
+        ],
+      });
+
+
+    const score =
+      scoreRes.choices[0].message.content;
+
+
+
+    const finalText =
+      promptText +
+      "\n\nSCORE:\n" +
+      score;
+
 
 
     const stream =
       new ReadableStream({
         async start(controller) {
           controller.enqueue(
-            new TextEncoder().encode(refined)
+            new TextEncoder().encode(finalText)
           );
           controller.close();
         },
@@ -257,11 +288,9 @@ export async function POST(req) {
     });
 
   } catch (e) {
-
     return NextResponse.json({
       error: "fail",
     });
-
   }
 
 }
