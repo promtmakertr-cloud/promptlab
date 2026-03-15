@@ -1,190 +1,70 @@
-import { NextResponse } from "next/server";
-import OpenAI from "openai";
-
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-
-function intentPrompt() {
-  return `Intent belirle JSON {intent:""}`;
-}
-
-function frameworkPrompt() {
-  return `
-Framework seç
-
-AIDA
-SWOT
-JTBD
-First Principles
-SCAMPER
-Lean
-StoryBrand
-
-JSON {frameworks:[]}
-`;
-}
-
-function rolePrompt() {
-  return `
-Rol üret
-
-JSON {role:""}
-`;
-}
-
-function variablePrompt() {
-  return `
-Değişken çıkar
-
-JSON
-
-{
-goal:"",
-format:"",
-tone:""
-}
-`;
-}
-
 function masterPromptBuilder(mode) {
 
   if (mode === "FAST") {
     return `
-Türkçe kısa prompt yaz.
-Rol yaz.
-Framework yaz.
+Sen bir PROMPT mühendisisin.
+
+Görev:
+
+Kullanıcı için AI'ye verilecek prompt yaz.
+
+Kurallar:
+
+- Türkçe yaz
+- Kısa yaz
+- İçeriği üretme
+- Prompt üret
+
+Format:
+
+ROL:
+GÖREV:
+KURALLAR:
+ÇIKTI:
 `;
   }
 
   if (mode === "PRO") {
     return `
-Türkçe detaylı master prompt yaz.
+Sen bir MASTER PROMPT ENGINE'sin.
 
-Rol
-Amaç
-Framework
-Kurallar
-Format
-Detaylı yaz
+Görev:
+
+Kullanıcı için AI sistemine verilecek PROFESYONEL PROMPT üret.
+
+ÖNEMLİ:
+
+İçeriği üretme.
+Prompt üret.
+
+Her zaman şu yapıyı kullan:
+
+ROL:
+BAĞLAM:
+AMAÇ:
+FRAMEWORK:
+KURALLAR:
+FORMAT:
+ÇIKTI TALİMATI:
+
+Sonuç:
+
+Sadece PROMPT döndür.
 `;
   }
-
-  // BALANCED default
 
   return `
-Türkçe master prompt yaz.
+Sen bir prompt builder'sın.
 
-Ne kısa ne uzun.
+İçerik üretme.
+Prompt üret.
 
-Rol
-Amaç
-Detay
-Framework
-Kurallar
-Format
+Rol yaz
+Amaç yaz
+Kurallar yaz
+Framework yaz
+Format yaz
+
+Sadece prompt döndür.
 `;
-}
-
-
-export async function POST(req) {
-
-  try {
-
-    const body = await req.json();
-
-    const userInput = body.userInput;
-    const mode = body.mode || "BALANCED";
-
-
-    const intent =
-      (await openai.chat.completions.create({
-        model: "gpt-4o",
-        messages: [
-          { role: "system", content: intentPrompt() },
-          { role: "user", content: userInput },
-        ],
-      })).choices[0].message.content;
-
-
-    const frameworks =
-      (await openai.chat.completions.create({
-        model: "gpt-4o",
-        messages: [
-          { role: "system", content: frameworkPrompt() },
-          { role: "user", content: intent },
-        ],
-      })).choices[0].message.content;
-
-
-    const role =
-      (await openai.chat.completions.create({
-        model: "gpt-4o",
-        messages: [
-          { role: "system", content: rolePrompt() },
-          { role: "user", content: intent },
-        ],
-      })).choices[0].message.content;
-
-
-    const variables =
-      (await openai.chat.completions.create({
-        model: "gpt-4o",
-        messages: [
-          { role: "system", content: variablePrompt() },
-          { role: "user", content: userInput },
-        ],
-      })).choices[0].message.content;
-
-
-    const master =
-      await openai.chat.completions.create({
-        model: "gpt-4o",
-        messages: [
-          {
-            role: "system",
-            content: masterPromptBuilder(mode),
-          },
-          {
-            role: "user",
-            content:
-              userInput +
-              intent +
-              frameworks +
-              role +
-              variables,
-          },
-        ],
-      });
-
-
-    const text =
-      master.choices[0].message.content;
-
-
-    const stream =
-      new ReadableStream({
-        async start(controller) {
-          controller.enqueue(
-            new TextEncoder().encode(text)
-          );
-          controller.close();
-        },
-      });
-
-
-    return new Response(stream, {
-      headers: {
-        "Content-Type": "text/plain",
-      },
-    });
-
-  } catch (e) {
-
-    return NextResponse.json({
-      error: "fail",
-    });
-
-  }
-
 }
