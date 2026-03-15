@@ -6,18 +6,12 @@ const openai = new OpenAI({
 });
 
 function intentPrompt() {
-  return `
-Intent belirle.
-
-JSON:
-
-{intent:""}
-`;
+  return `Intent belirle JSON {intent:""}`;
 }
 
 function frameworkPrompt() {
   return `
-Framework seç.
+Framework seç
 
 AIDA
 SWOT
@@ -27,31 +21,21 @@ SCAMPER
 Lean
 StoryBrand
 
-JSON:
-
-{frameworks:[]}
+JSON {frameworks:[]}
 `;
 }
 
 function rolePrompt() {
   return `
-Uzman rol üret.
+Rol üret
 
-Türkçe yaz.
-
-JSON
-
-{role:""}
+JSON {role:""}
 `;
 }
 
 function variablePrompt() {
   return `
-Değişken çıkar.
-
-goal
-format
-tone
+Değişken çıkar
 
 JSON
 
@@ -63,37 +47,55 @@ tone:""
 `;
 }
 
-function masterPromptBuilder() {
+function masterPromptBuilder(mode) {
+
+  if (mode === "FAST") {
+    return `
+Türkçe kısa prompt yaz.
+Rol yaz.
+Framework yaz.
+`;
+  }
+
+  if (mode === "PRO") {
+    return `
+Türkçe detaylı master prompt yaz.
+
+Rol
+Amaç
+Framework
+Kurallar
+Format
+Detaylı yaz
+`;
+  }
+
+  // BALANCED default
+
   return `
-Türkçe MASTER PROMPT üret.
+Türkçe master prompt yaz.
 
-Kurallar:
+Ne kısa ne uzun.
 
-- Türkçe yaz
-- Çok kısa yazma
-- Çok uzun yazma
-- Rol yaz
-- Framework kullan
-- Açık yaz
-- Kullanılabilir olsun
-
-Format:
-
-ROL:
-AMAÇ:
-DETAY:
-FRAMEWORK:
-KURALLAR:
-ÇIKTI:
-
-Sadece prompt döndür.
+Rol
+Amaç
+Detay
+Framework
+Kurallar
+Format
 `;
 }
 
+
 export async function POST(req) {
+
   try {
 
-    const { userInput } = await req.json();
+    const body = await req.json();
+
+    const userInput = body.userInput;
+    const mode = body.mode || "BALANCED";
+
 
     const intent =
       (await openai.chat.completions.create({
@@ -104,6 +106,7 @@ export async function POST(req) {
         ],
       })).choices[0].message.content;
 
+
     const frameworks =
       (await openai.chat.completions.create({
         model: "gpt-4o",
@@ -112,6 +115,7 @@ export async function POST(req) {
           { role: "user", content: intent },
         ],
       })).choices[0].message.content;
+
 
     const role =
       (await openai.chat.completions.create({
@@ -122,6 +126,7 @@ export async function POST(req) {
         ],
       })).choices[0].message.content;
 
+
     const variables =
       (await openai.chat.completions.create({
         model: "gpt-4o",
@@ -131,13 +136,14 @@ export async function POST(req) {
         ],
       })).choices[0].message.content;
 
+
     const master =
       await openai.chat.completions.create({
         model: "gpt-4o",
         messages: [
           {
             role: "system",
-            content: masterPromptBuilder(),
+            content: masterPromptBuilder(mode),
           },
           {
             role: "user",
@@ -151,17 +157,21 @@ export async function POST(req) {
         ],
       });
 
+
     const text =
       master.choices[0].message.content;
+
 
     const stream =
       new ReadableStream({
         async start(controller) {
           controller.enqueue(
-            new TextEncoder().encode(text));
+            new TextEncoder().encode(text)
+          );
           controller.close();
         },
       });
+
 
     return new Response(stream, {
       headers: {
@@ -170,8 +180,11 @@ export async function POST(req) {
     });
 
   } catch (e) {
+
     return NextResponse.json({
       error: "fail",
     });
+
   }
+
 }
