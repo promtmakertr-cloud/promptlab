@@ -13,6 +13,76 @@ const client = new OpenAI({
 
 
 
+function buildStructure(framework) {
+
+  if (framework === "agent") {
+
+    return `
+ROL
+AMAÇ
+TOOLS
+STEPS
+RULES
+OUTPUT
+`
+  }
+
+  if (framework === "chain") {
+
+    return `
+ROL
+GOAL
+STEP 1
+STEP 2
+STEP 3
+OUTPUT
+`
+  }
+
+  if (framework === "system") {
+
+    return `
+SYSTEM ROLE
+CAPABILITIES
+RULES
+LIMITS
+OUTPUT
+`
+  }
+
+  if (framework === "json") {
+
+    return `
+ROLE
+GOAL
+JSON FORMAT
+RULES
+OUTPUT JSON
+`
+  }
+
+  if (framework === "tool") {
+
+    return `
+ROLE
+TOOLS
+USAGE
+RULES
+OUTPUT
+`
+  }
+
+  return `
+ROL
+AMAÇ
+KURALLAR
+FORMAT
+ÇIKTI
+`
+}
+
+
+
 function masterPromptBuilder(
   mode,
   domain,
@@ -20,7 +90,8 @@ function masterPromptBuilder(
   output
 ) {
 
-  if (!mode) mode = "BALANCED"
+  const structure =
+    buildStructure(framework)
 
 
 
@@ -33,7 +104,10 @@ Domain: ${domain}
 Framework: ${framework}
 Output: ${output}
 
-Kısa prompt üret.
+${structure}
+
+Kısa yaz.
+Prompt üret.
 `
 
   }
@@ -49,15 +123,33 @@ Domain: ${domain}
 Framework: ${framework}
 Output: ${output}
 
-Profesyonel prompt üret.
+${structure}
 
-ROL
-BAĞLAM
-AMAÇ
-FRAMEWORK
-OUTPUT
-KURALLAR
-FORMAT
+Profesyonel yaz.
+
+Sadece prompt döndür.
+`
+
+  }
+
+
+
+  if (mode === "ULTRA") {
+
+    return `
+Sen bir ULTRA PROMPT ENGINE'sin.
+
+Domain: ${domain}
+Framework: ${framework}
+Output: ${output}
+
+${structure}
+
+En iyi promptu üret.
+
+Detaylı ol.
+Profesyonel ol.
+Optimize et.
 
 Sadece prompt döndür.
 `
@@ -72,6 +164,8 @@ Sen bir prompt builder'sın.
 Domain: ${domain}
 Framework: ${framework}
 Output: ${output}
+
+${structure}
 
 Prompt üret.
 `
@@ -121,7 +215,7 @@ export async function POST(req) {
 
 
 
-  // FIRST CALL
+  // FIRST
 
   const first =
     await client.chat.completions.create({
@@ -148,9 +242,9 @@ export async function POST(req) {
 
 
 
-  // REFINE (only for PRO)
+  // REFINE
 
-  if (mode === "PRO") {
+  if (mode === "PRO" || mode === "ULTRA") {
 
     const refine =
       await client.chat.completions.create({
@@ -160,7 +254,8 @@ export async function POST(req) {
         messages: [
           {
             role: "system",
-            content: refinePromptInstruction(),
+            content:
+              refinePromptInstruction(),
           },
           {
             role: "user",
