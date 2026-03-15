@@ -5,6 +5,7 @@ import { detectDomain } from "@/lib/engine/domain"
 import { detectFramework } from "@/lib/engine/framework"
 import { detectOutputType } from "@/lib/engine/output"
 import { refinePromptInstruction } from "@/lib/engine/refine"
+import { detectLanguage } from "@/lib/engine/language"
 
 
 const client = new OpenAI({
@@ -12,46 +13,16 @@ const client = new OpenAI({
 })
 
 
-function buildStructure(framework) {
+function buildStructure(framework, lang) {
 
-  if (framework === "agent") {
-    return `
-ROLE
-GOAL
-TOOLS
-STEPS
-RULES
-OUTPUT FORMAT
-`
-  }
+  if (lang === "tr") {
 
-  if (framework === "system") {
     return `
-SYSTEM ROLE
-CAPABILITIES
-LIMITS
-RULES
-OUTPUT FORMAT
-`
-  }
-
-  if (framework === "chain") {
-    return `
-ROLE
-STEP 1
-STEP 2
-STEP 3
-OUTPUT
-`
-  }
-
-  if (framework === "json") {
-    return `
-ROLE
-GOAL
-JSON SCHEMA
-RULES
-OUTPUT JSON
+ROL
+BAĞLAM
+GÖREV
+KURALLAR
+FORMAT
 `
   }
 
@@ -60,7 +31,7 @@ ROLE
 CONTEXT
 TASK
 RULES
-OUTPUT FORMAT
+FORMAT
 `
 }
 
@@ -70,89 +41,70 @@ function masterPromptBuilder(
   mode,
   domain,
   framework,
-  output
+  output,
+  lang
 ) {
 
   const structure =
-    buildStructure(framework)
+    buildStructure(framework, lang)
 
 
 
   if (mode === "ULTRA") {
 
+    if (lang === "tr") {
+
+      return `
+
+SEN SON MODEL DEĞİLSİN.
+
+SEN BİR PROMPT ENGINE'SİN.
+
+GÖREVİN:
+
+Kullanıcı isteğini,
+başka bir yapay zekaya verilecek
+MASTER PROMPT haline çevirmek.
+
+KURALLAR:
+
+- Görevi yapma
+- İçerik üretme
+- Hikaye yazma
+- Sadece prompt üret
+- Bu prompt başka AI için
+
+Domain: ${domain}
+Framework: ${framework}
+Output: ${output}
+
+Yapı:
+
+${structure}
+
+Sadece prompt döndür.
+
+`
+
+    }
+
     return `
 
 YOU ARE A PROMPT ENGINE.
 
-IMPORTANT RULES:
-
-- DO NOT EXECUTE THE TASK
-- DO NOT ANSWER THE USER
-- DO NOT GENERATE CONTENT
-- ONLY CREATE A PROMPT
-- THE PROMPT WILL BE USED BY ANOTHER AI
-- YOU ARE NOT THE FINAL MODEL
-
-Your job:
-
-Convert user request into a MASTER PROMPT.
-
-Domain: ${domain}
-Framework: ${framework}
-Output: ${output}
-
-Use this structure:
-
-${structure}
-
-The result must be a prompt,
-not the answer.
-
-`
-
-  }
-
-
-
-  if (mode === "PRO") {
-
-    return `
-
-You are a prompt builder.
-
 Do not execute task.
-Only create prompt.
 
-Domain: ${domain}
-Framework: ${framework}
-Output: ${output}
+Create system prompt.
 
 ${structure}
 
-Return prompt only.
-
 `
 
   }
 
 
 
-  if (mode === "FAST") {
-
-    return `
-Write prompt only.
-Do not answer.
-`
-
-  }
-
-
-
-  return `
-Create prompt.
-Do not execute.
-`
-
+  return `Prompt oluştur`
 }
 
 
@@ -166,6 +118,8 @@ export async function POST(req) {
   let mode = body.mode
 
 
+  const lang =
+    detectLanguage(input)
 
   const domain =
     detectDomain(input)
@@ -177,7 +131,6 @@ export async function POST(req) {
     detectOutputType(input)
 
 
-
   mode = autoModeEngine({
     input,
     mode,
@@ -187,15 +140,14 @@ export async function POST(req) {
   })
 
 
-
   const systemPrompt =
     masterPromptBuilder(
       mode,
       domain,
       framework,
-      output
+      output,
+      lang
     )
-
 
 
   const first =
@@ -211,19 +163,17 @@ export async function POST(req) {
         {
           role: "user",
           content:
-            "USER REQUEST:\n" +
+            "KULLANICI İSTEĞİ:\n" +
             input +
-            "\n\nCREATE PROMPT FOR THIS.",
+            "\nPROMPT OLUŞTUR",
         },
       ],
 
     })
 
 
-
   let result =
     first.choices[0].message.content
-
 
 
   if (mode === "PRO" || mode === "ULTRA") {
@@ -251,7 +201,6 @@ export async function POST(req) {
       refine.choices[0].message.content
 
   }
-
 
 
   return new Response(
