@@ -196,7 +196,7 @@ export default function Home() {
   };
 
   const AIPlatformButton = ({ url, icon, name, platformClass }: AIPlatformButtonProps) => (
-    <button className={`ai-module-btn ${platformClass}`} onClick={() => { navigator.clipboard.writeText(result); window.open(url, '_blank'); }}>
+    <button className={`ai-brand-btn ${platformClass}`} onClick={() => { navigator.clipboard.writeText(result); window.open(url, '_blank'); }}>
       {icon} <span>{name}</span>
     </button>
   );
@@ -210,7 +210,6 @@ export default function Home() {
               {slots.map((slot) => {
                 const { category, promptText } = parsePromptData(slot.text);
                 return (
-                  {/* 🔥 ANİMASYON DELAY (GECİKME) BURADA ONAYLANDI VE GERİ GETİRİLDİ 🔥 */}
                   <div key={slot.id} className={`cinematic-text slot-${slot.id}`} style={{ ...slot.pos, position: 'absolute' as const, fontSize: slot.size, animationDelay: slot.delay, display: slot.pos.display || 'block' }} onClick={() => setInput(promptText)} onAnimationIteration={() => handleAnimationIteration(slot.id)}>
                     {category && <div className="prompt-category" style={pCat}><ScrambleText text={category} initialDelayMs={parseFloat(slot.delay || '0') * 1000} /></div>}
                     <div className="prompt-body" style={pBody}><ScrambleText text={promptText} initialDelayMs={parseFloat(slot.delay || '0') * 1000} /></div>
@@ -247,7 +246,7 @@ export default function Home() {
                   {!loading && result && (
                     <div style={actionRow}>
                       <div style={{ flex: 1, minWidth: '300px' }}>
-                        <div style={labelStart}>ÜRETİMİ BAŞLAT:</div>
+                        <div style={labelStart}>✨ ÜRETİMİ BAŞLAT:</div>
                         <div style={btnGrid}>
                           <AIPlatformButton url="https://chatgpt.com" icon={IconChatGPT} name="ChatGPT" platformClass="btn-chatgpt" />
                           <AIPlatformButton url="https://gemini.google.com" icon={IconGemini} name="Gemini" platformClass="btn-gemini" />
@@ -266,17 +265,18 @@ export default function Home() {
       </div>
 
       <div style={bottomArea}>
-        <div style={inputBoxInner}>
-          <textarea className="main-input" style={inputField} placeholder={`Ne oluşturmak istiyorsun?\nÖrn: “${typewriterText}”`} rows={2} value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => { if(e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleGenerate(); }}} />
-          <div style={actionButtons}>
-            <button onClick={handleVoiceTyping} style={iconButton} className={isListening ? "pulse-mic" : ""}><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#888" strokeWidth="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line></svg></button>
-            <button onClick={handleGenerate} disabled={loading || !input.trim()} style={sendButton}> {loading ? '⏳' : '↑'} </button>
+        <div style={glowWrapper}>
+          <div className="input-box-inner" style={inputBoxInner}>
+            <textarea className="main-input" style={inputField} placeholder={`Ne oluşturmak istiyorsun?\nÖrn: “${typewriterText}”`} rows={2} value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => { if(e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleGenerate(); }}} />
+            <div style={actionButtons}>
+              <button onClick={handleVoiceTyping} style={iconButton} className={isListening ? "pulse-mic" : ""}><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#888" strokeWidth="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line></svg></button>
+              <button onClick={handleGenerate} disabled={loading || !input.trim()} style={sendButton}> {loading ? '⏳' : '↑'} </button>
+            </div>
           </div>
         </div>
       </div>
 
       <style jsx global>{`
-        /* 🔥 ORİJİNAL IŞIKLI ÇERÇEVE VE ANİMASYONLAR BURADA 🔥 */
         @keyframes elegantGlow {
           0%   { box-shadow: 0 0 8px rgba(58, 134, 255, 0.15), inset 0 0 4px rgba(58, 134, 255, 0.05); border-color: rgba(58, 134, 255, 0.2); }
           50%  { box-shadow: 0 0 20px rgba(131, 56, 236, 0.35), inset 0 0 8px rgba(131, 56, 236, 0.15); border-color: rgba(131, 56, 236, 0.45); }
@@ -291,13 +291,15 @@ export default function Home() {
         .cinematic-text:hover .prompt-body { color: #ffffff; opacity: 1; text-shadow: 0 0 10px rgba(255, 255, 255, 0.4); }
         
         .cursor-blink { display: inline-block; width: 8px; height: 1.2em; background-color: #00E5FF; vertical-align: middle; margin-left: 4px; animation: blink 1s step-end infinite; }
-        .ai-module-btn { display: flex; align-items: center; gap: 8px; background: rgba(255, 255, 255, 0.04); color: rgba(255, 255, 255, 0.7); border: 1px solid rgba(255, 255, 255, 0.1); padding: 10px 16px; border-radius: 12px; cursor: pointer; font-size: 0.85rem; transition: all 0.3s ease; }
-        .ai-module-btn:hover { background: rgba(255, 255, 255, 0.08); color: #fff; transform: translateY(-2px); border-color: rgba(255, 255, 255, 0.3); }
-        .btn-chatgpt:hover { border-color: #10a37f !important; color: #10a37f !important; }
-        .btn-gemini:hover { border-color: #4285f4 !important; color: #4285f4 !important; }
-        .btn-claude:hover { border-color: #d97757 !important; color: #d97757 !important; }
-        .btn-perplexity:hover { border-color: #20b2aa !important; color: #20b2aa !important; }
-        .btn-copilot:hover { border-color: #3c78d8 !important; color: #3c78d8 !important; }
+        
+        /* 🔥 ORİJİNAL, SADE AI BUTONLARI 🔥 */
+        .ai-brand-btn { background: transparent; color: #888; border: 1px solid transparent; padding: 8px 12px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 0.85rem; transition: all 0.3s ease; }
+        .ai-brand-btn:hover { color: #fff; transform: translateY(-3px) scale(1.02); background: rgba(255,255,255,0.05); }
+        .btn-chatgpt:hover { border-color: #10a37f !important; background: rgba(16, 163, 127, 0.1) !important; box-shadow: 0 0 20px rgba(16, 163, 127, 0.2) !important; }
+        .btn-gemini:hover { border-color: #4285f4 !important; background: rgba(66, 133, 244, 0.1) !important; box-shadow: 0 0 20px rgba(66, 133, 244, 0.2) !important; }
+        .btn-claude:hover { border-color: #d97757 !important; background: rgba(217, 119, 87, 0.1) !important; box-shadow: 0 0 20px rgba(217, 119, 87, 0.2) !important; }
+        .btn-perplexity:hover { border-color: #20b2aa !important; background: rgba(32, 178, 170, 0.1) !important; box-shadow: 0 0 20px rgba(32, 178, 170, 0.2) !important; }
+        .btn-copilot:hover { border-color: #3c78d8 !important; background: rgba(60, 120, 216, 0.1) !important; box-shadow: 0 0 20px rgba(60, 120, 216, 0.2) !important; }
         
         @media (max-width: 768px) { 
           .hero-section { marginTop: 40vh !important; } 
@@ -334,7 +336,11 @@ const btnGrid = { display: 'flex', flexWrap: 'wrap' as const, gap: '10px' };
 const labelStart = { fontSize: '0.65rem', color: '#444', marginBottom: '12px', fontWeight: 'bold' as const, letterSpacing: '1px' };
 const copyBtnPrimary = { background: '#fff', color: '#000', border: 'none', padding: '12px 24px', borderRadius: '12px', fontWeight: 'bold' as const, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' };
 const bottomArea = { position: 'fixed' as const, bottom: 0, left: 0, right: 0, padding: '30px 20px', display: 'flex', justifyContent: 'center', zIndex: 100, pointerEvents: 'none' as const };
-const inputBoxInner = { backgroundColor: '#0a0a0a', borderRadius: '30px', border: '1px solid rgba(255,255,255,0.1)', animation: 'elegantGlow 8s infinite alternate', padding: '10px 15px 10px 25px', width: '100%', maxWidth: '680px', pointerEvents: 'auto' as const, display: 'flex', alignItems: 'center' };
+const glowWrapper = { position: 'relative' as const, width: '100%', maxWidth: '680px', zIndex: 2, pointerEvents: 'auto' as const };
+
+// 🔥 IŞIKLI ÇERÇEVE GERİ GELDİ 🔥
+const inputBoxInner = { backgroundColor: '#0a0a0a', borderRadius: '30px', border: '1px solid rgba(58, 134, 255, 0.2)', animation: 'elegantGlow 8s infinite alternate', padding: '10px 15px 10px 25px', width: '100%', height: '100%', display: 'flex', alignItems: 'center' };
+
 const inputField = { flex: 1, background: 'transparent', border: 'none', color: '#fff', fontSize: '1rem', outline: 'none', resize: 'none' as const };
 const actionButtons = { display: 'flex', alignItems: 'center', gap: '8px' };
 const iconButton = { background: 'none', border: 'none', cursor: 'pointer' };
