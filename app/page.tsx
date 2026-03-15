@@ -120,6 +120,9 @@ export default function Home() {
   const [typewriterText, setTypewriterText] = useState('');
   const [typewriterIndex, setTypewriterIndex] = useState(0);
   const [isDeleting, setIsDeleting] = useState(false);
+  
+  // 🔥 YENİ EKLENEN MODE STATE 🔥
+  const [mode, setMode] = useState("BALANCED");
 
   const getMobileRandomPos = () => {
     const r = Math.random();
@@ -197,7 +200,12 @@ export default function Home() {
     setLoading(true); setSubmittedPrompt(input); setIsPromptExpanded(false); setResult(''); 
     const currentInput = input; setInput(''); 
     try {
-      const res = await fetch('/api/generate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userInput: currentInput }) });
+      // 🔥 YENİ EKLENEN "MODE" PARAMETRESİ API'YE GÖNDERİLİYOR 🔥
+      const res = await fetch('/api/generate', { 
+        method: 'POST', 
+        headers: { 'Content-Type': 'application/json' }, 
+        body: JSON.stringify({ userInput: currentInput, mode: mode }) 
+      });
       if (!res.body) return;
       const reader = res.body.getReader(); const decoder = new TextDecoder();
       let done = false; while (!done) { const { value, done: d } = await reader.read(); done = d; if (value) setResult((p) => p + decoder.decode(value)); }
@@ -291,10 +299,29 @@ export default function Home() {
         )}
       </div>
 
-      {/* 🔥 ORİJİNAL ALT IŞIK (floorGlow) VE INPUT YAPISI GERİ GELDİ 🔥 */}
+      {/* 🔥 ALT IŞIK VE INPUT YAPISI 🔥 */}
       <div style={bottomArea}>
         <div className="floor-glow" style={floorGlow}></div>
         <div style={glowWrapper}>
+          
+          {/* 🔥 YENİ: ŞIK MODE SEÇİCİ (PILL TASARIM) 🔥 */}
+          {!submittedPrompt && (
+            <div style={modeSelectorWrapper}>
+              {['FAST', 'BALANCED', 'PRO'].map((m) => (
+                <button 
+                  key={m} 
+                  onClick={() => setMode(m)} 
+                  style={mode === m ? modeBtnActive : modeBtn}
+                >
+                  {m === 'FAST' && '⚡ '}
+                  {m === 'BALANCED' && '⚖️ '}
+                  {m === 'PRO' && '🧠 '}
+                  {m}
+                </button>
+              ))}
+            </div>
+          )}
+
           <div className="input-box-inner" style={inputBoxInner}>
             <textarea className="main-input" style={inputField} placeholder={`Ne oluşturmak istiyorsun?\nÖrn: “${typewriterText}”`} rows={2} value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => { if(e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleGenerate(); }}} />
             <div style={actionButtons}>
@@ -351,12 +378,9 @@ export default function Home() {
 const container = { backgroundColor: '#050505', minHeight: '100vh', color: '#ECECEC', fontFamily: 'Inter, sans-serif', position: 'relative' as const, overflowX: 'hidden' as const };
 const contentArea = { minHeight: '100vh', display: 'flex', flexDirection: 'column' as const, alignItems: 'center', justifyContent: 'center', paddingBottom: '150px' };
 const floatingContainer = { position: 'absolute' as const, inset: 0, pointerEvents: 'none' as const };
-
-// 🔥 60VH BOŞLUK VE LOGO FRAME GERİ GELDİ 🔥
 const heroSection = { display: 'flex', flexDirection: 'column' as const, alignItems: 'center', textAlign: 'center' as const, zIndex: 10, marginTop: '60vh', width: '100%', gap: '15px', height: 'auto', minHeight: 'min-content', pointerEvents: 'none' as const };
 const logoFrame = { display: 'flex', alignItems: 'center', justifyContent: 'center' };
 const centerLogo = { width: '100%', maxWidth: '180px', height: 'auto', display: 'block', objectFit: 'contain' as const };
-
 const heroTitle = { fontSize: '2.2rem', fontWeight: '600' as const, color: '#fff', margin: 0, letterSpacing: '-0.5px' };
 const heroSub = { color: '#888', fontSize: '1rem', maxWidth: '500px', padding: '0 20px', lineHeight: '1.5' };
 const pCat = { fontFamily: 'Times New Roman, serif', fontStyle: 'italic', fontSize: '1.35em', color: '#fff', marginBottom: '6px', opacity: 0.95 };
@@ -375,11 +399,15 @@ const actionRow = { marginTop: '30px', paddingTop: '20px', borderTop: '1px solid
 const btnGrid = { display: 'flex', flexWrap: 'wrap' as const, gap: '10px' };
 const labelStart = { fontSize: '0.85rem', color: '#888', marginBottom: '12px', fontWeight: 'bold' as const, letterSpacing: '0.5px' };
 const copyBtnPrimary = { background: '#fff', color: '#000', border: 'none', padding: '8px 16px', borderRadius: '8px', fontWeight: 'bold' as const, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' };
-
-// 🔥 ALT IŞIK (floorGlow) VE INPUT YAPISI GERİ GELDİ 🔥
 const bottomArea = { position: 'fixed' as const, bottom: 0, left: 0, right: 0, padding: '30px 20px 40px 20px', display: 'flex', flexDirection: 'column' as const, alignItems: 'center', zIndex: 100, pointerEvents: 'none' as const };
 const floorGlow = { position: 'absolute' as const, bottom: '-10px', left: '50%', transform: 'translateX(-50%)', width: '50vw', maxWidth: '600px', height: '60px', background: 'linear-gradient(90deg, #3A86FF, #8338EC, #00E5FF, #8338EC, #3A86FF)', backgroundSize: '200% 100%', filter: 'blur(45px)', opacity: 0.25, zIndex: 1, pointerEvents: 'none' as const };
 const glowWrapper = { position: 'relative' as const, width: '100%', maxWidth: '680px', zIndex: 2, pointerEvents: 'auto' as const };
+
+// 🔥 YENİ: MODE SEÇİCİ STİLLERİ 🔥
+const modeSelectorWrapper = { display: 'flex', gap: '10px', marginBottom: '12px', justifyContent: 'center' };
+const modeBtn = { background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', color: '#888', padding: '6px 14px', borderRadius: '20px', fontSize: '0.75rem', fontWeight: '600' as const, cursor: 'pointer', transition: 'all 0.2s ease', letterSpacing: '0.5px' };
+const modeBtnActive = { ...modeBtn, background: 'rgba(0, 229, 255, 0.1)', borderColor: 'rgba(0, 229, 255, 0.4)', color: '#00E5FF', boxShadow: '0 0 10px rgba(0, 229, 255, 0.2)' };
+
 const inputBoxInner = { backgroundColor: '#0a0a0a', borderRadius: '40px', border: '1px solid rgba(58, 134, 255, 0.2)', animation: 'elegantGlow 8s infinite alternate', padding: '6px 10px 6px 18px', width: '100%', display: 'flex', alignItems: 'center' };
 const inputField = { flex: 1, background: 'transparent', border: 'none', color: '#fff', fontSize: '1rem', outline: 'none', resize: 'none' as const, padding: '8px 0', maxHeight: '150px' };
 const actionButtons = { display: 'flex', alignItems: 'center', gap: '6px' };
