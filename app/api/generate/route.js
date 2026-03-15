@@ -20,13 +20,11 @@ function domainPrompt() {
 }
 
 
-// FRAMEWORK (MULTI)
+// FRAMEWORK
 
 function frameworkPrompt() {
   return `
 Select MULTIPLE frameworks.
-
-Framework list:
 
 AIDA
 PAS
@@ -95,21 +93,41 @@ constraints:""
 }
 
 
-// MASTER
+// ✅ SMART MASTER BUILDER
 
 function masterPromptBuilder() {
   return `
-Create master prompt.
+You are a master prompt builder.
 
-Use:
+Create a HIGH QUALITY MASTER PROMPT.
 
-Role
-Domain
-Framework
-Variables
-Output type
+Rules:
 
-Return prompt
+- Always write expert role
+- Always include context
+- Always use frameworks
+- Always include variables
+- Always include output format
+- Always include instructions
+- Always structured
+
+Structure:
+
+ROLE:
+
+CONTEXT:
+
+GOAL:
+
+VARIABLES:
+
+FRAMEWORKS:
+
+INSTRUCTIONS:
+
+OUTPUT FORMAT:
+
+Return only prompt
 `;
 }
 
