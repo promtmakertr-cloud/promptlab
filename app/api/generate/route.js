@@ -5,108 +5,175 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-const TONE = {
-  professional:
-    "Otoriter, stratejik, sonuç odaklı.",
-  creative:
-    "Yaratıcı, metaforik, ilham verici.",
-  technical:
-    "Mühendislik dili, metrik odaklı, jargon yüksek.",
-  concise:
-    "Minimal, kısa, vurucu.",
+const TONES = {
+  professional: "Profesyonel, stratejik, güven veren",
+  creative: "Yaratıcı, metaforik, ilham verici",
+  technical: "Teknik, mühendislik dili",
+  concise: "Minimal, net, kısa",
 };
 
-function buildSystemPrompt(tone, language) {
-  const toneText = TONE[tone] || TONE.professional;
+function systemBase(language, tone) {
+  const toneText = TONES[tone] || TONES.professional;
 
-  const langText =
+  const lang =
     language === "en"
-      ? "Write everything in English."
-      : "Tüm içeriği Türkçe yaz.";
-
-  return `
-Sen MASTER PROMPT ENGINE v4 sistemisin.
-
-GÖREV:
-Kullanıcı girdisini analiz et,
-eksikleri tamamla,
-framework ekle,
-optimize et,
-final master prompt üret.
-
-ALGORİTMA
-
-1. intent detect
-2. missing params
-3. inject framework
-4. optimize structure
-5. final master prompt
-
-TON:
-${toneText}
-
-DİL:
-${langText}
-
-FORMAT:
-
-**Expertise Role:**
-**Task & Context:**
-**Technical Details:**
-**Style & Tone:**
-**Desired Output Format:**
-
-Kurallar:
-
-- en az 4 teknik madde
-- açıklama yapma
-- direkt prompt üret
+      ? `
+CRITICAL:
+Write ONLY in English.
+Do not use Turkish.
+`
+      : `
+KRİTİK:
+Tüm çıktıyı SADECE Türkçe yaz.
+İngilizce kelime kullanma.
+Başlıklar dahil Türkçe olacak.
 `;
-}
 
-function buildRefinePrompt() {
   return `
-Sen Prompt Refiner AI'sın.
+Sen MASTER PROMPT ENGINE v6 sistemisin.
 
 Görev:
 
-Verilen master prompt'u
+Kullanıcı girdisini analiz et
+niyeti bul
+alanı belirle
+framework seç
+eksikleri tamamla
+en güçlü master prompt üret
 
-- daha derin
-- daha teknik
-- daha net
-- daha optimize
+${lang}
 
-hale getir.
+Ton:
+${toneText}
 
 Kurallar:
 
-- aynı format
-- daha güçlü
-- daha uzun
-- daha profesyonel
+- Her isteğe aynı format verme
+- Gereksiz karmaşıklık ekleme
+- Domain'e göre prompt üret
+- Framework gerekiyorsa ekle
+- Psikoloji gerekiyorsa ekle
+- Teknik gerekiyorsa ekle
+- AI'dan maksimum verim alacak prompt yaz
 `;
 }
 
-function buildScorePrompt() {
+function intentPrompt() {
   return `
-Prompt Quality Analyzer
+User input analiz et
 
-0-100 arası puan ver.
+Kategori seç:
 
-Kriterler:
+marketing
+sales
+software
+image
+video
+writing
+academic
+business
+general
 
-- clarity
-- completeness
-- ai efficiency
-- depth
-- structure
-
-JSON ver:
+JSON ver
 
 {
-score: number,
-reason: string
+intent:""
+}
+`;
+}
+
+function frameworkPrompt() {
+  return `
+Intent'e göre framework seç
+
+marketing → AIDA PAS StoryBrand
+sales → objection persuasion closing
+software → clean code architecture
+image → camera light render
+academic → citation analysis
+business → strategy ROI
+
+JSON ver
+
+{
+frameworks:[]
+}
+`;
+}
+
+function masterPromptBuilder(language) {
+  const lang =
+    language === "en"
+      ? `
+Write in English only
+`
+      : `
+KRİTİK:
+Sadece Türkçe yaz
+`;
+
+  return `
+Master prompt üret
+
+${lang}
+
+Kurallar:
+
+- Gereksiz başlık ekleme
+- Gerekirse başlık ekle
+- Framework kullan
+- Eksikleri tamamla
+- AI için optimize et
+- Açıklama yazma
+- Direkt prompt üret
+`;
+}
+
+function refinePrompt() {
+  return `
+Prompt Refiner
+
+Görev:
+
+Prompt'u daha güçlü yap
+
+- daha net
+- daha derin
+- daha ikna edici
+- daha teknik
+- daha optimize
+
+Formatı bozma
+`;
+}
+
+function scorePrompt(language) {
+  if (language === "en") {
+    return `
+Score prompt 0-100
+
+JSON:
+
+{
+score:number,
+reason:string
+}
+`;
+  }
+
+  return `
+KRİTİK:
+Sadece Türkçe yaz
+
+Promptu değerlendir
+
+0-100 puan ver
+
+JSON:
+
+{
+score:number,
+reason:string
 }
 `;
 }
@@ -129,89 +196,144 @@ export async function POST(req) {
       );
     }
 
-    const systemPrompt = buildSystemPrompt(
-      tone,
-      language
-    );
+    // INTENT
 
-    const userMessage = previousPrompt
-      ? `MEVCUT PROMPT:\n${previousPrompt}\n\nİSTEK:\n${userInput}`
-      : `INPUT:\n${userInput}`;
+    const intentRes =
+      await openai.chat.completions.create({
+        model: "gpt-4o",
+        temperature: 0,
+        response_format: { type: "json_object" },
+        messages: [
+          {
+            role: "system",
+            content: intentPrompt(),
+          },
+          {
+            role: "user",
+            content: userInput,
+          },
+        ],
+      });
 
-    // -------------------
-    // STEP 1 → MASTER
-    // -------------------
+    const intent =
+      JSON.parse(
+        intentRes.choices[0].message.content
+      );
 
-    const master = await openai.chat.completions.create({
-      model: "gpt-4o",
-      temperature: 0.4,
-      messages: [
-        {
-          role: "system",
-          content: systemPrompt,
-        },
-        {
-          role: "user",
-          content: userMessage,
-        },
-      ],
-    });
+    // FRAMEWORK
+
+    const frameRes =
+      await openai.chat.completions.create({
+        model: "gpt-4o",
+        temperature: 0,
+        response_format: { type: "json_object" },
+        messages: [
+          {
+            role: "system",
+            content: frameworkPrompt(),
+          },
+          {
+            role: "user",
+            content: intent.intent,
+          },
+        ],
+      });
+
+    const frameworks =
+      JSON.parse(
+        frameRes.choices[0].message.content
+      );
+
+    // MASTER
+
+    const master =
+      await openai.chat.completions.create({
+        model: "gpt-4o",
+        temperature: 0.4,
+        messages: [
+          {
+            role: "system",
+            content: systemBase(
+              language,
+              tone
+            ),
+          },
+          {
+            role: "user",
+            content: `
+INPUT:
+${userInput}
+
+INTENT:
+${intent.intent}
+
+FRAMEWORKS:
+${frameworks.frameworks.join(",")}
+
+${previousPrompt || ""}
+`,
+          },
+          {
+            role: "system",
+            content:
+              masterPromptBuilder(language),
+          },
+        ],
+      });
 
     const masterPrompt =
       master.choices[0].message.content;
 
-    // -------------------
-    // STEP 2 → REFINE
-    // -------------------
+    // REFINE
 
-    const refine = await openai.chat.completions.create({
-      model: "gpt-4o",
-      temperature: 0.3,
-      messages: [
-        {
-          role: "system",
-          content: buildRefinePrompt(),
-        },
-        {
-          role: "user",
-          content: masterPrompt,
-        },
-      ],
-    });
+    const refine =
+      await openai.chat.completions.create({
+        model: "gpt-4o",
+        temperature: 0.3,
+        messages: [
+          {
+            role: "system",
+            content: refinePrompt(),
+          },
+          {
+            role: "user",
+            content: masterPrompt,
+          },
+        ],
+      });
 
-    const refinedPrompt =
+    const refined =
       refine.choices[0].message.content;
 
-    // -------------------
-    // STEP 3 → SCORE
-    // -------------------
+    // SCORE
 
-    const score = await openai.chat.completions.create({
-      model: "gpt-4o",
-      temperature: 0,
-      response_format: { type: "json_object" },
-      messages: [
-        {
-          role: "system",
-          content: buildScorePrompt(),
-        },
-        {
-          role: "user",
-          content: refinedPrompt,
-        },
-      ],
-    });
+    const score =
+      await openai.chat.completions.create({
+        model: "gpt-4o",
+        temperature: 0,
+        response_format: { type: "json_object" },
+        messages: [
+          {
+            role: "system",
+            content:
+              scorePrompt(language),
+          },
+          {
+            role: "user",
+            content: refined,
+          },
+        ],
+      });
 
-    const scoreData = JSON.parse(
-      score.choices[0].message.content
-    );
-
-    // -------------------
-    // FINAL
-    // -------------------
+    const scoreData =
+      JSON.parse(
+        score.choices[0].message.content
+      );
 
     return NextResponse.json({
-      prompt: refinedPrompt,
+      prompt: refined,
+      intent: intent.intent,
+      frameworks: frameworks.frameworks,
       score: scoreData.score,
       reason: scoreData.reason,
     });
