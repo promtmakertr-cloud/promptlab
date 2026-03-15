@@ -1,4 +1,5 @@
 import OpenAI from "openai"
+import { autoModeEngine } from "@/lib/engine/autoMode"
 
 const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -11,32 +12,14 @@ function masterPromptBuilder(mode) {
     mode = "BALANCED"
   }
 
-  if (mode === "AUTO") {
-    mode = "BALANCED"
-  }
-
-
   if (mode === "FAST") {
     return `
 Sen bir PROMPT mühendisisin.
 
-Görev:
-
-Kullanıcı için AI'ye verilecek prompt yaz.
-
-Kurallar:
-
-- Türkçe yaz
-- Kısa yaz
-- İçeriği üretme
-- Prompt üret
-
-Format:
-
-ROL:
-GÖREV:
-KURALLAR:
-ÇIKTI:
+Prompt üret.
+İçerik üretme.
+Türkçe yaz.
+Kısa yaz.
 `;
   }
 
@@ -45,28 +28,16 @@ KURALLAR:
     return `
 Sen bir MASTER PROMPT ENGINE'sin.
 
-Görev:
+Profesyonel prompt üret.
 
-Kullanıcı için AI sistemine verilecek PROFESYONEL PROMPT üret.
+ROL
+BAĞLAM
+AMAÇ
+FRAMEWORK
+KURALLAR
+FORMAT
 
-ÖNEMLİ:
-
-İçeriği üretme.
-Prompt üret.
-
-Her zaman şu yapıyı kullan:
-
-ROL:
-BAĞLAM:
-AMAÇ:
-FRAMEWORK:
-KURALLAR:
-FORMAT:
-ÇIKTI TALİMATI:
-
-Sonuç:
-
-Sadece PROMPT döndür.
+Sadece prompt döndür.
 `;
   }
 
@@ -74,16 +45,13 @@ Sadece PROMPT döndür.
   return `
 Sen bir prompt builder'sın.
 
-İçerik üretme.
 Prompt üret.
+İçerik üretme.
 
 Rol yaz
 Amaç yaz
 Kurallar yaz
-Framework yaz
 Format yaz
-
-Sadece prompt döndür.
 `;
 }
 
@@ -97,9 +65,12 @@ export async function POST(req) {
 
   let mode = body.mode
 
-  if (!mode) {
-    mode = "BALANCED"
-  }
+
+  mode = autoModeEngine({
+    input,
+    mode,
+  })
+
 
   const systemPrompt = masterPromptBuilder(mode)
 
