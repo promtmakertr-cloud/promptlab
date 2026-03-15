@@ -8,6 +8,7 @@ export default function Header() {
 
   return (
     <header style={headerStyle}>
+      {/* LOGO TEKRAR SOL ÜSTTE */}
       <a href="/" style={logoLink}>
         <img src="/logo.png" alt="Logo" style={miniLogo} />
       </a>
@@ -39,12 +40,9 @@ export default function Header() {
               <div style={navLinkDisabled}>API Erişimi <span style={tag}>Yakında</span></div>
             </nav>
             
+            {/* GEREKSİZ SİSTEM YAZILARI SİLİNDİ SADECE VERSİYON KALDI */}
             <div style={drawerFooter}>
-              <div style={{ color: '#00E5FF', fontSize: '0.65rem', letterSpacing: '2px', marginBottom: '5px' }}>SİSTEM DURUMU</div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#00E5FF', boxShadow: '0 0 10px #00E5FF' }}></div>
-                <span>Tüm Modüller Aktif</span>
-              </div>
+              PROMPTLAB v1.0
             </div>
           </div>
         </div>
@@ -68,4 +66,4 @@ const navLink = { color: '#E0E0E0', fontSize: '1.2rem', textDecoration: 'none', 
 const navDivider = { height: '1px', background: 'rgba(255,255,255,0.05)', margin: '10px 0' };
 const navLinkDisabled = { color: '#555', fontSize: '1.1rem', cursor: 'not-allowed', display: 'flex', alignItems: 'center', justifyContent: 'space-between' };
 const tag = { fontSize: '0.65rem', padding: '4px 8px', borderRadius: '6px', background: 'rgba(131, 56, 236, 0.15)', color: '#8338EC', fontWeight: 'bold' as const, letterSpacing: '1px' };
-const drawerFooter = { fontSize: '0.8rem', color: '#666', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '20px' };
+const drawerFooter = { fontSize: '0.8rem', color: '#444', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '20px', letterSpacing: '1px' };
