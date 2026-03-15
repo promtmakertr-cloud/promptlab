@@ -16,7 +16,6 @@ const client = new OpenAI({
 function buildStructure(framework) {
 
   if (framework === "agent") {
-
     return `
 ROL
 AMAÇ
@@ -28,10 +27,8 @@ OUTPUT
   }
 
   if (framework === "chain") {
-
     return `
 ROL
-GOAL
 STEP 1
 STEP 2
 STEP 3
@@ -40,10 +37,8 @@ OUTPUT
   }
 
   if (framework === "system") {
-
     return `
 SYSTEM ROLE
-CAPABILITIES
 RULES
 LIMITS
 OUTPUT
@@ -51,24 +46,11 @@ OUTPUT
   }
 
   if (framework === "json") {
-
     return `
 ROLE
 GOAL
 JSON FORMAT
-RULES
 OUTPUT JSON
-`
-  }
-
-  if (framework === "tool") {
-
-    return `
-ROLE
-TOOLS
-USAGE
-RULES
-OUTPUT
 `
   }
 
@@ -95,19 +77,31 @@ function masterPromptBuilder(
 
 
 
-  if (mode === "FAST") {
+  if (mode === "ULTRA") {
 
     return `
-Sen bir prompt builder'sın.
+
+SEN BİR PROMPT ENGINE'SİN.
+
+ÖNEMLİ KURALLAR:
+
+- ASLA görevi yapma
+- ASLA içerik üretme
+- ASLA açıklama yapma
+- SADECE PROMPT üret
+- Kullanıcının istediğini yapma
+- Kullanıcının isteği için PROMPT yaz
 
 Domain: ${domain}
 Framework: ${framework}
 Output: ${output}
 
+KULLANILACAK YAPI:
+
 ${structure}
 
-Kısa yaz.
-Prompt üret.
+Sadece PROMPT döndür.
+
 `
 
   }
@@ -117,7 +111,11 @@ Prompt üret.
   if (mode === "PRO") {
 
     return `
-Sen bir MASTER PROMPT ENGINE'sin.
+
+Sen bir PROMPT ENGINE'sin.
+
+İçerik üretme.
+Prompt üret.
 
 Domain: ${domain}
 Framework: ${framework}
@@ -125,33 +123,21 @@ Output: ${output}
 
 ${structure}
 
-Profesyonel yaz.
-
 Sadece prompt döndür.
+
 `
 
   }
 
 
 
-  if (mode === "ULTRA") {
+  if (mode === "FAST") {
 
     return `
-Sen bir ULTRA PROMPT ENGINE'sin.
 
-Domain: ${domain}
-Framework: ${framework}
-Output: ${output}
+Prompt yaz.
+İçerik yazma.
 
-${structure}
-
-En iyi promptu üret.
-
-Detaylı ol.
-Profesyonel ol.
-Optimize et.
-
-Sadece prompt döndür.
 `
 
   }
@@ -159,15 +145,10 @@ Sadece prompt döndür.
 
 
   return `
-Sen bir prompt builder'sın.
-
-Domain: ${domain}
-Framework: ${framework}
-Output: ${output}
-
-${structure}
 
 Prompt üret.
+İçerik üretme.
+
 `
 
 }
@@ -215,8 +196,6 @@ export async function POST(req) {
 
 
 
-  // FIRST
-
   const first =
     await client.chat.completions.create({
 
@@ -229,7 +208,9 @@ export async function POST(req) {
         },
         {
           role: "user",
-          content: input,
+          content:
+            "KULLANICI İSTEĞİ:\n" + input +
+            "\n\nSADECE BUNUN İÇİN PROMPT YAZ.",
         },
       ],
 
@@ -241,8 +222,6 @@ export async function POST(req) {
     first.choices[0].message.content
 
 
-
-  // REFINE
 
   if (mode === "PRO" || mode === "ULTRA") {
 
