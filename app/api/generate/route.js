@@ -6,10 +6,10 @@ import { detectFramework } from "@/lib/engine/framework"
 import { detectOutputType } from "@/lib/engine/output"
 import { refinePromptInstruction } from "@/lib/engine/refine"
 
-
 const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 })
+
 
 
 function buildStructure(framework) {
@@ -78,30 +78,41 @@ function masterPromptBuilder(
 
 
 
+  // 🔴 STRONG BLOCKER
+
+  const blocker = `
+
+IMPORTANT:
+
+You are NOT allowed to execute the task.
+
+You are NOT the final AI.
+
+You are building a PROMPT for another AI.
+
+Never write story
+Never write blog
+Never write code
+Never answer the request
+Never generate final content
+
+Only generate instructions.
+
+Output must be a PROMPT.
+
+`
+
+
+
   if (mode === "ULTRA") {
 
     return `
 
-YOU ARE NOT THE FINAL AI.
+${blocker}
 
-YOU ARE A PROMPT ENGINE.
+You are a MASTER PROMPT ENGINE.
 
-Your job:
-Create a SYSTEM PROMPT
-for another AI model.
-
-STRICT RULES:
-
-- Do NOT execute the task
-- Do NOT answer the user
-- Do NOT generate story / text / code
-- Only generate a PROMPT
-- The prompt will be used later
-- You are building instructions
-
-User request will be given.
-
-You must convert it into a MASTER PROMPT.
+Convert user request into SYSTEM PROMPT.
 
 Domain: ${domain}
 Framework: ${framework}
@@ -110,8 +121,6 @@ Output: ${output}
 Use this structure:
 
 ${structure}
-
-The result must be usable as a SYSTEM PROMPT.
 
 Return ONLY the prompt.
 
@@ -125,11 +134,9 @@ Return ONLY the prompt.
 
     return `
 
-You are a prompt builder.
+${blocker}
 
-Do not execute task.
-
-Create prompt only.
+Create a professional prompt.
 
 Domain: ${domain}
 Framework: ${framework}
@@ -137,7 +144,7 @@ Output: ${output}
 
 ${structure}
 
-Return prompt only.
+Return only prompt.
 
 `
 
@@ -148,8 +155,11 @@ Return prompt only.
   if (mode === "FAST") {
 
     return `
-Write prompt only.
-Do not execute.
+
+${blocker}
+
+Write short prompt.
+
 `
 
   }
@@ -157,8 +167,11 @@ Do not execute.
 
 
   return `
-Create prompt.
-Do not answer.
+
+${blocker}
+
+Create prompt only.
+
 `
 
 }
@@ -206,23 +219,28 @@ export async function POST(req) {
 
 
 
+  // ✅ FIRST CALL
+
   const first =
     await client.chat.completions.create({
 
       model: "gpt-4o",
 
       messages: [
+
         {
           role: "system",
           content: systemPrompt,
         },
+
         {
           role: "user",
           content:
             "USER REQUEST:\n" +
             input +
-            "\n\nBUILD MASTER PROMPT.",
+            "\n\nBUILD MASTER PROMPT ONLY.",
         },
+
       ],
 
     })
@@ -234,6 +252,8 @@ export async function POST(req) {
 
 
 
+  // ✅ REFINE
+
   if (mode === "PRO" || mode === "ULTRA") {
 
     const refine =
@@ -242,15 +262,25 @@ export async function POST(req) {
         model: "gpt-4o",
 
         messages: [
+
           {
             role: "system",
-            content:
-              refinePromptInstruction(),
+            content: `
+You are a PROMPT OPTIMIZER.
+
+Do NOT execute task.
+Do NOT generate content.
+
+Improve the prompt only.
+Return prompt only.
+`,
           },
+
           {
             role: "user",
             content: result,
           },
+
         ],
 
       })
