@@ -20,10 +20,39 @@ function domainPrompt() {
 }
 
 
-// FRAMEWORK
+// FRAMEWORK (MULTI)
 
 function frameworkPrompt() {
-  return `Select frameworks JSON {frameworks:[]}`;
+  return `
+Select MULTIPLE frameworks.
+
+Framework list:
+
+AIDA
+PAS
+SWOT
+STP
+StoryBrand
+JTBD
+First Principles
+SCAMPER
+Lean
+Porter Five Forces
+PESTLE
+OKR
+Agile
+Design Thinking
+Clean Architecture
+MVC
+Prompt Engineering
+Chain of Thought
+
+Return JSON
+
+{
+frameworks:[]
+}
+`;
 }
 
 
@@ -93,8 +122,6 @@ export async function POST(req) {
     const { userInput } = await req.json();
 
 
-    // INTENT
-
     const intent =
       (
         await openai.chat.completions.create({
@@ -106,9 +133,6 @@ export async function POST(req) {
         })
       ).choices[0].message.content;
 
-
-
-    // DOMAIN
 
     const domain =
       (
@@ -122,9 +146,6 @@ export async function POST(req) {
       ).choices[0].message.content;
 
 
-
-    // FRAMEWORK
-
     const frameworks =
       (
         await openai.chat.completions.create({
@@ -136,9 +157,6 @@ export async function POST(req) {
         })
       ).choices[0].message.content;
 
-
-
-    // ROLE
 
     const role =
       (
@@ -152,9 +170,6 @@ export async function POST(req) {
       ).choices[0].message.content;
 
 
-
-    // OUTPUT
-
     const output =
       (
         await openai.chat.completions.create({
@@ -167,9 +182,6 @@ export async function POST(req) {
       ).choices[0].message.content;
 
 
-
-    // VARIABLES
-
     const variables =
       (
         await openai.chat.completions.create({
@@ -181,9 +193,6 @@ export async function POST(req) {
         })
       ).choices[0].message.content;
 
-
-
-    // MASTER
 
     const master =
       await openai.chat.completions.create({
@@ -210,7 +219,6 @@ export async function POST(req) {
 
     const refined =
       master.choices[0].message.content;
-
 
 
     const stream =
