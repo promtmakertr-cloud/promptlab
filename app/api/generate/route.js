@@ -6,6 +6,7 @@ import { detectFramework } from "@/lib/engine/framework"
 import { detectOutputType } from "@/lib/engine/output"
 import { refinePromptInstruction } from "@/lib/engine/refine"
 import { calculatePromptScore } from "@/lib/engine/score"
+import { detectLanguage } from "@/lib/engine/language"
 
 const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -16,51 +17,31 @@ const client = new OpenAI({
 function buildStructure(framework) {
   if (framework === "agent") {
     return `
-ROLE
-GOAL
-TOOLS
-STEPS
-RULES
-OUTPUT FORMAT
+ROL
+AMAÇ
+ARAÇLAR
+ADIMLAR
+KURALLAR
+ÇIKTI FORMATI
 `
   }
 
   if (framework === "system") {
     return `
-SYSTEM ROLE
-CAPABILITIES
-LIMITS
-RULES
-OUTPUT FORMAT
-`
-  }
-
-  if (framework === "chain") {
-    return `
-ROLE
-STEP 1
-STEP 2
-STEP 3
-OUTPUT
-`
-  }
-
-  if (framework === "json") {
-    return `
-ROLE
-GOAL
-JSON SCHEMA
-RULES
-OUTPUT JSON
+SYSTEM ROLÜ
+YETENEKLER
+SINIRLAR
+KURALLAR
+ÇIKTI
 `
   }
 
   return `
-ROLE
-CONTEXT
-TASK
-RULES
-OUTPUT FORMAT
+ROL
+BAĞLAM
+GÖREV
+KURALLAR
+ÇIKTI FORMATI
 `
 }
 
@@ -70,29 +51,34 @@ function masterPromptBuilder(
   mode,
   domain,
   framework,
-  output
+  output,
+  language
 ) {
 
-  const structure = buildStructure(framework)
+  const structure =
+    buildStructure(framework)
+
+
 
   const blocker = `
 
-IMPORTANT:
-
-You are NOT the final AI.
-You are a PROMPT ENGINE.
+You are NOT final AI.
+You are PROMPT ENGINE.
 
 Do NOT execute task.
-Do NOT generate final content.
-Do NOT write story.
-Do NOT write blog.
-Do NOT write code.
+Do NOT generate content.
 
-Only build PROMPT.
-
-Output must be instructions.
+Only build prompt.
 
 `
+
+
+
+  const langRule =
+    language === "TR"
+      ? "Write prompt in TURKISH."
+      : "Write prompt in ENGLISH."
+
 
 
   if (mode === "ULTRA") {
@@ -100,26 +86,21 @@ Output must be instructions.
 
 ${blocker}
 
-You are MASTER PROMPT ENGINE.
+${langRule}
 
-Create SYSTEM PROMPT.
+Create MASTER PROMPT.
 
 Domain: ${domain}
 Framework: ${framework}
 Output: ${output}
 
-STRICT RULES:
+STRICT RULES
 
-- Use structure
-- Use constraints
-- Use rules
-- Enforce output format
-- Add limits
-- Add behavior rules
-- Add validation rules
-- Add failure rules
-
-Structure:
+Use structure
+Add constraints
+Add rules
+Add validation
+Add limits
 
 ${structure}
 
@@ -129,40 +110,16 @@ Return prompt only.
   }
 
 
-  if (mode === "PRO") {
-    return `
-
-${blocker}
-
-Create professional prompt.
-
-Domain: ${domain}
-Framework: ${framework}
-Output: ${output}
-
-${structure}
-
-Return prompt only.
-
-`
-  }
-
-
-  if (mode === "FAST") {
-    return `
-
-${blocker}
-
-Write short prompt.
-
-`
-  }
 
   return `
 
 ${blocker}
 
-Create prompt only.
+${langRule}
+
+Create prompt.
+
+${structure}
 
 `
 }
@@ -182,6 +139,9 @@ export async function POST(req) {
 
 
 
+  const language =
+    detectLanguage(input)
+
   const domain =
     detectDomain(input)
 
@@ -191,14 +151,12 @@ export async function POST(req) {
   const output =
     detectOutputType(input)
 
-
-
   const score =
     calculatePromptScore(input)
 
 
 
-  // 🔴 MODE FIX
+  // AUTO only
 
   if (mode === "AUTO") {
     mode = autoModeEngine({
@@ -212,20 +170,13 @@ export async function POST(req) {
 
 
 
-  // 🔴 ULTRA FORCE
-
-  if (score.total > 80 && mode !== "ULTRA") {
-    mode = "ULTRA"
-  }
-
-
-
   const systemPrompt =
     masterPromptBuilder(
       mode,
       domain,
       framework,
-      output
+      output,
+      language
     )
 
 
@@ -242,10 +193,7 @@ export async function POST(req) {
         },
         {
           role: "user",
-          content:
-            "USER REQUEST:\n" +
-            input +
-            "\n\nBUILD MASTER PROMPT ONLY.",
+          content: input,
         },
       ],
 
@@ -269,15 +217,8 @@ export async function POST(req) {
 
           {
             role: "system",
-            content: `
-You are PROMPT OPTIMIZER.
-
-Do NOT execute.
-Do NOT generate content.
-
-Improve prompt only.
-Return prompt only.
-`,
+            content:
+              refinePromptInstruction(),
           },
 
           {
@@ -296,12 +237,11 @@ Return prompt only.
 
 
 
-  // 🔴 DEBUG RETURN
-
   return Response.json({
     prompt: result,
     mode,
     score,
+    language,
     domain,
     framework,
     output,
