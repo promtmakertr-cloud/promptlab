@@ -12,7 +12,6 @@ const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 })
 
-
 const STRUCTURE = `
 
 ROLE:
@@ -25,7 +24,6 @@ OUTPUT FORMAT:
 `
 
 
-
 function masterPromptBuilder(
   mode,
   domain,
@@ -35,25 +33,24 @@ function masterPromptBuilder(
 ) {
 
   const langRule =
-    language === "tr"
+    language === "Turkish"
       ? "Write in Turkish."
       : "Write in English."
 
 
   const blocker = `
 
-You are a PROMPT ENGINE.
+You are a MASTER PROMPT ENGINE.
 
-Do not execute the task.
-Do not generate article.
-Do not generate blog.
-Do not generate story.
-Do not generate final content.
+CRITICAL RULES:
 
-You must create PROMPT only.
+- NEVER execute the task
+- NEVER generate final content
+- NEVER answer the user
+- ONLY create prompt
+- This prompt will be used by another AI
 
 `
-
 
 
   if (mode === "ULTRA") {
@@ -70,17 +67,37 @@ Domain: ${domain}
 Framework: ${framework}
 Output: ${output}
 
-Use this structure:
+Use EXACT structure:
 
 ${STRUCTURE}
 
-Follow the structure as much as possible.
+Follow structure strictly.
+Add strong rules.
+Add constraints.
+Make prompt professional.
+
+Return ONLY prompt.
+
+`
+  }
+
+
+  if (mode === "PRO") {
+
+    return `
+
+${blocker}
+
+${langRule}
+
+Create professional prompt.
+
+${STRUCTURE}
 
 Return only prompt.
 
 `
   }
-
 
 
   return `
@@ -89,7 +106,7 @@ ${blocker}
 
 ${langRule}
 
-Create prompt using structure.
+Create prompt.
 
 ${STRUCTURE}
 
@@ -123,12 +140,23 @@ export async function POST(req) {
   const output =
     detectOutputType(input)
 
+
+  // ✅ FIXED SCORE
+
   const score =
-    calculatePromptScore(input)
+    calculatePromptScore(
+      input,
+      domain,
+      framework,
+      output
+    )
 
 
 
-  if (mode === "AUTO") {
+  // ✅ FIXED AUTO
+
+  if (!mode || mode === "AUTO") {
+
     mode = autoModeEngine({
       input,
       domain,
@@ -136,6 +164,7 @@ export async function POST(req) {
       output,
       score,
     })
+
   }
 
 
@@ -155,6 +184,8 @@ export async function POST(req) {
     await client.chat.completions.create({
 
       model,
+
+      temperature: 0.3,
 
       messages: [
         {
@@ -176,6 +207,8 @@ export async function POST(req) {
 
 
 
+  // ✅ FIXED REFINE
+
   if (mode === "PRO" || mode === "ULTRA") {
 
     const refine =
@@ -183,12 +216,17 @@ export async function POST(req) {
 
         model,
 
+        temperature: 0.2,
+
         messages: [
 
           {
             role: "system",
             content:
-              refinePromptInstruction(),
+              refinePromptInstruction(
+                language,
+                mode
+              ),
           },
 
           {
