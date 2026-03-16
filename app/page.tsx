@@ -196,19 +196,37 @@ export default function Home() {
 
   const handleGenerate = async () => {
     if (!input.trim() || loading) return;
-    setLoading(true); setSubmittedPrompt(input); setIsPromptExpanded(false); setResult(''); 
-    const currentInput = input; setInput(''); 
+    setLoading(true); 
+    setSubmittedPrompt(input); 
+    setIsPromptExpanded(false); 
+    setResult(''); 
+    
+    const currentInput = input; 
+    setInput(''); 
+    
     try {
-      // API'ye input ve mode değerlerini iletiyoruz
       const res = await fetch('/api/generate', { 
         method: 'POST', 
         headers: { 'Content-Type': 'application/json' }, 
-        body: JSON.stringify({ userInput: currentInput, input: currentInput, mode: mode }) 
+        body: JSON.stringify({ input: currentInput, mode: mode }) 
       });
-      if (!res.body) return;
-      const reader = res.body.getReader(); const decoder = new TextDecoder();
-      let done = false; while (!done) { const { value, done: d } = await reader.read(); done = d; if (value) setResult((p) => p + decoder.decode(value)); }
-    } catch (e) { alert("Hata oluştu."); } finally { setLoading(false); }
+
+      const data = await res.json();
+
+      if (data.prompt) {
+        setResult(data.prompt);
+        // Eğer AUTO seçildiyse ve backend bir mod belirlediyse ekranda onu gösterelim
+        if (mode === 'AUTO' && data.debug?.mode) {
+          setMode(data.debug.mode);
+        }
+      } else {
+        setResult("Bir hata oluştu: " + (data.error || "Bilinmeyen hata"));
+      }
+    } catch (e) { 
+      setResult("API'ye bağlanırken bir hata oluştu.");
+    } finally { 
+      setLoading(false); 
+    }
   };
 
   const handleVoiceTyping = () => {
