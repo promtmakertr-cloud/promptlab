@@ -8,7 +8,7 @@ import { detectDomain } from "@/lib/engine/domain"
 import { detectFramework } from "@/lib/engine/framework"
 import { detectOutputType } from "@/lib/engine/output"
 import { refinePromptInstruction } from "@/lib/engine/refine"
-import { calculatePromptScore } from "@/lib/engine/score"
+import { calculatePromptScoreV2 } from "@/lib/engine/score"
 import { detectLanguage } from "@/lib/engine/language"
 
 const client = new OpenAI({
@@ -143,10 +143,10 @@ export async function POST(req) {
     detectOutputType(input)
 
 
-  // ✅ SCORE FIX
+  // ✅ V2 SCORE
 
   const score =
-    calculatePromptScore(
+    calculatePromptScoreV2(
       input,
       domain,
       framework,
@@ -154,7 +154,7 @@ export async function POST(req) {
     )
 
 
-  // ✅ AUTO MODE FIX
+  // ✅ AUTO MODE
 
   if (!mode || mode === "AUTO") {
 
@@ -202,8 +202,6 @@ export async function POST(req) {
   let result =
     first.choices[0].message.content
 
-
-  // ✅ REFINE FIX
 
   if (mode === "PRO" || mode === "ULTRA") {
 
