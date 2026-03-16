@@ -5,6 +5,7 @@ import { detectDomain } from "@/lib/engine/domain"
 import { detectFramework } from "@/lib/engine/framework"
 import { detectOutputType } from "@/lib/engine/output"
 import { refinePromptInstruction } from "@/lib/engine/refine"
+import { calculatePromptScore } from "@/lib/engine/score"
 
 const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -13,7 +14,6 @@ const client = new OpenAI({
 
 
 function buildStructure(framework) {
-
   if (framework === "agent") {
     return `
 ROLE
@@ -73,70 +73,68 @@ function masterPromptBuilder(
   output
 ) {
 
-  const structure =
-    buildStructure(framework)
-
-
-
-  // 🔴 STRONG BLOCKER
+  const structure = buildStructure(framework)
 
   const blocker = `
 
 IMPORTANT:
 
-You are NOT allowed to execute the task.
-
 You are NOT the final AI.
+You are a PROMPT ENGINE.
 
-You are building a PROMPT for another AI.
+Do NOT execute task.
+Do NOT generate final content.
+Do NOT write story.
+Do NOT write blog.
+Do NOT write code.
 
-Never write story
-Never write blog
-Never write code
-Never answer the request
-Never generate final content
+Only build PROMPT.
 
-Only generate instructions.
-
-Output must be a PROMPT.
+Output must be instructions.
 
 `
-
 
 
   if (mode === "ULTRA") {
-
     return `
 
 ${blocker}
 
-You are a MASTER PROMPT ENGINE.
+You are MASTER PROMPT ENGINE.
 
-Convert user request into SYSTEM PROMPT.
+Create SYSTEM PROMPT.
 
 Domain: ${domain}
 Framework: ${framework}
 Output: ${output}
 
-Use this structure:
+STRICT RULES:
+
+- Use structure
+- Use constraints
+- Use rules
+- Enforce output format
+- Add limits
+- Add behavior rules
+- Add validation rules
+- Add failure rules
+
+Structure:
 
 ${structure}
 
-Return ONLY the prompt.
+Return prompt only.
 
 `
-
   }
-
 
 
   if (mode === "PRO") {
-
     return `
 
 ${blocker}
 
-Create a professional prompt.
+Create professional prompt.
 
 Domain: ${domain}
 Framework: ${framework}
@@ -144,16 +142,13 @@ Output: ${output}
 
 ${structure}
 
-Return only prompt.
+Return prompt only.
 
 `
-
   }
 
 
-
   if (mode === "FAST") {
-
     return `
 
 ${blocker}
@@ -161,10 +156,7 @@ ${blocker}
 Write short prompt.
 
 `
-
   }
-
-
 
   return `
 
@@ -173,7 +165,6 @@ ${blocker}
 Create prompt only.
 
 `
-
 }
 
 
@@ -184,7 +175,10 @@ export async function POST(req) {
 
   const input = body.input || ""
 
-  let mode = body.mode
+  let mode = body.mode || "AUTO"
+
+  const model =
+    body.model || "gpt-4o"
 
 
 
@@ -199,13 +193,30 @@ export async function POST(req) {
 
 
 
-  mode = autoModeEngine({
-    input,
-    mode,
-    domain,
-    framework,
-    output,
-  })
+  const score =
+    calculatePromptScore(input)
+
+
+
+  // 🔴 MODE FIX
+
+  if (mode === "AUTO") {
+    mode = autoModeEngine({
+      input,
+      domain,
+      framework,
+      output,
+      score,
+    })
+  }
+
+
+
+  // 🔴 ULTRA FORCE
+
+  if (score.total > 80 && mode !== "ULTRA") {
+    mode = "ULTRA"
+  }
 
 
 
@@ -219,20 +230,16 @@ export async function POST(req) {
 
 
 
-  // ✅ FIRST CALL
-
   const first =
     await client.chat.completions.create({
 
-      model: "gpt-4o",
+      model,
 
       messages: [
-
         {
           role: "system",
           content: systemPrompt,
         },
-
         {
           role: "user",
           content:
@@ -240,7 +247,6 @@ export async function POST(req) {
             input +
             "\n\nBUILD MASTER PROMPT ONLY.",
         },
-
       ],
 
     })
@@ -252,26 +258,24 @@ export async function POST(req) {
 
 
 
-  // ✅ REFINE
-
   if (mode === "PRO" || mode === "ULTRA") {
 
     const refine =
       await client.chat.completions.create({
 
-        model: "gpt-4o",
+        model,
 
         messages: [
 
           {
             role: "system",
             content: `
-You are a PROMPT OPTIMIZER.
+You are PROMPT OPTIMIZER.
 
-Do NOT execute task.
+Do NOT execute.
 Do NOT generate content.
 
-Improve the prompt only.
+Improve prompt only.
 Return prompt only.
 `,
           },
@@ -292,13 +296,16 @@ Return prompt only.
 
 
 
-  return new Response(
-    result,
-    {
-      headers: {
-        "Content-Type": "text/plain",
-      },
-    }
-  )
+  // 🔴 DEBUG RETURN
+
+  return Response.json({
+    prompt: result,
+    mode,
+    score,
+    domain,
+    framework,
+    output,
+    model,
+  })
 
 }
