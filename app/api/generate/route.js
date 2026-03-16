@@ -1,118 +1,221 @@
-import { NextResponse } from 'next/server';
-import OpenAI from 'openai';
+import OpenAI from "openai"
 
-// Engine modüllerinin varsayılan import yolları (kendi yapınıza göre güncelleyebilirsiniz)
-import { detectLanguage } from '@/lib/engine/language';
-import { detectDomain } from '@/lib/engine/domain';
-import { detectFramework } from '@/lib/engine/framework';
-import { detectOutputType } from '@/lib/engine/output';
-import { calculateScore } from '@/lib/engine/score';
-import { selectMode } from '@/lib/engine/autoMode';
+import { autoModeEngine } from "@/lib/engine/autoMode"
+import { detectDomain } from "@/lib/engine/domain"
+import { detectFramework } from "@/lib/engine/framework"
+import { detectOutputType } from "@/lib/engine/output"
+import { refinePromptInstruction } from "@/lib/engine/refine"
+import { calculatePromptScore } from "@/lib/engine/score"
+import { detectLanguage } from "@/lib/engine/language"
 
-const openai = new OpenAI({
+const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
-});
+})
+
+
+const STRUCTURE = `
+
+ROLE:
+CONTEXT:
+TASK:
+RULES:
+CONSTRAINTS:
+OUTPUT FORMAT:
+
+`
+
+
+
+function masterPromptBuilder(
+  mode,
+  domain,
+  framework,
+  output,
+  language
+) {
+
+  const langRule =
+    language === "tr"
+      ? "Write in Turkish."
+      : "Write in English."
+
+
+  const blocker = `
+
+You are a PROMPT ENGINE.
+
+Do not execute the task.
+Do not generate article.
+Do not generate blog.
+Do not generate story.
+Do not generate final content.
+
+You must create PROMPT only.
+
+`
+
+
+
+  if (mode === "ULTRA") {
+
+    return `
+
+${blocker}
+
+${langRule}
+
+Create a MASTER PROMPT.
+
+Domain: ${domain}
+Framework: ${framework}
+Output: ${output}
+
+Use this structure:
+
+${STRUCTURE}
+
+Follow the structure as much as possible.
+
+Return only prompt.
+
+`
+  }
+
+
+
+  return `
+
+${blocker}
+
+${langRule}
+
+Create prompt using structure.
+
+${STRUCTURE}
+
+`
+}
+
+
 
 export async function POST(req) {
-  try {
-    const body = await req.json();
-    const { input, model = 'gpt-4o' } = body;
 
-    if (!input) {
-      return NextResponse.json({ error: 'Input girdisi eksik.' }, { status: 400 });
-    }
+  const body = await req.json()
 
-    // 1. ENGINE DETECTORS (Sistem Değişkenlerini Algılama)
-    const language = await detectLanguage(input); 
-    const domain = await detectDomain(input);
-    const framework = await detectFramework(input);
-    const outputType = await detectOutputType(input);
-    const score = await calculateScore(input);
-    const mode = await selectMode(score); // FAST, BALANCED, PRO, ULTRA
+  const input = body.input || ""
 
-    // 2. MASTER PROMPT BUILDER (META PROMPT)
-    // EXECUTION BLOCKER: İçerik üretmeyi kesinlikle yasaklayan katı sistem talimatı
-    const systemInstruction = `You are an elite "Master Prompt Engineer" system. 
-YOUR SOLE PURPOSE IS TO WRITE PROMPTS. 
+  let mode = body.mode || "AUTO"
 
-CRITICAL EXECUTION BLOCKERS:
-- YOU MUST NEVER GENERATE THE ACTUAL CONTENT, ARTICLE, CODE, OR PLAN.
-- YOU MUST NEVER ANSWER THE USER'S REQUEST DIRECTLY.
-- YOUR ONLY OUTPUT MUST BE A PROMPT THAT INSTRUCTS ANOTHER AI TO DO THE TASK.
+  const model =
+    body.model || "gpt-4o"
 
-MANDATORY STRUCTURE:
-You MUST format your response using EXACTLY these markdown headers. Do not add, change, or remove any headers:
-ROLE
-CONTEXT
-TASK
-RULES
-CONSTRAINTS
-OUTPUT FORMAT
 
-LANGUAGE REQUIREMENT:
-The entire prompt you generate MUST be written perfectly in: ${language}. Do not use any other language.
 
-CONTEXTUAL DATA TO INJECT:
-- Domain: ${domain}
-- Framework: ${framework}
-- Target Output Type: ${outputType}`;
+  const language =
+    detectLanguage(input)
 
-    const userInstruction = `User's raw input: "${input}"\n\nAnalyze this input and generate the professional Master Prompt using the mandatory structure.`;
+  const domain =
+    detectDomain(input)
 
-    // 3. FIRST AI CALL
-    const firstResponse = await openai.chat.completions.create({
-      model: model,
-      messages: [
-        { role: 'system', content: systemInstruction },
-        { role: 'user', content: userInstruction }
-      ],
-      temperature: 0.3, // Düşük sıcaklık: Halüsinasyonu önler ve formata sadık kalır
-    });
+  const framework =
+    detectFramework(input)
 
-    let generatedPrompt = firstResponse.choices[0].message.content;
+  const output =
+    detectOutputType(input)
 
-    // 4. REFINE SYSTEM (PRO / ULTRA MODES)
-    // Refine aşamasında formatın bozulmasını engelleyen koruyucu yapı
-    if (mode === 'PRO' || mode === 'ULTRA') {
-      const isUltra = mode === 'ULTRA';
-      
-      const refineSystemInstruction = `You are a strict Prompt Optimizer. Your job is to enhance an existing prompt.
-      
-CRITICAL RULES:
-1. DO NOT execute the prompt. DO NOT generate the content it asks for.
-2. YOU MUST strictly keep the text in this language: ${language}.
-3. YOU MUST strictly preserve these exact headers without adding markdown symbols like # unless they were already there: ROLE, CONTEXT, TASK, RULES, CONSTRAINTS, OUTPUT FORMAT.
-4. Enhance the instructions to be more precise, professional, and foolproof.
-${isUltra ? '5. ULTRA MODE ACTIVE: Inject advanced edge-case handling, negative constraints (what NOT to do), and structural rigidity into the RULES and CONSTRAINTS sections. Ensure the target AI has zero room for error.' : ''}`;
+  const score =
+    calculatePromptScore(input)
 
-      const refineResponse = await openai.chat.completions.create({
-        model: isUltra ? 'gpt-4o' : model, // ULTRA modda her zaman en güçlü modeli zorla
-        messages: [
-          { role: 'system', content: refineSystemInstruction },
-          { role: 'user', content: `Enhance the following prompt while strictly maintaining its structure:\n\n${generatedPrompt}` }
-        ],
-        temperature: 0.2, // Refine aşamasında çok daha düşük sıcaklık, yapıyı kilitler
-      });
 
-      generatedPrompt = refineResponse.choices[0].message.content;
-    }
 
-    // 5. RESULT & DEBUG JSON
-    return NextResponse.json({
-      success: true,
-      debug: {
-        mode,
-        language,
-        domain,
-        framework,
-        outputType,
-        score
-      },
-      prompt: generatedPrompt,
-    });
-
-  } catch (error) {
-    console.error('Master Prompt Engine Error:', error);
-    return NextResponse.json({ error: 'Engine execution failed', details: error.message }, { status: 500 });
+  if (mode === "AUTO") {
+    mode = autoModeEngine({
+      input,
+      domain,
+      framework,
+      output,
+      score,
+    })
   }
+
+
+
+  const systemPrompt =
+    masterPromptBuilder(
+      mode,
+      domain,
+      framework,
+      output,
+      language
+    )
+
+
+
+  const first =
+    await client.chat.completions.create({
+
+      model,
+
+      messages: [
+        {
+          role: "system",
+          content: systemPrompt,
+        },
+        {
+          role: "user",
+          content: input,
+        },
+      ],
+
+    })
+
+
+
+  let result =
+    first.choices[0].message.content
+
+
+
+  if (mode === "PRO" || mode === "ULTRA") {
+
+    const refine =
+      await client.chat.completions.create({
+
+        model,
+
+        messages: [
+
+          {
+            role: "system",
+            content:
+              refinePromptInstruction(),
+          },
+
+          {
+            role: "user",
+            content: result,
+          },
+
+        ],
+
+      })
+
+    result =
+      refine.choices[0].message.content
+
+  }
+
+
+
+  return Response.json({
+    prompt: result,
+    mode,
+    score,
+    language,
+    domain,
+    framework,
+    output,
+    model,
+  })
+
 }
