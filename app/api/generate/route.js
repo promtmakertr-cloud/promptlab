@@ -48,7 +48,7 @@ CRITICAL RULES:
 - NEVER generate final content
 - NEVER answer the user
 - ONLY create prompt
-- This prompt will be used by another AI
+- The prompt will be used by another AI
 
 `
 
@@ -61,7 +61,7 @@ ${blocker}
 
 ${langRule}
 
-Create a MASTER PROMPT.
+Create MASTER PROMPT.
 
 Domain: ${domain}
 Framework: ${framework}
@@ -71,12 +71,10 @@ Use EXACT structure:
 
 ${STRUCTURE}
 
-Follow structure strictly.
-Add strong rules.
+Be strict.
+Be detailed.
 Add constraints.
-Make prompt professional.
-
-Return ONLY prompt.
+Return only prompt.
 
 `
   }
@@ -152,8 +150,7 @@ export async function POST(req) {
     )
 
 
-
-  // ✅ FIXED AUTO
+  // ✅ FIXED AUTO MODE
 
   if (!mode || mode === "AUTO") {
 
@@ -168,7 +165,6 @@ export async function POST(req) {
   }
 
 
-
   const systemPrompt =
     masterPromptBuilder(
       mode,
@@ -179,12 +175,10 @@ export async function POST(req) {
     )
 
 
-
   const first =
     await client.chat.completions.create({
 
       model,
-
       temperature: 0.3,
 
       messages: [
@@ -201,13 +195,11 @@ export async function POST(req) {
     })
 
 
-
   let result =
     first.choices[0].message.content
 
 
-
-  // ✅ FIXED REFINE
+  // ✅ REFINE FIX
 
   if (mode === "PRO" || mode === "ULTRA") {
 
@@ -215,7 +207,6 @@ export async function POST(req) {
       await client.chat.completions.create({
 
         model,
-
         temperature: 0.2,
 
         messages: [
@@ -242,7 +233,6 @@ export async function POST(req) {
       refine.choices[0].message.content
 
   }
-
 
 
   return Response.json({
