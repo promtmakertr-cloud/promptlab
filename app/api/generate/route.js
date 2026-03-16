@@ -14,34 +14,15 @@ const client = new OpenAI({
 
 
 
-function buildStructure(framework) {
-  if (framework === "agent") {
-    return `
-ROL
-AMAÇ
-ARAÇLAR
-ADIMLAR
-KURALLAR
-ÇIKTI FORMATI
-`
-  }
-
-  if (framework === "system") {
-    return `
-SYSTEM ROLÜ
-YETENEKLER
-SINIRLAR
-KURALLAR
-ÇIKTI
-`
-  }
-
+function buildStructure() {
   return `
-ROL
-BAĞLAM
-GÖREV
-KURALLAR
-ÇIKTI FORMATI
+ROLE
+CONTEXT
+TASK
+RULES
+CONSTRAINTS
+OUTPUT FORMAT
+VALIDATION
 `
 }
 
@@ -55,29 +36,33 @@ function masterPromptBuilder(
   language
 ) {
 
-  const structure =
-    buildStructure(framework)
+  const structure = buildStructure()
+
+  const langRule =
+    language === "TR"
+      ? "Write prompt in Turkish."
+      : "Write prompt in English."
 
 
 
   const blocker = `
 
-You are NOT final AI.
-You are PROMPT ENGINE.
+YOU ARE PROMPT ENGINE.
 
-Do NOT execute task.
-Do NOT generate content.
+You are NOT allowed to do the task.
 
-Only build prompt.
+Never write article
+Never write story
+Never write blog
+Never write outline
+Never write plan
+Never write content
+
+You must build PROMPT only.
+
+Output must be SYSTEM PROMPT.
 
 `
-
-
-
-  const langRule =
-    language === "TR"
-      ? "Write prompt in TURKISH."
-      : "Write prompt in ENGLISH."
 
 
 
@@ -94,17 +79,27 @@ Domain: ${domain}
 Framework: ${framework}
 Output: ${output}
 
-STRICT RULES
+STRICT:
 
 Use structure
-Add constraints
-Add rules
-Add validation
-Add limits
+Use rules
+Use constraints
+Use validation
+Use limits
+
+Result MUST look like:
+
+ROLE:
+CONTEXT:
+TASK:
+RULES:
+CONSTRAINTS:
+OUTPUT FORMAT:
+VALIDATION:
 
 ${structure}
 
-Return prompt only.
+Return only prompt.
 
 `
   }
@@ -117,7 +112,7 @@ ${blocker}
 
 ${langRule}
 
-Create prompt.
+Create prompt using structure.
 
 ${structure}
 
@@ -155,8 +150,6 @@ export async function POST(req) {
     calculatePromptScore(input)
 
 
-
-  // AUTO only
 
   if (mode === "AUTO") {
     mode = autoModeEngine({
