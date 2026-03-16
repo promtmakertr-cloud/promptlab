@@ -13,18 +13,17 @@ const client = new OpenAI({
 })
 
 
+const STRUCTURE = `
 
-function buildStructure() {
-  return `
-ROLE
-CONTEXT
-TASK
-RULES
-CONSTRAINTS
-OUTPUT FORMAT
-VALIDATION
+ROLE:
+CONTEXT:
+TASK:
+RULES:
+CONSTRAINTS:
+OUTPUT FORMAT:
+VALIDATION:
+
 `
-}
 
 
 
@@ -36,37 +35,37 @@ function masterPromptBuilder(
   language
 ) {
 
-  const structure = buildStructure()
-
   const langRule =
-    language === "TR"
-      ? "Write prompt in Turkish."
-      : "Write prompt in English."
-
+    language === "tr"
+      ? "Write in Turkish."
+      : "Write in English."
 
 
   const blocker = `
 
 YOU ARE PROMPT ENGINE.
 
-You are NOT allowed to do the task.
+You are NOT final AI.
 
-Never write article
-Never write story
-Never write blog
-Never write outline
-Never write plan
-Never write content
+Never execute task.
+Never write article.
+Never write blog.
+Never write outline.
+Never write story.
+Never write content.
 
-You must build PROMPT only.
+You must generate PROMPT only.
 
-Output must be SYSTEM PROMPT.
+The result MUST follow template.
+
+If format is wrong → output INVALID.
 
 `
 
 
 
   if (mode === "ULTRA") {
+
     return `
 
 ${blocker}
@@ -79,27 +78,23 @@ Domain: ${domain}
 Framework: ${framework}
 Output: ${output}
 
-STRICT:
+STRICT TEMPLATE:
 
-Use structure
-Use rules
-Use constraints
-Use validation
-Use limits
+${STRUCTURE}
 
-Result MUST look like:
+Rules:
 
-ROLE:
-CONTEXT:
-TASK:
-RULES:
-CONSTRAINTS:
-OUTPUT FORMAT:
-VALIDATION:
+- Must start with ROLE:
+- Must include TASK:
+- Must include RULES:
+- Must include OUTPUT FORMAT:
+- Must include VALIDATION:
+- No extra text
+- No explanation
+- No article
+- No plan
 
-${structure}
-
-Return only prompt.
+Return ONLY prompt.
 
 `
   }
@@ -112,9 +107,11 @@ ${blocker}
 
 ${langRule}
 
-Create prompt using structure.
+Use template:
 
-${structure}
+${STRUCTURE}
+
+Return prompt only.
 
 `
 }
