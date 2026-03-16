@@ -21,7 +21,6 @@ TASK:
 RULES:
 CONSTRAINTS:
 OUTPUT FORMAT:
-VALIDATION:
 
 `
 
@@ -43,22 +42,15 @@ function masterPromptBuilder(
 
   const blocker = `
 
-YOU ARE PROMPT ENGINE.
+You are a PROMPT ENGINE.
 
-You are NOT final AI.
+Do not execute the task.
+Do not generate article.
+Do not generate blog.
+Do not generate story.
+Do not generate final content.
 
-Never execute task.
-Never write article.
-Never write blog.
-Never write outline.
-Never write story.
-Never write content.
-
-You must generate PROMPT only.
-
-The result MUST follow template.
-
-If format is wrong → output INVALID.
+You must create PROMPT only.
 
 `
 
@@ -72,29 +64,19 @@ ${blocker}
 
 ${langRule}
 
-Create MASTER PROMPT.
+Create a MASTER PROMPT.
 
 Domain: ${domain}
 Framework: ${framework}
 Output: ${output}
 
-STRICT TEMPLATE:
+Use this structure:
 
 ${STRUCTURE}
 
-Rules:
+Follow the structure as much as possible.
 
-- Must start with ROLE:
-- Must include TASK:
-- Must include RULES:
-- Must include OUTPUT FORMAT:
-- Must include VALIDATION:
-- No extra text
-- No explanation
-- No article
-- No plan
-
-Return ONLY prompt.
+Return only prompt.
 
 `
   }
@@ -107,11 +89,9 @@ ${blocker}
 
 ${langRule}
 
-Use template:
+Create prompt using structure.
 
 ${STRUCTURE}
-
-Return prompt only.
 
 `
 }
