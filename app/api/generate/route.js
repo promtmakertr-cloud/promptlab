@@ -1,3 +1,6 @@
+export const dynamic = "force-dynamic"
+export const revalidate = 0
+
 import OpenAI from "openai"
 
 import { autoModeEngine } from "@/lib/engine/autoMode"
@@ -74,6 +77,7 @@ ${STRUCTURE}
 Be strict.
 Be detailed.
 Add constraints.
+
 Return only prompt.
 
 `
@@ -139,7 +143,7 @@ export async function POST(req) {
     detectOutputType(input)
 
 
-  // ✅ FIXED SCORE
+  // ✅ SCORE FIX
 
   const score =
     calculatePromptScore(
@@ -150,7 +154,7 @@ export async function POST(req) {
     )
 
 
-  // ✅ FIXED AUTO MODE
+  // ✅ AUTO MODE FIX
 
   if (!mode || mode === "AUTO") {
 
