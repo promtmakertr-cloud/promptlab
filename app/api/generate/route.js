@@ -102,13 +102,31 @@ Return only prompt.
   }
 
 
+  if (mode === "BALANCED") {
+
+    return `
+
+${blocker}
+
+${langRule}
+
+Create balanced prompt.
+
+${STRUCTURE}
+
+Return only prompt.
+
+`
+  }
+
+
   return `
 
 ${blocker}
 
 ${langRule}
 
-Create prompt.
+Create simple prompt.
 
 ${STRUCTURE}
 
@@ -123,7 +141,10 @@ export async function POST(req) {
 
   const input = body.input || ""
 
-  let mode = body.mode || "AUTO"
+  const requestedMode =
+    body.mode || "AUTO"
+
+  let mode = requestedMode
 
   const model =
     body.model || "gpt-4o"
@@ -143,7 +164,6 @@ export async function POST(req) {
     detectOutputType(input)
 
 
-  // ✅ V2 SCORE
 
   const score =
     calculatePromptScoreV2(
@@ -154,19 +174,18 @@ export async function POST(req) {
     )
 
 
-  // ✅ AUTO MODE
 
-  if (!mode || mode === "AUTO") {
+  // ✅ TRUE ENGINE MODE DECISION
 
-    mode = autoModeEngine({
-      input,
-      domain,
-      framework,
-      output,
-      score,
-    })
+  mode = autoModeEngine({
+    input,
+    domain,
+    framework,
+    output,
+    score,
+    requestedMode,
+  })
 
-  }
 
 
   const systemPrompt =
@@ -177,6 +196,7 @@ export async function POST(req) {
       output,
       language
     )
+
 
 
   const first =
@@ -201,6 +221,7 @@ export async function POST(req) {
 
   let result =
     first.choices[0].message.content
+
 
 
   if (mode === "PRO" || mode === "ULTRA") {
@@ -237,9 +258,11 @@ export async function POST(req) {
   }
 
 
+
   return Response.json({
     prompt: result,
     mode,
+    requestedMode,
     score,
     language,
     domain,
